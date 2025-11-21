@@ -8,10 +8,13 @@
     <div class="max-w-6xl mx-auto py-8 px-6">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-800">Conductores</h2>
-            <a href="{{ route('conductores.create') }}"
-               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
-               + Nuevo Conductor
-            </a>
+            <div class="flex space-x-2">
+                <a href="{{ route('conductores.create') }}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
+                   + Nuevo Conductor
+                </a>
+
+            </div>
         </div>
 
         @if (session('success'))
@@ -55,6 +58,12 @@
                                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
                                         Editar
                                     </a>
+<a href="{{ route('conductores.carnet', $c) }}"
+   class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm shadow-sm">
+   Generar Carnet
+</a>
+
+									
                                     <form method="POST" action="{{ route('conductores.destroy', $c) }}" onsubmit="return confirm('¿Eliminar este conductor?')">
                                         @csrf @method('DELETE')
                                         <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">

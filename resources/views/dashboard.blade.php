@@ -10,6 +10,15 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     {{ __("You're logged in!") }}
+
+                    <div class="mt-6">
+                        <a 
+                            href="{{ route('conductores.index') }}" 
+                            class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md shadow"
+                        >
+                            Conductores
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

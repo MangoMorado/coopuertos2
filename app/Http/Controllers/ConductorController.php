@@ -34,6 +34,14 @@ class ConductorController extends Controller
 
         return redirect()->route('conductores.index')->with('success', 'Conductor creado correctamente.');
     }
+public function generarCarnet(Conductor $conductor)
+{
+    // Ejemplo simple: devolver PDF o vista del carnet
+    // Aquí puedes usar un paquete como barryvdh/laravel-dompdf para generar PDF
+    return view('conductores.carnet', compact('conductor'));
+}
+
+
 
     public function show($uuid)
     {
