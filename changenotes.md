@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.1.2*
+- Force scheme HTTPS en AppServiceProvider.
+
 ## *v. 0.0.1.1*
 - Trust proxies y URLs para servir login en HTTPS.
 
