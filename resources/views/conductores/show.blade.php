@@ -9,8 +9,19 @@
         <div class="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
             
             <!-- Cabecera con gradiente y foto -->
+            @php
+                $fotoUrl = null;
+                if ($conductor->foto) {
+                    if (\Illuminate\Support\Str::startsWith($conductor->foto, 'uploads/')) {
+                        $fotoUrl = asset($conductor->foto);
+                    } else {
+                        $fotoUrl = asset('storage/' . $conductor->foto);
+                    }
+                }
+                $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conductor->nombre) . '&background=1e3a8a&color=fff';
+            @endphp
             <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-6 text-white text-center">
-                <img src="{{ $conductor->foto ? asset('storage/' . $conductor->foto) : 'https://ui-avatars.com/api/?name=' . urlencode($conductor->nombre) . '&background=1e3a8a&color=fff' }}"
+                <img src="{{ $fotoUrl ?? $fallbackAvatar }}"
                      alt="Foto del conductor"
                      class="w-28 h-28 mx-auto rounded-full border-4 border-white shadow-md mb-3">
                 <h1 class="text-2xl font-semibold">{{ $conductor->nombre }}</h1>

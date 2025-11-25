@@ -18,7 +18,7 @@
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
             <div>
                 <a href="/">
-                    <img src="{{ asset('images/logo.webp') }}" alt="Logo" class="w-100 h-50 mx-auto">
+                    <img src="{{ asset('images/logo.svg') }}" class="mx-auto h-24 w-auto sm:h-28" alt="Logo">
                 </a>
             </div>
 
