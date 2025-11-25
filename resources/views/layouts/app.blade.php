@@ -14,29 +14,48 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
+
 <body class="font-sans antialiased bg-gray-50 text-gray-900">
-    <div class="min-h-screen flex flex-col">
+
+    <!-- Contenedor principal -->
+    <div class="min-h-screen flex">
+
+        <!-- =========================
+              SIDEBAR (Navigation)
+        ========================== -->
         @include('layouts.navigation')
 
-        @isset($header)
-            <header class="bg-white shadow">
-                <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                    {{ $header }}
+        <!-- =========================
+              CONTENIDO PRINCIPAL
+        ========================== -->
+        <div class="flex-1 flex flex-col">
+
+            <!-- HEADER (opcional según vista) -->
+            @isset($header)
+                <header class="bg-white shadow">
+                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {{ $header }}
+                    </div>
+                </header>
+            @endisset
+
+            <!-- CONTENIDO -->
+            <main class="flex-1 py-6 px-4 sm:px-6 lg:px-8">
+                <div class="max-w-7xl mx-auto">
+                    {{ $slot }}
                 </div>
-            </header>
-        @endisset
+            </main>
 
-        <main class="flex-1 py-6 px-4 sm:px-6 lg:px-8">
-            <div class="max-w-7xl mx-auto">
-                {{ $slot }}
-            </div>
-        </main>
+            <!-- FOOTER -->
+            <footer class="bg-white border-t mt-auto">
+                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+                    © {{ date('Y') }} {{ config('app.name', 'Coopuertos') }}.
+                </div>
+            </footer>
 
-        <footer class="bg-white border-t mt-auto">
-            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
-                © {{ date('Y') }} {{ config('app.name', 'Laravel') }}. Todos los derechos reservados.
-            </div>
-        </footer>
+        </div>
+
     </div>
+
 </body>
 </html>

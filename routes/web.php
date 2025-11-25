@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ConductorController;
 
+use App\Http\Controllers\DashboardController;
 // Ruta pública principal
 Route::get('/', function () {
     return view('welcome');
@@ -25,6 +26,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 	Route::get('/conductores/{conductor}/carnet', [ConductorController::class, 'generarCarnet'])
     ->name('conductores.carnet');
+
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
+
 
     // CRUD completo de conductores (excepto show)
     Route::resource('conductores', ConductorController::class)->except('show');
