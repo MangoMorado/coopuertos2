@@ -20,47 +20,127 @@
             <form method="POST" action="{{ route('conductores.store') }}" enctype="multipart/form-data" class="space-y-5">
                 @csrf
 
-                <div>
-                    <label class="block font-semibold text-gray-700 mb-1">Nombre</label>
-                    <input type="text" name="nombre" value="{{ old('nombre') }}" required
-                           class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                </div>
-
+                <!-- Nombres y Apellidos -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Empresa</label>
-                        <input type="text" name="empresa" value="{{ old('empresa') }}"
+                        <label class="block font-semibold text-gray-700 mb-1">Nombres</label>
+                        <input type="text" name="nombres" value="{{ old('nombres') }}" required
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Licencia</label>
-                        <input type="text" name="licencia" value="{{ old('licencia') }}"
+                        <label class="block font-semibold text-gray-700 mb-1">Apellidos</label>
+                        <input type="text" name="apellidos" value="{{ old('apellidos') }}" required
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 
+                <!-- Cédula y Tipo de Conductor -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Fecha de vencimiento</label>
-                        <input type="date" name="vencimiento_licencia" value="{{ old('vencimiento_licencia') }}"
+                        <label class="block font-semibold text-gray-700 mb-1">Cédula</label>
+                        <input type="text" name="cedula" value="{{ old('cedula') }}" required
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Foto del conductor</label>
+                        <label class="block font-semibold text-gray-700 mb-1">Tipo de Conductor</label>
+                        <select name="conductor_tipo" required
+                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Seleccione</option>
+                            <option value="A" {{ old('conductor_tipo') == 'A' ? 'selected' : '' }}>Tipo A (Camionetas)</option>
+                            <option value="B" {{ old('conductor_tipo') == 'B' ? 'selected' : '' }}>Tipo B (Busetas)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- RH y Vehículo Placa -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">RH</label>
+                        <select name="rh" required
+                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Seleccione</option>
+                            @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $grupo)
+                                <option value="{{ $grupo }}" {{ old('rh') == $grupo ? 'selected' : '' }}>{{ $grupo }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Vehículo Placa</label>
+                        <input type="text" name="vehiculo_placa" value="{{ old('vehiculo_placa') }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Número Interno y Celular -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Número Interno</label>
+                        <input type="text" name="numero_interno" value="{{ old('numero_interno') }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Celular</label>
+                        <input type="text" name="celular" value="{{ old('celular') }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Correo y Fecha de Nacimiento -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Correo</label>
+                        <input type="email" name="correo" value="{{ old('correo') }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Fecha de Nacimiento</label>
+                        <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Otra Profesión y Nivel de Estudios -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">¿Sabe otra profesión?</label>
+                        <input type="text" name="otra_profesion" value="{{ old('otra_profesion') }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Nivel de Estudios</label>
+                        <input type="text" name="nivel_estudios" value="{{ old('nivel_estudios') }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Licencia, Vencimiento y Foto -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Foto del Conductor</label>
                         <input type="file" name="foto" accept="image/*"
                                class="w-full border-gray-300 rounded-lg shadow-sm">
                     </div>
                 </div>
 
-<div class="flex justify-end space-x-3 pt-4">
-    <a href="{{ route('conductores.index') }}"
-       class="btn btn-gray">
-       Cancelar
-    </a>
-    <button type="submit" class="btn btn-blue">
-        Guardar
-    </button>
-</div>
+                <!-- Estado -->
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Estado</label>
+                    <select name="estado" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="activo" {{ old('estado') == 'activo' ? 'selected' : '' }}>Activo</option>
+                        <option value="inactivo" {{ old('estado') == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4">
+                    <a href="{{ route('conductores.index') }}" class="btn btn-gray">
+                        Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-blue">
+                        Guardar
+                    </button>
+                </div>
             </form>
         </div>
     </div>

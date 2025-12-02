@@ -17,55 +17,129 @@
         @endif
 
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <form method="POST" action="{{ route('conductores.update', $conductor) }}" enctype="multipart/form-data" class="space-y-5">
+            <form method="POST" action="{{ route('conductores.update', $conductor->id) }}" enctype="multipart/form-data" class="space-y-5">
                 @csrf
-                @method('put')
+                @method('PUT')
 
-                <div>
-                    <label class="block font-semibold text-gray-700 mb-1">Nombre</label>
-                    <input type="text" name="nombre" value="{{ old('nombre', $conductor->nombre) }}" required
-                           class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                </div>
-
+                <!-- Nombres y Apellidos -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Empresa</label>
-                        <input type="text" name="empresa" value="{{ old('empresa', $conductor->empresa) }}"
+                        <label class="block font-semibold text-gray-700 mb-1">Nombres</label>
+                        <input type="text" name="nombres" value="{{ old('nombres', $conductor->nombres) }}" required
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Licencia</label>
-                        <input type="text" name="licencia" value="{{ old('licencia', $conductor->licencia) }}"
+                        <label class="block font-semibold text-gray-700 mb-1">Apellidos</label>
+                        <input type="text" name="apellidos" value="{{ old('apellidos', $conductor->apellidos) }}" required
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 
+                <!-- Cédula y Tipo de Conductor -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Fecha de vencimiento</label>
-                        <input type="date" name="vencimiento_licencia" value="{{ old('vencimiento_licencia', $conductor->vencimiento_licencia) }}"
+                        <label class="block font-semibold text-gray-700 mb-1">Cédula</label>
+                        <input type="text" name="cedula" value="{{ old('cedula', $conductor->cedula) }}" required
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                     <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Foto del conductor</label>
+                        <label class="block font-semibold text-gray-700 mb-1">Tipo de Conductor</label>
+                        <select name="conductor_tipo" required
+                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Seleccione</option>
+                            <option value="A" {{ old('conductor_tipo', $conductor->conductor_tipo) == 'A' ? 'selected' : '' }}>Tipo A (Camionetas)</option>
+                            <option value="B" {{ old('conductor_tipo', $conductor->conductor_tipo) == 'B' ? 'selected' : '' }}>Tipo B (Busetas)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- RH y Vehículo Placa -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">RH</label>
+                        <select name="rh" required
+                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Seleccione</option>
+                            @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $grupo)
+                                <option value="{{ $grupo }}" {{ old('rh', $conductor->rh) == $grupo ? 'selected' : '' }}>{{ $grupo }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Vehículo Placa</label>
+                        <input type="text" name="vehiculo_placa" value="{{ old('vehiculo_placa', $conductor->vehiculo_placa) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Número Interno y Celular -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Número Interno</label>
+                        <input type="text" name="numero_interno" value="{{ old('numero_interno', $conductor->numero_interno) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Celular</label>
+                        <input type="text" name="celular" value="{{ old('celular', $conductor->celular) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Correo y Fecha de Nacimiento -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Correo</label>
+                        <input type="email" name="correo" value="{{ old('correo', $conductor->correo) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Fecha de Nacimiento</label>
+                        <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $conductor->fecha_nacimiento) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Otra Profesión y Nivel de Estudios -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">¿Sabe otra profesión?</label>
+                        <input type="text" name="otra_profesion" value="{{ old('otra_profesion', $conductor->otra_profesion) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Nivel de Estudios</label>
+                        <input type="text" name="nivel_estudios" value="{{ old('nivel_estudios', $conductor->nivel_estudios) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+
+                <!-- Foto -->
+                <div class="grid grid-cols-1 md:grid-cols-1 gap-4">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Foto del Conductor</label>
+                        @if($conductor->foto)
+                            <div class="mb-2">
+                                <img src="{{ asset('storage/' . $conductor->foto) }}" alt="Foto Conductor" class="w-32 h-32 object-cover rounded">
+                            </div>
+                        @endif
                         <input type="file" name="foto" accept="image/*"
                                class="w-full border-gray-300 rounded-lg shadow-sm">
-                        @if ($conductor->foto)
-                            <p class="text-sm text-gray-500 mt-1">Imagen actual:</p>
-                            @php
-                                $fotoActual = \Illuminate\Support\Str::startsWith($conductor->foto, 'uploads/')
-                                    ? asset($conductor->foto)
-                                    : asset('storage/' . $conductor->foto);
-                            @endphp
-                            <img src="{{ $fotoActual }}" alt="Foto actual" class="mt-2 h-24 w-24 object-cover rounded-md border">
-                        @endif
                     </div>
+                </div>
+
+                <!-- Estado -->
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Estado</label>
+                    <select name="estado" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="activo" {{ old('estado', $conductor->estado) == 'activo' ? 'selected' : '' }}>Activo</option>
+                        <option value="inactivo" {{ old('estado', $conductor->estado) == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
+                    </select>
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <a href="{{ route('conductores.index') }}"
-                       class="btn btn-gray">
-                       Cancelar
+                    <a href="{{ route('conductores.index') }}" class="btn btn-gray">
+                        Cancelar
                     </a>
                     <button type="submit" class="btn btn-blue">
                         Actualizar
@@ -75,4 +149,3 @@
         </div>
     </div>
 </x-app-layout>
-

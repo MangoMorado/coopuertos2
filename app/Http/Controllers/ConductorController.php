@@ -19,24 +19,41 @@ class ConductorController extends Controller
         return view('conductores.create');
     }
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'empresa' => 'nullable|string|max:255',
-            'licencia' => 'nullable|string|max:255',
-            'vencimiento_licencia' => 'nullable|date',
-            'foto' => 'nullable|image|max:2048',
-        ]);
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'nombres' => 'required|string|max:255',
+        'apellidos' => 'required|string|max:255',
+        'cedula' => 'required|string|unique:conductors,cedula',
+        'conductor_tipo' => 'required|in:A,B',
+        'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+        'vehiculo_placa' => 'nullable|string|max:20',
+        'numero_interno' => 'nullable|string|max:50',
+        'celular' => 'nullable|string|max:20',
+        'correo' => 'nullable|email',
+        'fecha_nacimiento' => 'nullable|date',
+        'otra_profesion' => 'nullable|string|max:255',
+        'nivel_estudios' => 'nullable|string|max:255',
+        'foto' => 'nullable|image|max:2048',
+        'estado' => 'required|in:activo,inactivo',
+    ]);
 
-        if ($request->hasFile('foto')) {
-            $validated['foto'] = $this->storePhoto($request->file('foto'));
-        }
-
-        Conductor::create($validated);
-
-        return redirect()->route('conductores.index')->with('success', 'Conductor creado correctamente.');
+    // Si correo está vacío, poner "No tiene"
+    if (empty($validated['correo'])) {
+        $validated['correo'] = 'No tiene';
     }
+
+    // Manejo de la foto si se sube
+    if ($request->hasFile('foto')) {
+        $validated['foto'] = $this->storePhoto($request->file('foto'));
+    }
+
+    Conductor::create($validated);
+
+    return redirect()->route('conductores.index')
+                     ->with('success', 'Conductor creado correctamente.');
+}
+
 public function generarCarnet(Conductor $conductor)
 {
     // Ejemplo simple: devolver PDF o vista del carnet
