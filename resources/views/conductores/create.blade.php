@@ -87,11 +87,26 @@
 
                 <!-- Correo y Fecha de Nacimiento -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Correo</label>
-                        <input type="email" name="correo" value="{{ old('correo') }}"
-                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    </div>
+<div class="relative flex flex-col">
+    <label class="block font-semibold text-gray-700 mb-1 flex items-center">
+        Correo
+        <div class="ml-2 relative group">
+            <div
+                class="w-5 h-5 bg-blue-500 text-white text-xs font-bold rounded-full flex items-center justify-center cursor-pointer">
+                i
+            </div>
+            <div
+                class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-44 bg-gray-800 text-white text-xs rounded py-1 px-2 text-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg pointer-events-none">
+                Sino tiene correo, dejar en blanco
+            </div>
+        </div>
+    </label>
+    <input type="email" name="correo" value="{{ old('correo') }}"
+           class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+</div>
+
+
+
                     <div>
                         <label class="block font-semibold text-gray-700 mb-1">Fecha de Nacimiento</label>
                         <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento') }}"
