@@ -8,11 +8,19 @@ use Illuminate\Support\Str;
 
 class ConductorController extends Controller
 {
-    public function index()
-    {
-        $conductores = Conductor::latest()->paginate(10);
-        return view('conductores.index', compact('conductores'));
+public function index(Request $request)
+{
+    $query = Conductor::query();
+
+    if ($request->filled('cedula')) {
+        $query->where('cedula', 'like', '%' . $request->cedula . '%');
     }
+
+    $conductores = $query->latest()->paginate(10)->withQueryString();
+
+    return view('conductores.index', compact('conductores'));
+}
+
 
     public function create()
     {

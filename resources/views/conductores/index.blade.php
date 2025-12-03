@@ -21,7 +21,23 @@
                 {{ session('success') }}
             </div>
         @endif
-
+<div class="mb-4">
+    <form action="{{ route('conductores.index') }}" method="GET" class="flex space-x-2">
+        <input type="text" name="cedula" placeholder="Buscar por cédula" 
+               value="{{ request('cedula') }}"
+               class="border rounded px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <button type="submit" 
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
+            Buscar
+        </button>
+        @if(request('cedula'))
+            <a href="{{ route('conductores.index') }}"
+               class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg shadow-md transition">
+               Limpiar
+            </a>
+        @endif
+    </form>
+</div>
         <div class="bg-white shadow-md rounded-lg overflow-hidden">
             <table class="w-full border-collapse text-sm">
                 <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
