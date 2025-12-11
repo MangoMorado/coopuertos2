@@ -120,11 +120,45 @@
                         <label class="block font-semibold text-gray-700 mb-1">Foto del Conductor</label>
                         @if($conductor->foto)
                             <div class="mb-2">
-                                <img src="{{ asset('storage/' . $conductor->foto) }}" alt="Foto Conductor" class="w-32 h-32 object-cover rounded">
+                                @php
+                                    $fotoUrl = null;
+                                    if ($conductor->foto) {
+                                        if (\Illuminate\Support\Str::startsWith($conductor->foto, 'uploads/')) {
+                                            $fotoUrl = asset($conductor->foto);
+                                        } else {
+                                            $fotoUrl = asset('storage/' . $conductor->foto);
+                                        }
+                                    }
+                                @endphp
+                                <img src="{{ $fotoUrl }}" alt="Foto Conductor" class="w-32 h-32 object-cover rounded">
                             </div>
                         @endif
-                        <input type="file" name="foto" accept="image/*"
+                        <input type="file" id="foto-input" name="foto" accept="image/*"
                                class="w-full border-gray-300 rounded-lg shadow-sm">
+                        
+                        <!-- Preview de imagen recortada -->
+                        <div id="preview-container" class="hidden mt-3">
+                            <p class="text-sm text-gray-600 mb-2">Vista previa de nueva imagen:</p>
+                            <img id="preview-image" src="" alt="Preview" class="w-32 h-32 object-cover rounded border border-gray-300">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de recorte -->
+                <div id="cropper-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+                        <h3 class="text-lg font-semibold mb-4">Recortar Imagen (1:1)</h3>
+                        <div id="cropper-container" class="mb-4">
+                            <img id="cropper-image" src="" alt="Imagen a recortar" style="max-width: 100%; max-height: 500px;">
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" id="cancel-crop" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400">
+                                Cancelar
+                            </button>
+                            <button type="button" id="crop-btn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                                Recortar
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -148,4 +182,8 @@
             </form>
         </div>
     </div>
+
+    @push('scripts')
+    <script src="{{ asset('js/image-cropper.js') }}"></script>
+    @endpush
 </x-app-layout>

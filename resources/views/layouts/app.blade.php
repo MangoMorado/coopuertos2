@@ -11,15 +11,20 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
+    <!-- Cropper.js JS -->
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 </head>
 
-<body class="font-sans antialiased bg-gray-50 text-gray-900">
+<body class="font-sans antialiased bg-gray-100 text-gray-900">
 
     <!-- Contenedor principal -->
-    <div class="min-h-screen flex">
-
+    <div class="min-h-screen">
         <!-- =========================
               SIDEBAR (Navigation)
         ========================== -->
@@ -28,7 +33,7 @@
         <!-- =========================
               CONTENIDO PRINCIPAL
         ========================== -->
-        <div class="flex-1 flex flex-col">
+        <div class="flex-1 flex flex-col ml-64 min-h-screen">
 
             <!-- HEADER (opcional según vista) -->
             @isset($header)
@@ -57,5 +62,6 @@
 
     </div>
 
+    @stack('scripts')
 </body>
 </html>

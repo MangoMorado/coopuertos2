@@ -1,5 +1,11 @@
 # Coopuertos App
 
+## *v. 0.0.1.3*
+- Nuevo Sidebar
+- Nuevos temas claro/oscuro
+- Nuevo sistema de recorte de imágenes 1:1
+- Corregido, ahora las placas en mayúsculas automáticas.
+
 ## *v. 0.0.1.2*
 - Force scheme HTTPS en AppServiceProvider.
 

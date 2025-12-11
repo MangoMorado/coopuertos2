@@ -47,6 +47,19 @@
             @endif
         </div>
 
+        <div>
+            <x-input-label for="theme" :value="__('Tema')" />
+            <select id="theme" name="theme" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="light" {{ old('theme', $user->theme ?? 'light') === 'light' ? 'selected' : '' }}>
+                    {{ __('Claro') }}
+                </option>
+                <option value="dark" {{ old('theme', $user->theme ?? 'light') === 'dark' ? 'selected' : '' }}>
+                    {{ __('Oscuro') }}
+                </option>
+            </select>
+            <x-input-error class="mt-2" :messages="$errors->get('theme')" />
+        </div>
+
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Guardar') }}</x-primary-button>
 

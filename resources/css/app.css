@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Scrollbar personalizado para sidebar */
+@layer utilities {
+    .sidebar-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .sidebar-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    
+    .sidebar-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(156, 163, 175, 0.5);
+        border-radius: 3px;
+    }
+    
+    .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: rgba(156, 163, 175, 0.7);
+    }
+}

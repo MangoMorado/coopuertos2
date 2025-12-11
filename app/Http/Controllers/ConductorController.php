@@ -51,6 +51,11 @@ public function store(Request $request)
         $validated['correo'] = 'No tiene';
     }
 
+    // Convertir placa a mayúsculas si existe
+    if (!empty($validated['vehiculo_placa'])) {
+        $validated['vehiculo_placa'] = strtoupper($validated['vehiculo_placa']);
+    }
+
     // Manejo de la foto si se sube
     if ($request->hasFile('foto')) {
         $validated['foto'] = $this->storePhoto($request->file('foto'));
@@ -107,6 +112,11 @@ public function update(Request $request, Conductor $conductore)
     // Si correo está vacío, poner "No tiene"
     if (empty($validated['correo'])) {
         $validated['correo'] = 'No tiene';
+    }
+
+    // Convertir placa a mayúsculas si existe
+    if (!empty($validated['vehiculo_placa'])) {
+        $validated['vehiculo_placa'] = strtoupper($validated['vehiculo_placa']);
     }
 
     // Manejo de la foto si se sube
