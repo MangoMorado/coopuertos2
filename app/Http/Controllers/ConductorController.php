@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Conductor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
@@ -188,5 +189,33 @@ public function update(Request $request, Conductor $conductore)
         if (File::exists($fullPath)) {
             File::delete($fullPath);
         }
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->get('q', '');
+        
+        if (strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $conductores = Conductor::where('nombres', 'like', "%{$query}%")
+            ->orWhere('apellidos', 'like', "%{$query}%")
+            ->orWhere('cedula', 'like', "%{$query}%")
+            ->orWhere('celular', 'like', "%{$query}%")
+            ->orWhere('correo', 'like', "%{$query}%")
+            ->limit(10)
+            ->get();
+
+        return response()->json($conductores->map(function ($conductor) {
+            return [
+                'id' => $conductor->id,
+                'nombres' => $conductor->nombres,
+                'apellidos' => $conductor->apellidos,
+                'cedula' => $conductor->cedula,
+                'celular' => $conductor->celular,
+                'label' => "{$conductor->nombres} {$conductor->apellidos} ({$conductor->cedula})",
+            ];
+        }));
     }
 }

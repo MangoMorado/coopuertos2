@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ConductorController;
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\PropietarioController;
 // Ruta pública principal
 Route::get('/', function () {
     return view('welcome');
@@ -35,6 +37,14 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
     // CRUD completo de conductores (excepto show)
     Route::resource('conductores', ConductorController::class)->except('show');
+
+    // Vehículos
+    Route::resource('vehiculos', VehicleController::class);
+
+    // Propietarios
+    Route::resource('propietarios', PropietarioController::class);
+    Route::get('/api/propietarios/search', [PropietarioController::class, 'search'])->name('api.propietarios.search');
+    Route::get('/api/conductores/search', [ConductorController::class, 'search'])->name('api.conductores.search');
 });
 
 // Ruta pública para mostrar un conductor específico por UUID
