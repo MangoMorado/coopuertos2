@@ -12,11 +12,29 @@ public function index(Request $request)
 {
     $query = Conductor::query();
 
-    if ($request->filled('cedula')) {
-        $query->where('cedula', 'like', '%' . $request->cedula . '%');
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->where('cedula', 'like', '%' . $search . '%')
+              ->orWhere('nombres', 'like', '%' . $search . '%')
+              ->orWhere('apellidos', 'like', '%' . $search . '%')
+              ->orWhere('vehiculo_placa', 'like', '%' . $search . '%')
+              ->orWhere('numero_interno', 'like', '%' . $search . '%')
+              ->orWhere('celular', 'like', '%' . $search . '%')
+              ->orWhere('correo', 'like', '%' . $search . '%');
+        });
     }
 
     $conductores = $query->latest()->paginate(10)->withQueryString();
+
+    if ($request->ajax() || $request->has('ajax')) {
+        $theme = Auth::user()->theme ?? 'light';
+        $isDark = $theme === 'dark';
+        return response()->json([
+            'html' => view('conductores.partials.table', compact('conductores', 'theme', 'isDark'))->render(),
+            'pagination' => view('conductores.partials.pagination', compact('conductores'))->render()
+        ]);
+    }
 
     return view('conductores.index', compact('conductores'));
 }

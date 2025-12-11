@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.0.1.4*
+- Busqueda ampliada y en tiempo real de conductores
+- Tema oscuro implementado
+
 ## *v. 0.0.1.3*
 - Nuevo Sidebar
 - Nuevos temas claro/oscuro

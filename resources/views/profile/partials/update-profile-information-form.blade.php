@@ -1,10 +1,22 @@
+@php
+    $isDark = $isDark ?? false;
+    $textTitle = $isDark ? 'text-gray-100' : 'text-gray-900';
+    $textSubtitle = $isDark ? 'text-gray-400' : 'text-gray-600';
+    $textInput = $isDark ? 'text-gray-100' : 'text-gray-900';
+    $bgInput = $isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300';
+    $textLabel = $isDark ? 'text-gray-300' : 'text-gray-700';
+    $textMessage = $isDark ? 'text-gray-300' : 'text-gray-800';
+    $textLink = $isDark ? 'text-blue-400 hover:text-blue-300' : 'text-gray-600 hover:text-gray-900';
+    $textSuccess = $isDark ? 'text-gray-400' : 'text-gray-600';
+@endphp
+
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-medium {{ $textTitle }}">
             {{ __('Información del perfil') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm {{ $textSubtitle }}">
             {{ __('Actualiza la información de tu cuenta y tu correo electrónico.') }}
         </p>
     </header>
@@ -18,28 +30,28 @@
         @method('patch')
 
         <div>
-            <x-input-label for="name" :value="__('Nombre')" />
-            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name', $user->name)" required autofocus autocomplete="name" />
+            <label for="name" class="block font-medium text-sm {{ $textLabel }}">{{ __('Nombre') }}</label>
+            <input id="name" name="name" type="text" class="mt-1 block w-full {{ $bgInput }} {{ $textInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" value="{{ old('name', $user->name) }}" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div>
-            <x-input-label for="email" :value="__('Correo electrónico')" />
-            <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
+            <label for="email" class="block font-medium text-sm {{ $textLabel }}">{{ __('Correo electrónico') }}</label>
+            <input id="email" name="email" type="email" class="mt-1 block w-full {{ $bgInput }} {{ $textInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" value="{{ old('email', $user->email) }}" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
                 <div>
-                    <p class="text-sm mt-2 text-gray-800">
+                    <p class="text-sm mt-2 {{ $textMessage }}">
                         {{ __('Tu correo electrónico no está verificado.') }}
 
-                        <button form="send-verification" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        <button form="send-verification" class="underline text-sm {{ $textLink }} rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                             {{ __('Haz clic aquí para reenviar el correo de verificación.') }}
                         </button>
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
-                        <p class="mt-2 font-medium text-sm text-green-600">
+                        <p class="mt-2 font-medium text-sm {{ $isDark ? 'text-green-400' : 'text-green-600' }}">
                             {{ __('Se envió un nuevo enlace de verificación a tu correo electrónico.') }}
                         </p>
                     @endif
@@ -48,8 +60,8 @@
         </div>
 
         <div>
-            <x-input-label for="theme" :value="__('Tema')" />
-            <select id="theme" name="theme" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <label for="theme" class="block font-medium text-sm {{ $textLabel }}">{{ __('Tema') }}</label>
+            <select id="theme" name="theme" class="mt-1 block w-full {{ $bgInput }} {{ $textInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                 <option value="light" {{ old('theme', $user->theme ?? 'light') === 'light' ? 'selected' : '' }}>
                     {{ __('Claro') }}
                 </option>
@@ -69,7 +81,7 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
+                    class="text-sm {{ $textSuccess }}"
                 >{{ __('Guardado.') }}</p>
             @endif
         </div>

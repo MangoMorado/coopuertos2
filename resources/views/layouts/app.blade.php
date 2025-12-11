@@ -1,3 +1,16 @@
+@php
+    $theme = Auth::user()->theme ?? 'light';
+    $isDark = $theme === 'dark';
+    
+    // Colores según el tema
+    $bgBody = $isDark ? 'bg-gray-900' : 'bg-gray-100';
+    $textBody = $isDark ? 'text-gray-100' : 'text-gray-900';
+    $bgHeader = $isDark ? 'bg-gray-800' : 'bg-white';
+    $bgFooter = $isDark ? 'bg-gray-800' : 'bg-white';
+    $textFooter = $isDark ? 'text-gray-400' : 'text-gray-500';
+    $borderFooter = $isDark ? 'border-gray-700' : 'border-gray-200';
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -21,7 +34,7 @@
     <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 </head>
 
-<body class="font-sans antialiased bg-gray-100 text-gray-900">
+<body class="font-sans antialiased {{ $bgBody }} {{ $textBody }}">
 
     <!-- Contenedor principal -->
     <div class="min-h-screen">
@@ -37,7 +50,7 @@
 
             <!-- HEADER (opcional según vista) -->
             @isset($header)
-                <header class="bg-white shadow">
+                <header class="{{ $bgHeader }} shadow border-b {{ $isDark ? 'border-gray-700' : 'border-gray-200' }}">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -52,8 +65,8 @@
             </main>
 
             <!-- FOOTER -->
-            <footer class="bg-white border-t mt-auto">
-                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-gray-500 text-sm">
+            <footer class="{{ $bgFooter }} border-t {{ $borderFooter }} mt-auto">
+                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center {{ $textFooter }} text-sm">
                     © {{ date('Y') }} {{ config('app.name', 'Coopuertos') }}.
                 </div>
             </footer>

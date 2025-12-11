@@ -1,10 +1,20 @@
+@php
+    $isDark = $isDark ?? false;
+    $textTitle = $isDark ? 'text-gray-100' : 'text-gray-900';
+    $textSubtitle = $isDark ? 'text-gray-400' : 'text-gray-600';
+    $textInput = $isDark ? 'text-gray-100' : 'text-gray-900';
+    $bgInput = $isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300';
+    $textLabel = $isDark ? 'text-gray-300' : 'text-gray-700';
+    $textSuccess = $isDark ? 'text-gray-400' : 'text-gray-600';
+@endphp
+
 <section>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-medium {{ $textTitle }}">
             {{ __('Actualizar contraseña') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm {{ $textSubtitle }}">
             {{ __('Asegúrate de usar una contraseña larga y aleatoria para mantener tu cuenta segura.') }}
         </p>
     </header>
@@ -14,20 +24,20 @@
         @method('put')
 
         <div>
-            <x-input-label for="update_password_current_password" :value="__('Contraseña actual')" />
-            <x-text-input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full" autocomplete="current-password" />
+            <label for="update_password_current_password" class="block font-medium text-sm {{ $textLabel }}">{{ __('Contraseña actual') }}</label>
+            <input id="update_password_current_password" name="current_password" type="password" class="mt-1 block w-full {{ $bgInput }} {{ $textInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="current-password" />
             <x-input-error :messages="$errors->updatePassword->get('current_password')" class="mt-2" />
         </div>
 
         <div>
-            <x-input-label for="update_password_password" :value="__('Nueva contraseña')" />
-            <x-text-input id="update_password_password" name="password" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+            <label for="update_password_password" class="block font-medium text-sm {{ $textLabel }}">{{ __('Nueva contraseña') }}</label>
+            <input id="update_password_password" name="password" type="password" class="mt-1 block w-full {{ $bgInput }} {{ $textInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="new-password" />
             <x-input-error :messages="$errors->updatePassword->get('password')" class="mt-2" />
         </div>
 
         <div>
-            <x-input-label for="update_password_password_confirmation" :value="__('Confirmar contraseña')" />
-            <x-text-input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" autocomplete="new-password" />
+            <label for="update_password_password_confirmation" class="block font-medium text-sm {{ $textLabel }}">{{ __('Confirmar contraseña') }}</label>
+            <input id="update_password_password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full {{ $bgInput }} {{ $textInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500" autocomplete="new-password" />
             <x-input-error :messages="$errors->updatePassword->get('password_confirmation')" class="mt-2" />
         </div>
 
@@ -40,7 +50,7 @@
                     x-show="show"
                     x-transition
                     x-init="setTimeout(() => show = false, 2000)"
-                    class="text-sm text-gray-600"
+                    class="text-sm {{ $textSuccess }}"
                 >{{ __('Guardado.') }}</p>
             @endif
         </div>

@@ -1,13 +1,29 @@
+@php
+    $theme = Auth::user()->theme ?? 'light';
+    $isDark = $theme === 'dark';
+    
+    // Colores según el tema
+    $textTitle = $isDark ? 'text-gray-100' : 'text-gray-800';
+    $bgTable = $isDark ? 'bg-gray-800' : 'bg-white';
+    $bgInput = $isDark ? 'bg-gray-700' : 'bg-white';
+    $textInput = $isDark ? 'text-gray-100' : 'text-gray-900';
+    $borderInput = $isDark ? 'border-gray-600' : 'border-gray-300';
+    $bgClearBtn = $isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400';
+    $textClearBtn = $isDark ? 'text-gray-100' : 'text-gray-800';
+    $bgSuccess = $isDark ? 'bg-green-900 border-green-700' : 'bg-green-100 border-green-300';
+    $textSuccess = $isDark ? 'text-green-200' : 'text-green-800';
+@endphp
+
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
             Listado de Conductores
         </h2>
     </x-slot>
 
     <div class="max-w-6xl mx-auto py-8 px-6">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Conductores</h2>
+            <h2 class="text-2xl font-bold {{ $textTitle }}">Conductores</h2>
             <div class="flex space-x-2">
                 <a href="{{ route('conductores.create') }}"
                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
@@ -17,88 +33,77 @@
         </div>
 
         @if (session('success'))
-            <div class="mb-4 bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded">
+            <div class="mb-4 {{ $bgSuccess }} border {{ $textSuccess }} px-4 py-2 rounded">
                 {{ session('success') }}
             </div>
         @endif
 <div class="mb-4">
-    <form action="{{ route('conductores.index') }}" method="GET" class="flex space-x-2">
-        <input type="text" name="cedula" placeholder="Buscar por cédula" 
-               value="{{ request('cedula') }}"
-               class="border rounded px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button type="submit" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
-            Buscar
-        </button>
-        @if(request('cedula'))
+    <div class="flex space-x-2">
+        <input type="text" id="search-input" placeholder="Buscar por cédula, nombre, apellido, placa, celular, correo..." 
+               value="{{ request('search') }}"
+               class="{{ $bgInput }} {{ $textInput }} {{ $borderInput }} border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400">
+        @if(request('search'))
             <a href="{{ route('conductores.index') }}"
-               class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg shadow-md transition">
+               class="{{ $bgClearBtn }} {{ $textClearBtn }} px-4 py-2 rounded-lg shadow-md transition">
                Limpiar
             </a>
         @endif
-    </form>
+    </div>
 </div>
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <table class="w-full border-collapse text-sm">
-                <thead class="bg-gray-100 text-gray-700 uppercase text-sm">
-                    <tr>
-                        <th class="text-left px-4 py-3">Cédula</th>
-                        <th class="text-left px-4 py-3">Nombres</th>
-                        <th class="text-left px-4 py-3">Apellidos</th>
-                        <th class="text-left px-4 py-3">Estado</th>
-                        <th class="text-center px-4 py-3">QR</th>
-                        <th class="text-center px-4 py-3">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="text-sm">
-                    @forelse($conductores as $c)
-                        <tr class="border-t hover:bg-gray-50 transition">
-                            <td class="px-4 py-3 text-gray-700">{{ $c->cedula }}</td>
-                            <td class="px-4 py-3 text-gray-700">{{ $c->nombres }}</td>
-                            <td class="px-4 py-3 text-gray-700">{{ $c->apellidos }}</td>
-                            <td class="px-4 py-3">
-                                <span class="px-2 py-1 text-xs rounded-full 
-                                    {{ $c->estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ ucfirst($c->estado) }}
-                                </span>
-                            </td>
-                            <td class="text-center py-3">
-                                {!! QrCode::size(70)->generate(route('conductor.public', $c->uuid)) !!}
-                            </td>
-                            <td class="text-center py-3">
-                                <div class="flex justify-center space-x-2">
-                                    <a href="{{ route('conductor.public', $c->uuid) }}"
-                                       class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
-                                        Ver
-                                    </a>
-                                    <a href="{{ route('conductores.edit', $c) }}"
-                                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
-                                        Editar
-                                    </a>
-                                    <a href="{{ route('conductores.carnet', $c) }}"
-                                       class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm shadow-sm">
-                                       Generar Carnet
-                                    </a>
-                                    <form method="POST" action="{{ route('conductores.destroy', $c) }}" onsubmit="return confirm('¿Eliminar este conductor?')">
-                                        @csrf @method('DELETE')
-                                        <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
-                                            Eliminar
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="text-center py-6 text-gray-500">No hay conductores registrados.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+        <div id="table-container" class="{{ $bgTable }} shadow-md rounded-lg overflow-hidden">
+            @include('conductores.partials.table', ['conductores' => $conductores, 'theme' => $theme, 'isDark' => $isDark])
         </div>
 
-        <div class="mt-6">
+        <div id="pagination-container" class="mt-6">
             {{ $conductores->links() }}
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        let searchTimeout;
+        const searchInput = document.getElementById('search-input');
+        const tableContainer = document.getElementById('table-container');
+        const paginationContainer = document.getElementById('pagination-container');
+
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                clearTimeout(searchTimeout);
+                const searchTerm = e.target.value;
+
+                searchTimeout = setTimeout(function() {
+                    if (searchTerm.length >= 2 || searchTerm.length === 0) {
+                        fetch(`{{ route('conductores.index') }}?search=${encodeURIComponent(searchTerm)}&ajax=1`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            const theme = '{{ $theme }}';
+                            const isDark = theme === 'dark';
+                            const bgTable = isDark ? 'bg-gray-800' : 'bg-white';
+                            tableContainer.className = bgTable + ' shadow-md rounded-lg overflow-hidden';
+                            tableContainer.innerHTML = data.html;
+                            paginationContainer.innerHTML = data.pagination;
+                            
+                            // Actualizar URL sin recargar
+                            const url = new URL(window.location);
+                            if (searchTerm) {
+                                url.searchParams.set('search', searchTerm);
+                            } else {
+                                url.searchParams.delete('search');
+                            }
+                            window.history.pushState({}, '', url);
+                        })
+                        .catch(error => {
+                            console.error('Error en la búsqueda:', error);
+                        });
+                    }
+                }, 300); // Esperar 300ms después de que el usuario deje de escribir
+            });
+        }
+    </script>
+    @endpush
 </x-app-layout>
