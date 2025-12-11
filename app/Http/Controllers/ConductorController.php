@@ -194,26 +194,44 @@ public function update(Request $request, Conductor $conductore)
     public function search(Request $request)
     {
         $query = $request->get('q', '');
+        $columns = $request->get('columns', []); // Columnas específicas a buscar
         
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
-        $conductores = Conductor::where('nombres', 'like', "%{$query}%")
-            ->orWhere('apellidos', 'like', "%{$query}%")
-            ->orWhere('cedula', 'like', "%{$query}%")
-            ->orWhere('celular', 'like', "%{$query}%")
-            ->orWhere('correo', 'like', "%{$query}%")
-            ->limit(10)
-            ->get();
+        // Si se especifican columnas, usar solo esas. Si no, buscar en todas las columnas comunes
+        if (!empty($columns) && is_array($columns)) {
+            $conductores = Conductor::where(function($q) use ($query, $columns) {
+                foreach ($columns as $column) {
+                    if (in_array($column, ['cedula', 'nombres', 'apellidos', 'celular', 'correo', 'vehiculo_placa', 'numero_interno'])) {
+                        $q->orWhere($column, 'like', "%{$query}%");
+                    }
+                }
+            })->limit(10)->get();
+        } else {
+            // Búsqueda por defecto en todas las columnas comunes
+            $conductores = Conductor::where(function($q) use ($query) {
+                $q->where('nombres', 'like', "%{$query}%")
+                  ->orWhere('apellidos', 'like', "%{$query}%")
+                  ->orWhere('cedula', 'like', "%{$query}%")
+                  ->orWhere('celular', 'like', "%{$query}%")
+                  ->orWhere('correo', 'like', "%{$query}%")
+                  ->orWhere('vehiculo_placa', 'like', "%{$query}%")
+                  ->orWhere('numero_interno', 'like', "%{$query}%");
+            })->limit(10)->get();
+        }
 
         return response()->json($conductores->map(function ($conductor) {
             return [
                 'id' => $conductor->id,
+                'cedula' => $conductor->cedula,
                 'nombres' => $conductor->nombres,
                 'apellidos' => $conductor->apellidos,
-                'cedula' => $conductor->cedula,
                 'celular' => $conductor->celular,
+                'correo' => $conductor->correo,
+                'vehiculo_placa' => $conductor->vehiculo_placa,
+                'numero_interno' => $conductor->numero_interno,
                 'label' => "{$conductor->nombres} {$conductor->apellidos} ({$conductor->cedula})",
             ];
         }));

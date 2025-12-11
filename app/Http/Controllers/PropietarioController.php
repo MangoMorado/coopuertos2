@@ -89,25 +89,41 @@ class PropietarioController extends Controller
     public function search(Request $request)
     {
         $query = $request->get('q', '');
+        $columns = $request->get('columns', []); // Columnas específicas a buscar
         
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
-        $propietarios = Propietario::where('nombre_completo', 'like', "%{$query}%")
-            ->orWhere('numero_identificacion', 'like', "%{$query}%")
-            ->orWhere('telefono_contacto', 'like', "%{$query}%")
-            ->orWhere('correo_electronico', 'like', "%{$query}%")
-            ->limit(10)
-            ->get();
+        // Si se especifican columnas, usar solo esas. Si no, buscar en todas las columnas comunes
+        if (!empty($columns) && is_array($columns)) {
+            $propietarios = Propietario::where(function($q) use ($query, $columns) {
+                foreach ($columns as $column) {
+                    if (in_array($column, ['numero_identificacion', 'nombre_completo', 'telefono_contacto', 'correo_electronico', 'direccion_contacto'])) {
+                        $q->orWhere($column, 'like', "%{$query}%");
+                    }
+                }
+            })->limit(10)->get();
+        } else {
+            // Búsqueda por defecto en todas las columnas comunes
+            $propietarios = Propietario::where(function($q) use ($query) {
+                $q->where('nombre_completo', 'like', "%{$query}%")
+                  ->orWhere('numero_identificacion', 'like', "%{$query}%")
+                  ->orWhere('telefono_contacto', 'like', "%{$query}%")
+                  ->orWhere('correo_electronico', 'like', "%{$query}%")
+                  ->orWhere('direccion_contacto', 'like', "%{$query}%");
+            })->limit(10)->get();
+        }
 
         return response()->json($propietarios->map(function ($propietario) {
             return [
                 'id' => $propietario->id,
-                'nombre_completo' => $propietario->nombre_completo,
                 'numero_identificacion' => $propietario->numero_identificacion,
+                'nombre_completo' => $propietario->nombre_completo,
+                'telefono_contacto' => $propietario->telefono_contacto,
+                'correo_electronico' => $propietario->correo_electronico,
+                'direccion_contacto' => $propietario->direccion_contacto,
                 'tipo_identificacion' => $propietario->tipo_identificacion,
-                'telefono' => $propietario->telefono_contacto,
                 'label' => "{$propietario->nombre_completo} ({$propietario->numero_identificacion})",
             ];
         }));

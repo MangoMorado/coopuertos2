@@ -1,5 +1,14 @@
 # Coopuertos App
 
+## *v. 0.0.3*
+- Actualizado a heroicons v2
+- Nueva función PQRS
+- Nueva función editor visual de PQRS
+
+## *v. 0.0.2*
+- Nuevas funciones CRUD: Vehiculos
+- Nuevas funciones CRUD: Propietarios
+
 ## *v. 0.0.1.4*
 - Busqueda ampliada y en tiempo real de conductores
 - Tema oscuro implementado

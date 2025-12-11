@@ -7,10 +7,19 @@ use App\Http\Controllers\ConductorController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\PropietarioController;
+use App\Http\Controllers\PqrController;
 // Ruta pública principal
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Rutas públicas (sin autenticación)
+Route::get('/api/vehiculos/search', [VehicleController::class, 'search'])->name('api.vehiculos.search');
+Route::get('/pqrs/formulario', [PqrController::class, 'publicForm'])->name('pqrs.form.public');
+Route::post('/pqrs/enviar', [PqrController::class, 'store'])->name('pqrs.store.public');
+
+// Ruta pública para mostrar un conductor específico por UUID
+Route::get('/conductor/{uuid}', [ConductorController::class, 'show'])->name('conductor.public');
 
 // Dashboard protegido por autenticación y verificación de email
 Route::get('/dashboard', function () {
@@ -45,10 +54,14 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     Route::resource('propietarios', PropietarioController::class);
     Route::get('/api/propietarios/search', [PropietarioController::class, 'search'])->name('api.propietarios.search');
     Route::get('/api/conductores/search', [ConductorController::class, 'search'])->name('api.conductores.search');
+    
+    // PQRS (Rutas protegidas)
+    Route::get('/pqrs-qr', [PqrController::class, 'generateQR'])->name('pqrs.qr');
+    Route::get('/pqrs/formulario/editar', [PqrController::class, 'editFormTemplate'])->name('pqrs.edit-template');
+    Route::post('/pqrs/formulario/editar', [PqrController::class, 'updateFormTemplate'])->name('pqrs.update-template');
+    Route::delete('/pqrs/{pqr}/adjunto/{index}', [PqrController::class, 'deleteAttachment'])->name('pqrs.adjunto.delete');
+    Route::resource('pqrs', PqrController::class);
 });
-
-// Ruta pública para mostrar un conductor específico por UUID
-Route::get('/conductor/{uuid}', [ConductorController::class, 'show'])->name('conductor.public');
 
 // Rutas de autenticación generadas por Laravel Breeze/Jetstream
 require __DIR__.'/auth.php';
