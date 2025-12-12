@@ -26,8 +26,31 @@ class Vehicle extends Model
         'foto',
     ];
 
+    // Relación antigua (mantener por compatibilidad, pero usar asignaciones)
     public function conductor()
     {
         return $this->belongsTo(Conductor::class);
+    }
+
+    // Relación muchos a muchos con conductores a través de conductor_vehicle
+    public function conductores()
+    {
+        return $this->belongsToMany(Conductor::class, 'conductor_vehicle')
+                    ->withPivot('estado', 'fecha_asignacion', 'fecha_desasignacion', 'observaciones')
+                    ->withTimestamps();
+    }
+
+    // Obtener todos los conductores activos del vehículo
+    public function conductoresActivos()
+    {
+        return $this->conductores()
+                    ->wherePivot('estado', 'activo')
+                    ->get();
+    }
+
+    // Obtener todas las asignaciones del vehículo
+    public function asignaciones()
+    {
+        return $this->hasMany(ConductorVehicle::class);
     }
 }

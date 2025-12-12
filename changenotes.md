@@ -1,5 +1,10 @@
 # Coopuertos App
 
+## *v. 0.0.4*
+- Se elimina las placas asociadas a conductores, ahora todo se administra desde la pestaña de vehiculos
+- Ahora los PQRS tienen estados
+- Nuevo PQRS Taquilla
+
 ## *v. 0.0.3*
 - Actualizado a heroicons v2
 - Nueva función PQRS

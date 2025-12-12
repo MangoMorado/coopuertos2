@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('cedula')->unique();
             $table->enum('conductor_tipo', ['A', 'B']); // Tipo A (camionetas), Tipo B (busetas)
             $table->enum('rh', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']);
-            $table->string('vehiculo_placa')->nullable();
             $table->string('numero_interno')->nullable();
             $table->string('celular')->nullable();
             $table->string('correo')->nullable();

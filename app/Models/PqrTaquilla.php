@@ -6,25 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Pqr extends Model
+class PqrTaquilla extends Model
 {
     use HasFactory;
+
+    protected $table = 'pqrs_taquilla';
 
     protected $fillable = [
         'uuid',
         'fecha',
+        'hora',
         'nombre',
-        'vehiculo_placa',
-        'vehiculo_id',
-        'numero_tiquete',
-        'correo_electronico',
-        'numero_telefono',
-        'calificacion',
-        'comentarios',
+        'sede',
+        'correo',
+        'telefono',
         'tipo',
+        'calificacion',
+        'comentario',
+        'adjuntos',
         'estado',
         'usuario_asignado_id',
-        'adjuntos',
     ];
 
     protected $casts = [
@@ -40,12 +41,10 @@ class Pqr extends Model
             if (empty($pqr->fecha)) {
                 $pqr->fecha = now();
             }
+            if (empty($pqr->hora)) {
+                $pqr->hora = now();
+            }
         });
-    }
-
-    public function vehiculo()
-    {
-        return $this->belongsTo(Vehicle::class);
     }
 
     public function usuarioAsignado()

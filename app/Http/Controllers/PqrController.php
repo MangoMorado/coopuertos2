@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pqr;
+use App\Models\PqrTaquilla;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -12,7 +13,7 @@ class PqrController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pqr::with('vehiculo');
+        $query = Pqr::with(['vehiculo', 'usuarioAsignado']);
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -22,13 +23,39 @@ class PqrController extends Controller
                   ->orWhere('numero_tiquete', 'like', '%' . $search . '%')
                   ->orWhere('numero_telefono', 'like', '%' . $search . '%')
                   ->orWhere('vehiculo_placa', 'like', '%' . $search . '%')
-                  ->orWhere('tipo', 'like', '%' . $search . '%');
+                  ->orWhere('tipo', 'like', '%' . $search . '%')
+                  ->orWhere('estado', 'like', '%' . $search . '%')
+                  ->orWhereHas('usuarioAsignado', function($q) use ($search) {
+                      $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                  });
             });
         }
 
         $pqrs = $query->latest()->paginate(10)->withQueryString();
 
-        return view('pqrs.index', compact('pqrs'));
+        // Obtener PQRS de Taquilla
+        $queryTaquilla = PqrTaquilla::with(['usuarioAsignado']);
+
+        if ($request->filled('search_taquilla')) {
+            $search = $request->search_taquilla;
+            $queryTaquilla->where(function($q) use ($search) {
+                $q->where('nombre', 'like', '%' . $search . '%')
+                  ->orWhere('correo', 'like', '%' . $search . '%')
+                  ->orWhere('telefono', 'like', '%' . $search . '%')
+                  ->orWhere('sede', 'like', '%' . $search . '%')
+                  ->orWhere('tipo', 'like', '%' . $search . '%')
+                  ->orWhere('estado', 'like', '%' . $search . '%')
+                  ->orWhereHas('usuarioAsignado', function($q) use ($search) {
+                      $q->where('name', 'like', '%' . $search . '%')
+                        ->orWhere('email', 'like', '%' . $search . '%');
+                  });
+            });
+        }
+
+        $pqrsTaquilla = $queryTaquilla->latest()->paginate(10)->withQueryString();
+
+        return view('pqrs.index', compact('pqrs', 'pqrsTaquilla'));
     }
 
     public function create()
@@ -57,6 +84,11 @@ class PqrController extends Controller
             }
         }
 
+        // Si no se proporciona estado, usar 'Radicada' por defecto
+        if (empty($validated['estado'])) {
+            $validated['estado'] = 'Radicada';
+        }
+
         Pqr::create($validated);
 
         // Si es desde el formulario público, redirigir al formulario
@@ -69,13 +101,13 @@ class PqrController extends Controller
 
     public function show(Pqr $pqr)
     {
-        $pqr->load('vehiculo');
+        $pqr->load(['vehiculo', 'usuarioAsignado']);
         return view('pqrs.show', compact('pqr'));
     }
 
     public function edit(Pqr $pqr)
     {
-        $pqr->load('vehiculo');
+        $pqr->load(['vehiculo', 'usuarioAsignado']);
         return view('pqrs.edit', compact('pqr'));
     }
 
@@ -787,6 +819,8 @@ class PqrController extends Controller
             'calificacion' => 'nullable|integer|min:1|max:5',
             'comentarios' => 'nullable|string',
             'tipo' => 'required|in:Peticiones,Quejas,Reclamos,Sugerencias,Otros',
+            'estado' => 'nullable|in:Radicada,En Trámite,En Espera de Información,Resuelta,Cerrada',
+            'usuario_asignado_id' => 'nullable|exists:users,id',
             'adjuntos.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,mp4,avi,mov|max:10240',
         ]);
     }
@@ -816,5 +850,489 @@ class PqrController extends Controller
         if (File::exists($fullPath)) {
             File::delete($fullPath);
         }
+    }
+
+    // ==================== MÉTODOS PARA PQRS TAQUILLA ====================
+
+    public function publicFormTaquilla()
+    {
+        return view('pqrs.form-public-taquilla');
+    }
+
+    public function editFormTemplateTaquilla()
+    {
+        $configPath = storage_path('app/pqrs_taquilla_form_config.json');
+        
+        if (File::exists($configPath)) {
+            $fields = json_decode(File::get($configPath), true);
+            // Normalizar campos
+            foreach ($fields as &$field) {
+                if ($field['type'] === 'textarea' && !isset($field['rows'])) {
+                    $field['rows'] = 4;
+                }
+                if ($field['type'] === 'rating' && !isset($field['max_rating'])) {
+                    $field['max_rating'] = 5;
+                }
+                if ($field['type'] === 'file') {
+                    $field['multiple'] = $field['multiple'] ?? true;
+                    $field['accept'] = $field['accept'] ?? 'image/*,.pdf,.doc,.docx,video/*';
+                    $field['help_text'] = $field['help_text'] ?? 'Formatos permitidos: Imágenes, Documentos, Videos. Máximo 10MB por archivo.';
+                }
+                if ($field['type'] === 'logo') {
+                    $field['logo_path'] = $field['logo_path'] ?? '/images/logo.svg';
+                }
+            }
+            unset($field);
+        } else {
+            $fields = $this->getDefaultFormFieldsTaquilla();
+            File::put($configPath, json_encode($fields, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
+        
+        return view('pqrs.edit-template-taquilla', compact('fields'));
+    }
+
+    public function updateFormTemplateTaquilla(Request $request)
+    {
+        $request->validate([
+            'fields' => 'required|array',
+            'fields.*.name' => 'required|string',
+            'fields.*.label' => 'required|string',
+            'fields.*.type' => 'required|string',
+        ]);
+
+        $configPath = storage_path('app/pqrs_taquilla_form_config.json');
+        $fields = $request->fields;
+        
+        // Procesar campos: decodificar options si vienen como JSON string
+        foreach ($fields as &$field) {
+            if (empty($field['id'])) {
+                $field['id'] = uniqid('field_');
+            }
+            // Procesar options si viene como JSON string
+            if (isset($field['options']) && is_string($field['options'])) {
+                $decoded = json_decode($field['options'], true);
+                $field['options'] = is_array($decoded) ? $decoded : [];
+            }
+            // Convertir required y enabled a boolean
+            $field['required'] = isset($field['required']) && ($field['required'] == '1' || $field['required'] === true);
+            $field['enabled'] = !isset($field['enabled']) || $field['enabled'] == '1' || $field['enabled'] === true;
+            $field['order'] = isset($field['order']) ? (int)$field['order'] : 999;
+            
+            // Procesar campos específicos por tipo
+            if ($field['type'] === 'file') {
+                $field['multiple'] = isset($field['multiple']) && ($field['multiple'] == '1' || $field['multiple'] === true);
+                $field['accept'] = $field['accept'] ?? null;
+                $field['help_text'] = $field['help_text'] ?? null;
+            }
+            if ($field['type'] === 'rating') {
+                $field['max_rating'] = isset($field['max_rating']) ? (int)$field['max_rating'] : 5;
+            }
+            if ($field['type'] === 'textarea') {
+                $field['rows'] = isset($field['rows']) ? (int)$field['rows'] : 4;
+            }
+            if ($field['type'] === 'logo') {
+                $field['logo_path'] = $field['logo_path'] ?? '/images/logo.svg';
+            }
+        }
+        unset($field);
+
+        File::put($configPath, json_encode($fields, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        
+        $this->regenerateFormTemplateTaquilla($fields);
+
+        return redirect()->route('pqrs.edit-template-taquilla')->with('success', 'Formulario de taquilla actualizado correctamente.');
+    }
+
+    public function storeTaquilla(Request $request)
+    {
+        $validated = $request->validate([
+            'fecha' => 'nullable|date',
+            'hora' => 'nullable',
+            'nombre' => 'required|string|max:255',
+            'sede' => 'nullable|string|max:255',
+            'correo' => 'nullable|email|max:255',
+            'telefono' => 'nullable|string|max:20',
+            'tipo' => 'required|in:Peticiones,Quejas,Reclamos,Sugerencias,Otros',
+            'calificacion' => 'nullable|integer|min:1|max:5',
+            'comentario' => 'nullable|string',
+            'adjuntos.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,mp4,avi,mov|max:10240',
+        ]);
+
+        // Manejo de adjuntos
+        if ($request->hasFile('adjuntos')) {
+            $adjuntos = [];
+            foreach ($request->file('adjuntos') as $file) {
+                $adjuntos[] = $this->storeFile($file);
+            }
+            $validated['adjuntos'] = $adjuntos;
+        }
+
+        // Si no se proporciona fecha/hora, usar ahora
+        if (empty($validated['fecha'])) {
+            $validated['fecha'] = now();
+        }
+        if (empty($validated['hora'])) {
+            $validated['hora'] = now();
+        }
+
+        // Estado por defecto
+        $validated['estado'] = 'Radicada';
+
+        PqrTaquilla::create($validated);
+
+        return redirect()->back()->with('success', 'PQRS de Taquilla enviado correctamente. ¡Gracias por tu feedback!');
+    }
+
+    protected function getDefaultFormFieldsTaquilla()
+    {
+        return [
+            [
+                'id' => 'logo',
+                'name' => 'logo',
+                'label' => 'Logo',
+                'type' => 'logo',
+                'required' => false,
+                'order' => 0,
+                'enabled' => true,
+                'logo_path' => '/images/logo.svg',
+            ],
+            [
+                'id' => 'tipo',
+                'name' => 'tipo',
+                'label' => 'Tipo',
+                'type' => 'select',
+                'required' => true,
+                'placeholder' => 'Seleccione...',
+                'value' => '',
+                'order' => 1,
+                'enabled' => true,
+                'options' => ['Peticiones', 'Quejas', 'Reclamos', 'Sugerencias', 'Otros'],
+            ],
+            [
+                'id' => 'fecha',
+                'name' => 'fecha',
+                'label' => 'Fecha',
+                'type' => 'date',
+                'required' => false,
+                'placeholder' => '',
+                'value' => date('Y-m-d'),
+                'order' => 2,
+                'enabled' => true,
+            ],
+            [
+                'id' => 'hora',
+                'name' => 'hora',
+                'label' => 'Hora',
+                'type' => 'time',
+                'required' => false,
+                'placeholder' => '',
+                'value' => date('H:i'),
+                'order' => 3,
+                'enabled' => true,
+            ],
+            [
+                'id' => 'nombre',
+                'name' => 'nombre',
+                'label' => 'Nombre',
+                'type' => 'text',
+                'required' => true,
+                'placeholder' => 'Ingrese su nombre completo',
+                'value' => '',
+                'order' => 4,
+                'enabled' => true,
+            ],
+            [
+                'id' => 'sede',
+                'name' => 'sede',
+                'label' => 'Sede',
+                'type' => 'text',
+                'required' => false,
+                'placeholder' => 'Ingrese la sede',
+                'value' => '',
+                'order' => 5,
+                'enabled' => true,
+            ],
+            [
+                'id' => 'correo',
+                'name' => 'correo',
+                'label' => 'Correo',
+                'type' => 'email',
+                'required' => false,
+                'placeholder' => 'correo@ejemplo.com',
+                'value' => '',
+                'order' => 6,
+                'enabled' => true,
+            ],
+            [
+                'id' => 'telefono',
+                'name' => 'telefono',
+                'label' => 'Teléfono',
+                'type' => 'tel',
+                'required' => false,
+                'placeholder' => 'Ingrese su número de teléfono',
+                'value' => '',
+                'order' => 7,
+                'enabled' => true,
+            ],
+            [
+                'id' => 'calificacion',
+                'name' => 'calificacion',
+                'label' => 'Califica el Servicio',
+                'type' => 'rating',
+                'required' => false,
+                'placeholder' => '',
+                'value' => 0,
+                'order' => 8,
+                'enabled' => true,
+                'max_rating' => 5,
+            ],
+            [
+                'id' => 'comentario',
+                'name' => 'comentario',
+                'label' => 'Comentario',
+                'type' => 'textarea',
+                'required' => false,
+                'placeholder' => 'Escriba sus comentarios aquí...',
+                'value' => '',
+                'order' => 9,
+                'enabled' => true,
+                'rows' => 4,
+            ],
+            [
+                'id' => 'adjuntos',
+                'name' => 'adjuntos',
+                'label' => 'Adjuntos',
+                'type' => 'file',
+                'required' => false,
+                'placeholder' => '',
+                'value' => '',
+                'order' => 10,
+                'enabled' => true,
+                'multiple' => true,
+                'accept' => 'image/*,.pdf,.doc,.docx,video/*',
+                'help_text' => 'Formatos permitidos: Imágenes (jpg, png), Documentos (pdf, doc, docx), Videos (mp4, avi, mov). Máximo 10MB por archivo.',
+            ],
+        ];
+    }
+
+    protected function regenerateFormTemplateTaquilla($fields)
+    {
+        usort($fields, function($a, $b) {
+            return ($a['order'] ?? 999) - ($b['order'] ?? 999);
+        });
+
+        $templatePath = resource_path('views/pqrs/form-public-taquilla.blade.php');
+        $template = $this->generateBladeTemplateTaquilla($fields);
+        
+        File::put($templatePath, $template);
+    }
+
+    protected function generateBladeTemplateTaquilla($fields)
+    {
+        $html = '<!DOCTYPE html>
+<html lang="{{ str_replace(\'_\', \'-\', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Formulario PQRS Taquilla - Coopuertos</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    @vite([\'resources/css/app.css\', \'resources/js/app.js\'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="font-sans text-gray-900 antialiased bg-gray-50">
+    <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto">
+            <div class="bg-white shadow-lg rounded-lg p-8">
+                <h1 class="text-3xl font-bold text-gray-900 mb-2">Formulario PQRS Taquilla</h1>
+                <p class="text-gray-600 mb-6">Peticiones, Quejas, Reclamos y Sugerencias - Taquilla</p>
+
+                @if (session(\'success\'))
+                    <div class="mb-6 bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded">
+                        {{ session(\'success\') }}
+                    </div>
+                @endif
+
+                @if ($errors->any())
+                    <div class="mb-6 bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded">
+                        <ul class="list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route(\'pqrs.taquilla.store\') }}" enctype="multipart/form-data" class="space-y-6">
+                    @csrf
+';
+
+        foreach ($fields as $field) {
+            if (!($field['enabled'] ?? true)) continue;
+
+            $required = ($field['required'] ?? false) ? 'required' : '';
+            $requiredStar = ($field['required'] ?? false) ? ' <span class="text-red-500">*</span>' : '';
+            $placeholder = !empty($field['placeholder']) ? 'placeholder="' . htmlspecialchars($field['placeholder']) . '"' : '';
+            $oldValue = 'old(\'' . $field['name'] . '\'' . (!empty($field['value']) ? ', \'' . $field['value'] . '\'' : '') . ')';
+
+            switch ($field['type']) {
+                case 'logo':
+                    $logoPath = $field['logo_path'] ?? '/images/logo.svg';
+                    $html .= "                    <div class=\"flex justify-center my-6\">\n";
+                    $html .= "                        <img src=\"$logoPath\" alt=\"Logo\" class=\"max-h-24 max-w-full object-contain\">\n";
+                    $html .= "                    </div>\n\n";
+                    break;
+                case 'rating':
+                    $maxRating = $field['max_rating'] ?? 5;
+                    $html .= "                    <div>\n";
+                    $html .= "                        <label class=\"block text-sm font-medium text-gray-700 mb-2\">" . htmlspecialchars($field['label']) . "$requiredStar</label>\n";
+                    $html .= "                        <div class=\"flex items-center space-x-2\" x-data=\"{ rating: {{ $oldValue }} }\">\n";
+                    $html .= "                            <input type=\"hidden\" name=\"{$field['name']}\" x-model=\"rating\">\n";
+                    for ($i = 1; $i <= $maxRating; $i++) {
+                        $html .= "                            <button type=\"button\" @click=\"rating = $i\" class=\"focus:outline-none\">\n";
+                        $html .= "                                <svg class=\"w-8 h-8 transition-colors\" :class=\"rating >= $i ? 'text-yellow-400 fill-current' : 'text-gray-300'\" fill=\"currentColor\" viewBox=\"0 0 20 20\">\n";
+                        $html .= "                                    <path d=\"M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z\"></path>\n";
+                        $html .= "                                </svg>\n";
+                        $html .= "                            </button>\n";
+                    }
+                    $html .= "                            <span class=\"ml-2 text-sm text-gray-600\" x-show=\"rating > 0\"><span x-text=\"rating\"></span> / $maxRating</span>\n";
+                    $html .= "                        </div>\n";
+                    $html .= "                    </div>\n\n";
+                    break;
+                case 'select':
+                    $options = $field['options'] ?? [];
+                    // Asegurar que options es un array
+                    if (is_string($options)) {
+                        $decoded = json_decode($options, true);
+                        $options = is_array($decoded) ? $decoded : [];
+                    }
+                    if (!is_array($options)) {
+                        $options = [];
+                    }
+                    $html .= "                    <div>\n";
+                    $html .= "                        <label class=\"block text-sm font-medium text-gray-700 mb-1\">" . htmlspecialchars($field['label']) . "$requiredStar</label>\n";
+                    $html .= "                        <select name=\"{$field['name']}\" $required class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500\">\n";
+                    $html .= "                            <option value=\"\">" . htmlspecialchars($field['placeholder'] ?? 'Seleccione...') . "</option>\n";
+                    foreach ($options as $option) {
+                        $html .= "                            <option value=\"" . htmlspecialchars($option) . "\" {{ $oldValue === '" . htmlspecialchars($option) . "' ? 'selected' : '' }}>" . htmlspecialchars($option) . "</option>\n";
+                    }
+                    $html .= "                        </select>\n";
+                    $html .= "                    </div>\n\n";
+                    break;
+                case 'textarea':
+                    $rows = $field['rows'] ?? 4;
+                    $html .= "                    <div>\n";
+                    $html .= "                        <label class=\"block text-sm font-medium text-gray-700 mb-1\">" . htmlspecialchars($field['label']) . "$requiredStar</label>\n";
+                    $html .= "                        <textarea name=\"{$field['name']}\" rows=\"$rows\" $required $placeholder class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500\">{{ $oldValue }}</textarea>\n";
+                    $html .= "                    </div>\n\n";
+                    break;
+                case 'file':
+                    $multiple = ($field['multiple'] ?? false) ? 'multiple' : '';
+                    $accept = !empty($field['accept']) ? 'accept="' . htmlspecialchars($field['accept']) . '"' : '';
+                    $helpText = !empty($field['help_text']) ? "\n                        <p class=\"text-xs text-gray-500 mb-2\">" . htmlspecialchars($field['help_text']) . "</p>" : '';
+                    $html .= "                    <div>\n";
+                    $html .= "                        <label class=\"block text-sm font-medium text-gray-700 mb-1\">" . htmlspecialchars($field['label']) . "$requiredStar</label>$helpText\n";
+                    $html .= "                        <input type=\"file\" name=\"{$field['name']}[]\" $multiple $accept $required class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500\">\n";
+                    $html .= "                    </div>\n\n";
+                    break;
+                case 'date':
+                case 'time':
+                case 'text':
+                case 'email':
+                case 'tel':
+                default:
+                    $type = $field['type'] === 'text' ? 'text' : ($field['type'] === 'email' ? 'email' : ($field['type'] === 'tel' ? 'tel' : $field['type']));
+                    $html .= "                    <div>\n";
+                    $html .= "                        <label class=\"block text-sm font-medium text-gray-700 mb-1\">" . htmlspecialchars($field['label']) . "$requiredStar</label>\n";
+                    $html .= "                        <input type=\"$type\" name=\"{$field['name']}\" value=\"{{ $oldValue }}\" $required $placeholder class=\"w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500\">\n";
+                    $html .= "                    </div>\n\n";
+                    break;
+            }
+        }
+
+        $html .= '                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition">
+                            Enviar PQRS
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>';
+
+        return $html;
+    }
+
+    // ==================== MÉTODOS CRUD PARA PQRS TAQUILLA ====================
+
+    public function createTaquilla()
+    {
+        return view('pqrs.create-taquilla');
+    }
+
+    public function showTaquilla(PqrTaquilla $pqrTaquilla)
+    {
+        $pqrTaquilla->load(['usuarioAsignado']);
+        return view('pqrs.show-taquilla', compact('pqrTaquilla'));
+    }
+
+    public function editTaquilla(PqrTaquilla $pqrTaquilla)
+    {
+        $pqrTaquilla->load(['usuarioAsignado']);
+        return view('pqrs.edit-taquilla', compact('pqrTaquilla'));
+    }
+
+    public function updateTaquilla(Request $request, PqrTaquilla $pqrTaquilla)
+    {
+        $validated = $request->validate([
+            'fecha' => 'required|date',
+            'hora' => 'required',
+            'nombre' => 'required|string|max:255',
+            'sede' => 'nullable|string|max:255',
+            'correo' => 'nullable|email|max:255',
+            'telefono' => 'nullable|string|max:20',
+            'tipo' => 'required|in:Peticiones,Quejas,Reclamos,Sugerencias,Otros',
+            'calificacion' => 'nullable|integer|min:1|max:5',
+            'comentario' => 'nullable|string',
+            'estado' => 'required|in:Radicada,En Trámite,En Espera de Información,Resuelta,Cerrada',
+            'usuario_asignado_id' => 'nullable|exists:users,id',
+            'adjuntos.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf,doc,docx,mp4,avi,mov|max:10240',
+        ]);
+
+        // Manejo de nuevos adjuntos
+        if ($request->hasFile('adjuntos')) {
+            $adjuntos = $pqrTaquilla->adjuntos ?? [];
+            foreach ($request->file('adjuntos') as $file) {
+                $adjuntos[] = $this->storeFile($file);
+            }
+            $validated['adjuntos'] = $adjuntos;
+        }
+
+        $pqrTaquilla->update($validated);
+
+        return redirect()->route('pqrs.index')->with('success', 'PQRS de Taquilla actualizado correctamente.');
+    }
+
+    public function destroyTaquilla(PqrTaquilla $pqrTaquilla)
+    {
+        // Eliminar adjuntos
+        if ($pqrTaquilla->adjuntos) {
+            foreach ($pqrTaquilla->adjuntos as $adjunto) {
+                $this->deleteFile($adjunto);
+            }
+        }
+
+        $pqrTaquilla->delete();
+
+        return redirect()->route('pqrs.index')->with('success', 'PQRS de Taquilla eliminado correctamente.');
+    }
+
+    public function generateQRTaquilla()
+    {
+        $url = url(route('pqrs.form.taquilla'));
+        return view('pqrs.qr-taquilla', compact('url'));
     }
 }

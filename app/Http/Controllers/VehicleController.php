@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Vehicle;
 use App\Models\Conductor;
+use App\Models\ConductorVehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -12,7 +13,9 @@ class VehicleController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Vehicle::with('conductor');
+        $query = Vehicle::with(['asignaciones' => function($q) {
+            $q->where('estado', 'activo')->with('conductor');
+        }]);
 
         if ($request->filled('search')) {
             $s = $request->search;
@@ -21,7 +24,15 @@ class VehicleController extends Controller
                   ->orWhere('marca', 'like', "%$s%")
                   ->orWhere('modelo', 'like', "%$s%")
                   ->orWhere('tipo', 'like', "%$s%")
-                  ->orWhere('propietario_nombre', 'like', "%$s%");
+                  ->orWhere('propietario_nombre', 'like', "%$s%")
+                  ->orWhereHas('asignaciones.conductor', function($q) use ($s) {
+                      $q->where('estado', 'activo')
+                        ->where(function($query) use ($s) {
+                            $query->where('nombres', 'like', "%$s%")
+                                  ->orWhere('apellidos', 'like', "%$s%")
+                                  ->orWhere('cedula', 'like', "%$s%");
+                        });
+                  });
             });
         }
 
@@ -45,7 +56,21 @@ class VehicleController extends Controller
             $validated['foto'] = $this->storePhoto($request->file('foto'));
         }
 
-        Vehicle::create($validated);
+        // Guardar conductor_id temporalmente si existe
+        $conductorId = $validated['conductor_id'] ?? null;
+        unset($validated['conductor_id']);
+
+        $vehiculo = Vehicle::create($validated);
+
+        // Si se asignó un conductor, crear el registro en conductor_vehicle
+        if ($conductorId) {
+            $conductor = Conductor::find($conductorId);
+            if ($conductor) {
+                $conductor->asignarVehiculo($vehiculo->id);
+            }
+            // También actualizar el campo conductor_id en vehicles para compatibilidad
+            $vehiculo->update(['conductor_id' => $conductorId]);
+        }
 
         return redirect()->route('vehiculos.index')->with('success', 'Vehículo creado correctamente.');
     }
@@ -75,7 +100,57 @@ class VehicleController extends Controller
             $validated['foto'] = $this->storePhoto($request->file('foto'));
         }
 
+        // Guardar conductor_id temporalmente si existe
+        $nuevoConductorId = $validated['conductor_id'] ?? null;
+        $conductorIdAnterior = $vehiculo->conductor_id;
+        unset($validated['conductor_id']);
+
         $vehiculo->update($validated);
+
+        // Gestionar la asignación en conductor_vehicle
+        if ($nuevoConductorId != $conductorIdAnterior) {
+            // Si había un conductor anterior, desasignarlo de este vehículo específico
+            if ($conductorIdAnterior) {
+                ConductorVehicle::where('conductor_id', $conductorIdAnterior)
+                    ->where('vehicle_id', $vehiculo->id)
+                    ->where('estado', 'activo')
+                    ->update([
+                        'estado' => 'inactivo',
+                        'fecha_desasignacion' => now(),
+                    ]);
+            }
+
+            // Si se asignó un nuevo conductor, crear el registro
+            if ($nuevoConductorId) {
+                $nuevoConductor = Conductor::find($nuevoConductorId);
+                if ($nuevoConductor) {
+                    // Desactivar cualquier otro vehículo activo del conductor
+                    ConductorVehicle::where('conductor_id', $nuevoConductorId)
+                        ->where('estado', 'activo')
+                        ->where('vehicle_id', '!=', $vehiculo->id)
+                        ->update([
+                            'estado' => 'inactivo',
+                            'fecha_desasignacion' => now(),
+                        ]);
+                    
+                    // Crear o activar la asignación para este vehículo
+                    ConductorVehicle::updateOrCreate(
+                        [
+                            'conductor_id' => $nuevoConductorId,
+                            'vehicle_id' => $vehiculo->id,
+                        ],
+                        [
+                            'estado' => 'activo',
+                            'fecha_asignacion' => now(),
+                            'fecha_desasignacion' => null,
+                        ]
+                    );
+                }
+            }
+
+            // Actualizar el campo conductor_id en vehicles para compatibilidad
+            $vehiculo->update(['conductor_id' => $nuevoConductorId]);
+        }
 
         return redirect()->route('vehiculos.index')->with('success', 'Vehículo actualizado correctamente.');
     }

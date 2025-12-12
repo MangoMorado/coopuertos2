@@ -19,7 +19,6 @@ public function index(Request $request)
             $q->where('cedula', 'like', '%' . $search . '%')
               ->orWhere('nombres', 'like', '%' . $search . '%')
               ->orWhere('apellidos', 'like', '%' . $search . '%')
-              ->orWhere('vehiculo_placa', 'like', '%' . $search . '%')
               ->orWhere('numero_interno', 'like', '%' . $search . '%')
               ->orWhere('celular', 'like', '%' . $search . '%')
               ->orWhere('correo', 'like', '%' . $search . '%');
@@ -54,7 +53,6 @@ public function store(Request $request)
         'cedula' => 'required|string|unique:conductors,cedula',
         'conductor_tipo' => 'required|in:A,B',
         'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-        'vehiculo_placa' => 'nullable|string|max:20',
         'numero_interno' => 'nullable|string|max:50',
         'celular' => 'nullable|string|max:20',
         'correo' => 'nullable|email',
@@ -68,11 +66,6 @@ public function store(Request $request)
     // Si correo está vacío, poner "No tiene"
     if (empty($validated['correo'])) {
         $validated['correo'] = 'No tiene';
-    }
-
-    // Convertir placa a mayúsculas si existe
-    if (!empty($validated['vehiculo_placa'])) {
-        $validated['vehiculo_placa'] = strtoupper($validated['vehiculo_placa']);
     }
 
     // Manejo de la foto si se sube
@@ -97,7 +90,9 @@ public function generarCarnet(Conductor $conductor)
 
     public function show($uuid)
     {
-        $conductor = Conductor::where('uuid', $uuid)->firstOrFail();
+        $conductor = Conductor::where('uuid', $uuid)
+            ->with(['asignacionActiva.vehicle'])
+            ->firstOrFail();
         return view('conductores.show', compact('conductor'));
     }
 
@@ -114,7 +109,6 @@ public function update(Request $request, Conductor $conductore)
         'cedula' => 'required|string|unique:conductors,cedula,' . $conductore->id,
         'conductor_tipo' => 'required|in:A,B',
         'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-        'vehiculo_placa' => 'nullable|string|max:20',
         'numero_interno' => 'nullable|string|max:50',
         'celular' => 'nullable|string|max:20',
         'correo' => 'nullable|email',
@@ -131,11 +125,6 @@ public function update(Request $request, Conductor $conductore)
     // Si correo está vacío, poner "No tiene"
     if (empty($validated['correo'])) {
         $validated['correo'] = 'No tiene';
-    }
-
-    // Convertir placa a mayúsculas si existe
-    if (!empty($validated['vehiculo_placa'])) {
-        $validated['vehiculo_placa'] = strtoupper($validated['vehiculo_placa']);
     }
 
     // Manejo de la foto si se sube
@@ -204,7 +193,7 @@ public function update(Request $request, Conductor $conductore)
         if (!empty($columns) && is_array($columns)) {
             $conductores = Conductor::where(function($q) use ($query, $columns) {
                 foreach ($columns as $column) {
-                    if (in_array($column, ['cedula', 'nombres', 'apellidos', 'celular', 'correo', 'vehiculo_placa', 'numero_interno'])) {
+                    if (in_array($column, ['cedula', 'nombres', 'apellidos', 'celular', 'correo', 'numero_interno'])) {
                         $q->orWhere($column, 'like', "%{$query}%");
                     }
                 }
@@ -217,7 +206,6 @@ public function update(Request $request, Conductor $conductore)
                   ->orWhere('cedula', 'like', "%{$query}%")
                   ->orWhere('celular', 'like', "%{$query}%")
                   ->orWhere('correo', 'like', "%{$query}%")
-                  ->orWhere('vehiculo_placa', 'like', "%{$query}%")
                   ->orWhere('numero_interno', 'like', "%{$query}%");
             })->limit(10)->get();
         }
@@ -230,10 +218,10 @@ public function update(Request $request, Conductor $conductore)
                 'apellidos' => $conductor->apellidos,
                 'celular' => $conductor->celular,
                 'correo' => $conductor->correo,
-                'vehiculo_placa' => $conductor->vehiculo_placa,
                 'numero_interno' => $conductor->numero_interno,
                 'label' => "{$conductor->nombres} {$conductor->apellidos} ({$conductor->cedula})",
             ];
         }));
     }
+
 }

@@ -40,8 +40,14 @@
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-500 text-sm">Placa Vehículo:</span>
-                    <span class="font-medium text-gray-800">{{ $conductor->vehiculo_placa ?? '-' }}</span>
+                    <span class="text-gray-500 text-sm">Vehículo Asignado:</span>
+                    <span class="font-medium text-gray-800">
+                        @if($conductor->asignacionActiva && $conductor->asignacionActiva->vehicle)
+                            {{ $conductor->asignacionActiva->vehicle->placa }} - {{ $conductor->asignacionActiva->vehicle->marca }} {{ $conductor->asignacionActiva->vehicle->modelo }}
+                        @else
+                            <span class="text-gray-400">Sin asignar</span>
+                        @endif
+                    </span>
                 </div>
 
                 <!-- Botón regresar -->

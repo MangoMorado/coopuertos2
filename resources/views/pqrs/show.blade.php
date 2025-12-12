@@ -45,6 +45,30 @@
                             <span class="{{ $textMuted }}">-</span>
                         @endif
                     </p>
+                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Estado:</strong> 
+                        <span class="px-2 py-1 text-xs rounded-full
+                            @if($pqr->estado === 'Radicada')
+                                {{ $isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800' }}
+                            @elseif($pqr->estado === 'En Trámite')
+                                {{ $isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800' }}
+                            @elseif($pqr->estado === 'En Espera de Información')
+                                {{ $isDark ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800' }}
+                            @elseif($pqr->estado === 'Resuelta')
+                                {{ $isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800' }}
+                            @else
+                                {{ $isDark ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800' }}
+                            @endif">
+                            {{ $pqr->estado ?? 'Radicada' }}
+                        </span>
+                    </p>
+                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Usuario Asignado:</strong> 
+                        @if($pqr->usuarioAsignado)
+                            {{ $pqr->usuarioAsignado->name }}
+                            <span class="text-xs {{ $isDark ? 'text-gray-500' : 'text-gray-600' }}">({{ $pqr->usuarioAsignado->email }})</span>
+                        @else
+                            <span class="{{ $textMuted }}">Sin asignar</span>
+                        @endif
+                    </p>
                 </div>
             </div>
 

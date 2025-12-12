@@ -58,6 +58,7 @@
                         <th class="text-left px-4 py-3">Tipo</th>
                         <th class="text-left px-4 py-3">Marca/Modelo</th>
                         <th class="text-left px-4 py-3">Año</th>
+                        <th class="text-left px-4 py-3">Conductor</th>
                         <th class="text-left px-4 py-3">Estado</th>
                         <th class="text-center px-4 py-3">Acciones</th>
                     </tr>
@@ -69,6 +70,19 @@
                             <td class="px-4 py-3 {{ $textBody }}">{{ $v->tipo }}</td>
                             <td class="px-4 py-3 {{ $textBody }}">{{ $v->marca }} {{ $v->modelo }}</td>
                             <td class="px-4 py-3 {{ $textBody }}">{{ $v->anio_fabricacion }}</td>
+                            <td class="px-4 py-3 {{ $textBody }}">
+                                @php
+                                    $conductorActivo = $v->asignaciones->first();
+                                @endphp
+                                @if($conductorActivo && $conductorActivo->conductor)
+                                    {{ $conductorActivo->conductor->nombres }} {{ $conductorActivo->conductor->apellidos }}
+                                    <span class="text-xs {{ $isDark ? 'text-gray-400' : 'text-gray-500' }}">
+                                        ({{ $conductorActivo->conductor->cedula }})
+                                    </span>
+                                @else
+                                    <span class="{{ $isDark ? 'text-gray-500' : 'text-gray-400' }}">Sin asignar</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3">
                                 <span class="px-2 py-1 text-xs rounded-full
                                     @if($v->estado === 'Activo')
@@ -102,7 +116,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-6 {{ $textEmpty }}">No se encontraron vehículos.</td>
+                            <td colspan="7" class="text-center py-6 {{ $textEmpty }}">No se encontraron vehículos.</td>
                         </tr>
                     @endforelse
                 </tbody>

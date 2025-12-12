@@ -125,6 +125,31 @@
         </select>
     </div>
 
+    <!-- Estado y Usuario Asignado -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label class="block font-semibold {{ $label }}">Estado</label>
+            <select name="estado"
+                    class="mt-1 block w-full {{ $bgInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                @foreach(['Radicada', 'En Trámite', 'En Espera de Información', 'Resuelta', 'Cerrada'] as $estado)
+                    <option value="{{ $estado }}" {{ old('estado', $pqr->estado ?? 'Radicada') === $estado ? 'selected' : '' }}>{{ $estado }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label class="block font-semibold {{ $label }}">Usuario Asignado</label>
+            <select name="usuario_asignado_id"
+                    class="mt-1 block w-full {{ $bgInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">Sin asignar</option>
+                @foreach(\App\Models\User::orderBy('name')->get() as $user)
+                    <option value="{{ $user->id }}" {{ old('usuario_asignado_id', $pqr->usuario_asignado_id ?? '') == $user->id ? 'selected' : '' }}>
+                        {{ $user->name }} ({{ $user->email }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
+    </div>
+
     <!-- Comentarios -->
     <div>
         <label class="block font-semibold {{ $label }}">Comentarios</label>

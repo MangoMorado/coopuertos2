@@ -53,23 +53,16 @@
                     </div>
                 </div>
 
-                <!-- RH y Vehículo Placa -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block font-semibold text-gray-700 mb-1">RH</label>
-                        <select name="rh" required
-                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Seleccione</option>
-                            @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $grupo)
-                                <option value="{{ $grupo }}" {{ old('rh', $conductor->rh) == $grupo ? 'selected' : '' }}>{{ $grupo }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-700 mb-1">Vehículo Placa</label>
-                        <input type="text" name="vehiculo_placa" value="{{ old('vehiculo_placa', $conductor->vehiculo_placa) }}"
-                               class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    </div>
+                <!-- RH -->
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">RH</label>
+                    <select name="rh" required
+                            class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">Seleccione</option>
+                        @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $grupo)
+                            <option value="{{ $grupo }}" {{ old('rh', $conductor->rh) == $grupo ? 'selected' : '' }}>{{ $grupo }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <!-- Número Interno y Celular -->

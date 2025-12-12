@@ -15,7 +15,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
-            Editor Visual del Formulario PQRS - Servicio
+            Editor Visual del Formulario PQRS - Taquilla
         </h2>
     </x-slot>
 
@@ -38,7 +38,7 @@
                 <div class="{{ $bgCard }} shadow border {{ $borderCard }} rounded-lg p-6">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="text-lg font-semibold {{ $textTitle }}">Campos del Formulario</h3>
-                        <a href="{{ route('pqrs.form.public') }}" target="_blank"
+                        <a href="{{ route('pqrs.form.taquilla') }}" target="_blank"
                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition text-sm flex items-center space-x-2">
                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
@@ -48,7 +48,7 @@
                         </a>
                     </div>
 
-                    <form method="POST" action="{{ route('pqrs.update-template') }}" id="form-builder-form">
+                    <form method="POST" action="{{ route('pqrs.update-template-taquilla') }}" id="form-builder-form">
                         @csrf
                         <div class="space-y-4" id="fields-container">
                             <template x-for="(field, index) in fields" :key="field.id">
@@ -60,16 +60,16 @@
                                                     @click="moveField(index, -1)"
                                                     :disabled="index === 0"
                                                     class="text-gray-400 hover:text-gray-600 disabled:opacity-30">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"></path>
                                                 </svg>
                                             </button>
                                             <button type="button" 
                                                     @click="moveField(index, 1)"
                                                     :disabled="index === fields.length - 1"
                                                     class="text-gray-400 hover:text-gray-600 disabled:opacity-30">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                                                 </svg>
                                             </button>
                                             <span class="text-sm font-medium {{ $textTitle }}" x-text="field.label || 'Campo sin nombre'"></span>
@@ -133,12 +133,8 @@
                                         <input type="hidden" :name="'fields[' + index + '][max_rating]'" :value="field.max_rating || 5">
                                     </template>
                                     
-                                    <template x-if="field.type === 'autocomplete'">
-                                        <div>
-                                            <input type="hidden" :name="'fields[' + index + '][autocomplete_source]'" :value="field.autocomplete_source || 'vehiculos'">
-                                            <input type="hidden" :name="'fields[' + index + '][autocomplete_columns]'" :value="JSON.stringify(field.autocomplete_columns || [])">
-                                            <input type="hidden" :name="'fields[' + index + '][autocomplete_label_field]'" :value="field.autocomplete_label_field || ''">
-                                        </div>
+                                    <template x-if="field.type === 'logo'">
+                                        <input type="hidden" :name="'fields[' + index + '][logo_path]'" :value="field.logo_path || '/images/logo.svg'">
                                     </template>
                                 </div>
                             </template>
@@ -187,11 +183,11 @@
                                     <option value="email">Correo</option>
                                     <option value="tel">Teléfono</option>
                                     <option value="date">Fecha</option>
+                                    <option value="time">Hora</option>
                                     <option value="textarea">Área de Texto</option>
                                     <option value="select">Lista Desplegable</option>
                                     <option value="rating">Calificación (Estrellas)</option>
                                     <option value="file">Archivo</option>
-                                    <option value="autocomplete">Búsqueda Automática</option>
                                     <option value="logo">Logo</option>
                                 </select>
                             </div>
@@ -236,52 +232,53 @@
                                               placeholder="Opción 1&#10;Opción 2&#10;Opción 3"></textarea>
                                 </div>
                             </template>
-
-                            <!-- Configuración para autocomplete -->
-                            <template x-if="fields[editingIndex].type === 'autocomplete'">
+                            
+                            <!-- Rows para textarea -->
+                            <template x-if="fields[editingIndex].type === 'textarea'">
+                                <div>
+                                    <label class="block text-sm font-medium {{ $textTitle }} mb-1">Filas</label>
+                                    <input type="number" 
+                                           x-model="fields[editingIndex].rows"
+                                           min="1"
+                                           max="20"
+                                           class="w-full {{ $bgInput }} border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </template>
+                            
+                            <!-- Max rating para rating -->
+                            <template x-if="fields[editingIndex].type === 'rating'">
+                                <div>
+                                    <label class="block text-sm font-medium {{ $textTitle }} mb-1">Máximo de Estrellas</label>
+                                    <input type="number" 
+                                           x-model="fields[editingIndex].max_rating"
+                                           min="1"
+                                           max="10"
+                                           class="w-full {{ $bgInput }} border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                </div>
+                            </template>
+                            
+                            <!-- Configuración para file -->
+                            <template x-if="fields[editingIndex].type === 'file'">
                                 <div class="space-y-4">
-                                    <!-- Selección de tabla -->
-                                    <div>
-                                        <label class="block text-sm font-medium {{ $textTitle }} mb-1">Tabla a buscar</label>
-                                        <select x-model="fields[editingIndex].autocomplete_source"
-                                                @change="updateAutocompleteColumns()"
-                                                class="w-full {{ $bgInput }} border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            <option value="vehiculos">Vehículos</option>
-                                            <option value="propietarios">Propietarios</option>
-                                            <option value="conductores">Conductores</option>
-                                        </select>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" 
+                                               x-model="fields[editingIndex].multiple"
+                                               id="multiple-file"
+                                               class="mr-2">
+                                        <label for="multiple-file" class="text-sm {{ $textBody }}">Permitir múltiples archivos</label>
                                     </div>
-
-                                    <!-- Selección de columnas -->
                                     <div>
-                                        <label class="block text-sm font-medium {{ $textTitle }} mb-1">Columnas para búsqueda (marcar las que desea habilitar)</label>
-                                        <div class="space-y-2 max-h-48 overflow-y-auto border {{ $borderCard }} rounded p-3">
-                                            <template x-for="(column, key) in availableColumns[fields[editingIndex].autocomplete_source] || []" :key="key">
-                                                <div class="flex items-center">
-                                                    <input type="checkbox" 
-                                                           :id="'column-' + editingIndex + '-' + key"
-                                                           :value="column.value"
-                                                           x-model="fields[editingIndex].autocomplete_columns"
-                                                           class="mr-2">
-                                                    <label :for="'column-' + editingIndex + '-' + key" class="text-sm {{ $textBody }}">
-                                                        <span x-text="column.label"></span>
-                                                        <span class="text-xs text-gray-400" x-text="'(' + column.value + ')'"></span>
-                                                    </label>
-                                                </div>
-                                            </template>
-                                        </div>
-                                        <p class="text-xs {{ $textBody }} mt-1">La búsqueda buscará en todas las columnas seleccionadas</p>
+                                        <label class="block text-sm font-medium {{ $textTitle }} mb-1">Tipos de archivo aceptados</label>
+                                        <input type="text" 
+                                               x-model="fields[editingIndex].accept"
+                                               placeholder="image/*,.pdf,.doc"
+                                               class="w-full {{ $bgInput }} border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                                     </div>
-
-                                    <!-- Campo para mostrar en el resultado -->
                                     <div>
-                                        <label class="block text-sm font-medium {{ $textTitle }} mb-1">Campo a mostrar en el resultado (label)</label>
-                                        <select x-model="fields[editingIndex].autocomplete_label_field"
-                                                class="w-full {{ $bgInput }} border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                            <template x-for="(column, key) in availableColumns[fields[editingIndex].autocomplete_source] || []" :key="key">
-                                                <option :value="column.value" x-text="column.label"></option>
-                                            </template>
-                                        </select>
+                                        <label class="block text-sm font-medium {{ $textTitle }} mb-1">Texto de ayuda</label>
+                                        <textarea x-model="fields[editingIndex].help_text"
+                                                  rows="3"
+                                                  class="w-full {{ $bgInput }} border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
                                     </div>
                                 </div>
                             </template>
@@ -319,6 +316,14 @@
                              style="display: none;">
                             <div class="py-1 max-h-64 overflow-y-auto">
                                 <button type="button"
+                                        @click="addField('logo'); showFieldTypes = false"
+                                        class="w-full text-left px-4 py-2 {{ $textBody }} {{ $hoverRow }} flex items-center space-x-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                                    </svg>
+                                    <span>Logo</span>
+                                </button>
+                                <button type="button"
                                         @click="addField('text'); showFieldTypes = false"
                                         class="w-full text-left px-4 py-2 {{ $textBody }} {{ $hoverRow }} flex items-center space-x-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -351,10 +356,18 @@
                                     <span>Fecha</span>
                                 </button>
                                 <button type="button"
+                                        @click="addField('time'); showFieldTypes = false"
+                                        class="w-full text-left px-4 py-2 {{ $textBody }} {{ $hoverRow }} flex items-center space-x-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    <span>Hora</span>
+                                </button>
+                                <button type="button"
                                         @click="addField('textarea'); showFieldTypes = false"
                                         class="w-full text-left px-4 py-2 {{ $textBody }} {{ $hoverRow }} flex items-center space-x-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z" />
                                     </svg>
                                     <span>Área de Texto</span>
                                 </button>
@@ -382,22 +395,6 @@
                                     </svg>
                                     <span>Archivo</span>
                                 </button>
-                                <button type="button"
-                                        @click="addField('autocomplete'); showFieldTypes = false"
-                                        class="w-full text-left px-4 py-2 {{ $textBody }} {{ $hoverRow }} flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                                    </svg>
-                                    <span>Búsqueda Automática</span>
-                                </button>
-                                <button type="button"
-                                        @click="addField('logo'); showFieldTypes = false"
-                                        class="w-full text-left px-4 py-2 {{ $textBody }} {{ $hoverRow }} flex items-center space-x-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                                    </svg>
-                                    <span>Logo</span>
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -412,33 +409,6 @@
                 fields: @json($fields),
                 editingIndex: null,
                 selectOptionsText: '',
-                availableColumns: {
-                    vehiculos: [
-                        { value: 'placa', label: 'Placa' },
-                        { value: 'marca', label: 'Marca' },
-                        { value: 'modelo', label: 'Modelo' },
-                        { value: 'anio_fabricacion', label: 'Año de Fabricación' },
-                        { value: 'chasis_vin', label: 'Chasis/VIN' },
-                        { value: 'capacidad_pasajeros', label: 'Capacidad de Pasajeros' },
-                        { value: 'tipo', label: 'Tipo' },
-                    ],
-                    propietarios: [
-                        { value: 'numero_identificacion', label: 'Número de Identificación' },
-                        { value: 'nombre_completo', label: 'Nombre Completo' },
-                        { value: 'telefono_contacto', label: 'Teléfono de Contacto' },
-                        { value: 'correo_electronico', label: 'Correo Electrónico' },
-                        { value: 'direccion_contacto', label: 'Dirección de Contacto' },
-                    ],
-                    conductores: [
-                        { value: 'cedula', label: 'Cédula' },
-                        { value: 'nombres', label: 'Nombres' },
-                        { value: 'apellidos', label: 'Apellidos' },
-                        { value: 'celular', label: 'Celular' },
-                        { value: 'correo', label: 'Correo' },
-                        { value: 'vehiculo_placa', label: 'Placa del Vehículo' },
-                        { value: 'numero_interno', label: 'Número Interno' },
-                    ],
-                },
 
                 editField(index) {
                     this.editingIndex = index;
@@ -447,47 +417,14 @@
                     } else {
                         this.selectOptionsText = '';
                     }
-                    // Inicializar columnas de autocomplete si no existen
-                    if (this.fields[index].type === 'autocomplete') {
-                        if (!this.fields[index].autocomplete_columns) {
-                            this.fields[index].autocomplete_columns = [];
-                        }
-                        if (!this.fields[index].autocomplete_source) {
-                            this.fields[index].autocomplete_source = 'vehiculos';
-                        }
-                        if (!this.fields[index].autocomplete_label_field) {
-                            const source = this.fields[index].autocomplete_source;
-                            const columns = this.availableColumns[source] || [];
-                            if (columns.length > 0) {
-                                this.fields[index].autocomplete_label_field = columns[0].value;
-                            }
-                        }
-                    }
-                },
-
-                updateAutocompleteColumns() {
-                    if (this.editingIndex !== null && this.fields[this.editingIndex].type === 'autocomplete') {
-                        const source = this.fields[this.editingIndex].autocomplete_source;
-                        // Reinicializar columnas seleccionadas si no existen
-                        if (!this.fields[this.editingIndex].autocomplete_columns) {
-                            this.fields[this.editingIndex].autocomplete_columns = [];
-                        }
-                        // Establecer el campo de label por defecto
-                        const columns = this.availableColumns[source] || [];
-                        if (columns.length > 0 && !this.fields[this.editingIndex].autocomplete_label_field) {
-                            this.fields[this.editingIndex].autocomplete_label_field = columns[0].value;
-                        }
-                    }
                 },
 
                 deleteField(index) {
                     if (confirm('¿Está seguro de eliminar este campo?')) {
                         this.fields.splice(index, 1);
-                        // Actualizar orden después de eliminar
                         this.fields.forEach((f, i) => {
                             f.order = i;
                         });
-                        // Si el campo eliminado estaba siendo editado, cerrar el editor
                         if (this.editingIndex === index) {
                             this.editingIndex = null;
                         } else if (this.editingIndex > index) {
@@ -498,6 +435,18 @@
 
                 addField(type) {
                     const fieldTypes = {
+                        logo: {
+                            id: 'logo_' + Date.now(),
+                            name: 'logo',
+                            label: 'Logo',
+                            type: 'logo',
+                            required: false,
+                            placeholder: '',
+                            value: '',
+                            order: this.fields.length,
+                            enabled: true,
+                            logo_path: '/images/logo.svg',
+                        },
                         text: {
                             id: 'campo_' + Date.now(),
                             name: 'campo_nuevo_' + Date.now(),
@@ -536,6 +485,17 @@
                             name: 'campo_date_' + Date.now(),
                             label: 'Fecha',
                             type: 'date',
+                            required: false,
+                            placeholder: '',
+                            value: '',
+                            order: this.fields.length,
+                            enabled: true,
+                        },
+                        time: {
+                            id: 'campo_' + Date.now(),
+                            name: 'campo_time_' + Date.now(),
+                            label: 'Hora',
+                            type: 'time',
                             required: false,
                             placeholder: '',
                             value: '',
@@ -592,38 +552,11 @@
                             accept: 'image/*,.pdf,.doc,.docx,video/*',
                             help_text: 'Formatos permitidos: Imágenes, Documentos, Videos. Máximo 10MB por archivo.',
                         },
-                        autocomplete: {
-                            id: 'campo_' + Date.now(),
-                            name: 'campo_autocomplete_' + Date.now(),
-                            label: 'Búsqueda Automática',
-                            type: 'autocomplete',
-                            required: false,
-                            placeholder: 'Buscar...',
-                            value: '',
-                            order: this.fields.length,
-                            enabled: true,
-                            autocomplete_source: 'vehiculos',
-                            autocomplete_columns: ['placa', 'marca', 'modelo'],
-                            autocomplete_label_field: 'placa',
-                        },
-                        logo: {
-                            id: 'campo_' + Date.now(),
-                            name: 'logo',
-                            label: 'Logo',
-                            type: 'logo',
-                            required: false,
-                            placeholder: '',
-                            value: '',
-                            order: this.fields.length,
-                            enabled: true,
-                            logo_path: '/images/logo.svg',
-                        },
                     };
 
                     const newField = fieldTypes[type];
                     if (newField) {
                         this.fields.push(newField);
-                        // Editar el nuevo campo automáticamente
                         this.editField(this.fields.length - 1);
                     }
                 },
@@ -633,7 +566,6 @@
                     if (newIndex >= 0 && newIndex < this.fields.length) {
                         const field = this.fields.splice(index, 1)[0];
                         this.fields.splice(newIndex, 0, field);
-                        // Actualizar orden
                         this.fields.forEach((f, i) => {
                             f.order = i;
                         });
