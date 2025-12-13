@@ -1,59 +1,160 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Coopuertos - Sistema de Gestión de Cooperativa de Puertos
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema web desarrollado con Laravel 12 para la gestión integral de conductores, vehículos, propietarios y PQRS (Peticiones, Quejas, Reclamos y Sugerencias) de una cooperativa de puertos.
 
-## About Laravel
+## 🚀 Características Principales
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Gestión de Conductores
+- CRUD completo de conductores
+- Generación de carnets con QR
+- Fotos públicas de conductores
+- Búsqueda en tiempo real
+- Visualización pública mediante UUID
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Gestión de Vehículos
+- CRUD completo de vehículos
+- Asociación con conductores
+- Búsqueda avanzada de vehículos
+- Gestión de placas
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Gestión de Propietarios
+- CRUD completo de propietarios
+- Búsqueda de propietarios
+- Asociación con vehículos
 
-## Learning Laravel
+### Sistema de PQRS
+- Formularios públicos para PQRS de servicio
+- Formularios de PQRS para taquilla
+- Editor visual de formularios
+- Gestión de estados de PQRS
+- Generación de códigos QR para formularios
+- Sistema de adjuntos
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Sistema de Carnets
+- Diseñador visual de plantillas de carnets
+- Personalización de carnets
+- Generación masiva de carnets
+- Descarga en formato ZIP
+- Seguimiento de progreso de generación
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Interfaz de Usuario
+- Tema claro/oscuro
+- Sidebar de navegación
+- Dashboard con métricas
+- UI completamente en español
+- Diseño responsive
 
-## Laravel Sponsors
+## 📋 Requisitos
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP >= 8.2
+- Composer
+- Node.js y NPM
+- Base de datos (MySQL, PostgreSQL, SQLite)
+- Servidor web (Apache/Nginx) o PHP Built-in Server
 
-### Premium Partners
+## 🛠️ Instalación
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+1. Clonar el repositorio:
+```bash
+git clone [url-del-repositorio]
+cd coopuertos2
+```
 
-## Contributing
+2. Instalar dependencias de PHP:
+```bash
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. Instalar dependencias de Node.js:
+```bash
+npm install
+```
 
-## Code of Conduct
+4. Configurar el archivo de entorno:
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. Configurar la base de datos en `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=coopuertos
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Security Vulnerabilities
+6. Ejecutar migraciones:
+```bash
+php artisan migrate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+7. (Opcional) Poblar la base de datos con datos de prueba:
+```bash
+php artisan db:seed
+```
 
-## License
+8. Compilar assets:
+```bash
+npm run build
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+9. Iniciar el servidor de desarrollo:
+```bash
+php artisan serve
+```
+
+O usar el script de desarrollo que incluye servidor, cola de trabajos y logs:
+```bash
+composer run dev
+```
+
+## 📦 Tecnologías Utilizadas
+
+- **Backend**: Laravel 12
+- **Frontend**: Blade Templates, Tailwind CSS, Alpine.js
+- **Generación de PDFs**: DomPDF
+- **Generación de QR**: SimpleSoftwareIO/simple-qrcode
+- **Autenticación**: Laravel Breeze
+- **Base de datos**: MySQL/PostgreSQL/SQLite
+
+## 📁 Estructura del Proyecto
+
+```
+coopuertos2/
+├── app/
+│   ├── Http/Controllers/    # Controladores
+│   ├── Models/              # Modelos Eloquent
+│   ├── Jobs/                # Trabajos en cola
+│   └── Console/Commands/    # Comandos Artisan
+├── database/
+│   ├── migrations/          # Migraciones de base de datos
+│   └── seeders/             # Seeders
+├── resources/
+│   ├── views/               # Vistas Blade
+│   └── js/                  # JavaScript
+├── routes/
+│   ├── web.php              # Rutas web
+│   └── auth.php             # Rutas de autenticación
+└── public/                  # Archivos públicos
+```
+
+## 🚦 Comandos Útiles
+
+- **Desarrollo**: `composer run dev` - Inicia servidor, cola y logs
+- **Tests**: `composer run test` - Ejecuta las pruebas
+- **Setup completo**: `composer run setup` - Instalación completa
+
+## 📝 Notas de Versión
+
+Para ver el historial completo de cambios y mejoras, consulta el archivo [changenotes.md](changenotes.md).
+
+## 📄 Licencia
+
+Este proyecto es software propietario. Todos los derechos reservados.
+
+## 👥 Soporte
+
+Para soporte técnico o consultas, contactar al equipo de desarrollo.

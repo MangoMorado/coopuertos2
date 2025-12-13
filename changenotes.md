@@ -1,5 +1,10 @@
 # Coopuertos App
 
+## *v. 0.0.5*
+- Nuevo sistema Carnets
+- Nuevo diseñador de Carnets
+- Nueva función Descarga de carnets
+
 ## *v. 0.0.4*
 - Se elimina las placas asociadas a conductores, ahora todo se administra desde la pestaña de vehiculos
 - Ahora los PQRS tienen estados
@@ -34,3 +39,16 @@
 - UI en español (auth, dashboard, navegación, perfil, conductores).
 - Logo e imágenes sirven desde assets/ uploads.
 - CRUD de conductores con edición, carnet, QR y fotos públicas.
+
+# Mejoras Pendientes:
+
+- 📝 Reportes y estadísticas
+- 📝 Exportación de datos (Excel, CSV)
+- 📝 Notificaciones por email
+- 📝 Dashboard con más métricas
+- 📝 API REST para integraciones
+- 📝 Sistema de roles y permisos de usuario
+- 📝 Historial de auditoría y logs de cambios
+- 📝 Importación masiva de datos desde Excel/CSV
+- 📝 Sistema de notificaciones push en tiempo real
+- 📝 App móvil para consulta de información

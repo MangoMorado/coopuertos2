@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\PqrController;
+use App\Http\Controllers\CarnetController;
 // Ruta pública principal
 Route::get('/', function () {
     return view('welcome');
@@ -71,6 +72,14 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     Route::delete('/pqrs-taquilla/{pqrTaquilla}', [PqrController::class, 'destroyTaquilla'])->name('pqrs-taquilla.destroy');
     Route::delete('/pqrs/{pqr}/adjunto/{index}', [PqrController::class, 'deleteAttachment'])->name('pqrs.adjunto.delete');
     Route::resource('pqrs', PqrController::class);
+    
+    // Carnets
+    Route::get('/carnets', [CarnetController::class, 'index'])->name('carnets.index');
+    Route::get('/carnets/personalizar', [CarnetController::class, 'personalizar'])->name('carnets.personalizar');
+    Route::post('/carnets/guardar-plantilla', [CarnetController::class, 'guardarPlantilla'])->name('carnets.guardar-plantilla');
+    Route::post('/carnets/descargar-todos', [CarnetController::class, 'descargarTodos'])->name('carnets.descargar-todos');
+    Route::get('/carnets/progreso/{sessionId}', [CarnetController::class, 'obtenerProgreso'])->name('carnets.progreso');
+    Route::get('/carnets/descargar/{sessionId}', [CarnetController::class, 'descargarZip'])->name('carnets.descargar-zip');
 });
 
 // Rutas de autenticación generadas por Laravel Breeze/Jetstream

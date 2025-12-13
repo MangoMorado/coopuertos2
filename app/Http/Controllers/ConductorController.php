@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ConductorController extends Controller
 {
@@ -93,7 +94,23 @@ public function generarCarnet(Conductor $conductor)
         $conductor = Conductor::where('uuid', $uuid)
             ->with(['asignacionActiva.vehicle'])
             ->firstOrFail();
-        return view('conductores.show', compact('conductor'));
+        
+        // Si se solicita solo el QR
+        if (request()->has('qr')) {
+            $size = (int) request()->get('size', 200);
+            // Usar SVG que no requiere imagick
+            $qrCode = QrCode::size($size)
+                ->generate(route('conductor.public', $uuid));
+            
+            return response($qrCode, 200)
+                ->header('Content-Type', 'image/svg+xml')
+                ->header('Content-Disposition', 'inline; filename="qr-code.svg"');
+        }
+        
+        // Obtener plantilla activa de carnet
+        $template = \App\Models\CarnetTemplate::where('activo', true)->first();
+        
+        return view('conductores.show', compact('conductor', 'template'));
     }
 
     public function edit(Conductor $conductore)

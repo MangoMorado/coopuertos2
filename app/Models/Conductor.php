@@ -28,6 +28,11 @@ class Conductor extends Model
         'estado',
     ];
 
+    // Casts para convertir automáticamente tipos
+    protected $casts = [
+        'fecha_nacimiento' => 'date',
+    ];
+
     // Generar UUID automáticamente al crear un registro
     protected static function booted()
     {
