@@ -1,24 +1,37 @@
 [phases]
 
 # 1. Fase de Configuración (Setup)
-# Asegura que Node.js esté disponible para el build de Vite
-setup = { # Nixpacks detecta la necesidad de Node por el package.json, pero a veces es bueno ser explícito
-    apt = ["git", "unzip"],
+[phases.setup]
+apt = ["git", "unzip"]
+cmds = [
     # Crea los directorios ignorados por Git
-    cmds = ["mkdir -p public/uploads/{carnets,conductores,pqrs,vehiculos}"]
-}
+    "mkdir -p public/uploads/{carnets,conductores,pqrs,vehiculos}"
+]
 
 # 2. Fase de Construcción (Build)
-# Aquí se instalan dependencias y se ejecuta la compilación de assets
 [phases.build]
 cmds = [
-    # Instala las dependencias de Node.js
-    "npm install", 
-    # **IMPORTANTE**: Ejecuta el comando de build de Vite para generar public/build/manifest.json
-    "npm run build", 
-    # Asigna permisos a los directorios que necesitan escritura
+    # ----------------------------------------
+    # I. Dependencias y Compilación de Assets
+    # ----------------------------------------
+    "composer install --no-dev --optimize-autoloader", # Instala dependencias de PHP (solo producción)
+    "npm install",
+    "npm run build", # Genera public/build/manifest.json
+
+    # ----------------------------------------
+    # II. Base de Datos y Configuración
+    # ----------------------------------------
+    # Ejecuta las migraciones de la base de datos.
+    # --force es necesario en entornos de producción.
+    "php artisan migrate --force", 
+    
+    # OPCIONAL: Si necesitas seeders (solo si son necesarios para el deploy)
+    # "php artisan db:seed --force", 
+
+    # ----------------------------------------
+    # III. Permisos y Enlaces (Storage)
+    # ----------------------------------------
     "chmod -R 775 storage bootstrap/cache",
     "chmod -R 775 public/uploads",
-    # Crea el symlink del storage
     "php artisan storage:link"
 ]
