@@ -1,20 +1,24 @@
 [phases]
 
-# Comandos de Configuración (antes de la construcción principal)
-[phases.setup]
-# Crea los directorios de uploads que están ignorados por Git
-cmds = [
-    "mkdir -p public/uploads/{carnets,conductores,pqrs,vehiculos}"
-]
+# 1. Fase de Configuración (Setup)
+# Asegura que Node.js esté disponible para el build de Vite
+setup = { # Nixpacks detecta la necesidad de Node por el package.json, pero a veces es bueno ser explícito
+    apt = ["git", "unzip"],
+    # Crea los directorios ignorados por Git
+    cmds = ["mkdir -p public/uploads/{carnets,conductores,pqrs,vehiculos}"]
+}
 
-# Comandos de Construcción (donde se asignan permisos y se linkea el storage)
+# 2. Fase de Construcción (Build)
+# Aquí se instalan dependencias y se ejecuta la compilación de assets
 [phases.build]
-# Asigna permisos a los directorios de Laravel y a las nuevas carpetas
-# Nixpacks generalmente usa un usuario no-root para correr el proceso de build,
-# por lo que evitamos `sudo` y solo confiamos en el `chmod`
 cmds = [
+    # Instala las dependencias de Node.js
+    "npm install", 
+    # **IMPORTANTE**: Ejecuta el comando de build de Vite para generar public/build/manifest.json
+    "npm run build", 
+    # Asigna permisos a los directorios que necesitan escritura
     "chmod -R 775 storage bootstrap/cache",
     "chmod -R 775 public/uploads",
-    # php artisan storage:link DEBE ejecutarse para crear el symlink en `public`
+    # Crea el symlink del storage
     "php artisan storage:link"
 ]

@@ -1,6 +1,9 @@
 # Coopuertos App
 
 ## *v. 0.0.5.1*
+- Correciones al archivo Nixpacks
+
+## *v. 0.0.5.1*
 - Creado el archivo Nixpacks
 
 ## *v. 0.0.5*
