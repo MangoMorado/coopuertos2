@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.5.4*
+- Ultima oportunidad al Nixpacks xd
+
 ## *v. 0.0.5.3*
 - Correciones al archivo Nixpacks
 

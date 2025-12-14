@@ -1,32 +1,28 @@
 [phases]
 
-# 1. Fase de Configuración (Setup)
 [phases.setup]
-apt = ["git", "unzip"]
+# Usamos apt para Node (aunque Nixpacks ya lo incluye), pero es bueno para dependencias.
+apt = ["git", "unzip"] 
 cmds = [
-    # Crea los directorios ignorados por Git
     "mkdir -p public/uploads/{carnets,conductores,pqrs,vehiculos}"
 ]
 
-# 2. Fase de Construcción (Build)
 [phases.build]
 cmds = [
     # ----------------------------------------
     # I. Dependencias y Compilación de Assets
     # ----------------------------------------
-    "composer install --no-dev --optimize-autoloader", # Instala dependencias de PHP (solo producción)
-    "npm install",
-    "npm run build", # Genera public/build/manifest.json
+    "composer install --no-dev --optimize-autoloader", # ¡La única instalación de Composer!
+    "npm install",                                   # Instala las dependencias de Node.js
+    "npm run build",                                 # Genera public/build/manifest.json
 
     # ----------------------------------------
     # II. Base de Datos y Configuración
     # ----------------------------------------
-    # Ejecuta las migraciones de la base de datos.
-    # --force es necesario en entornos de producción.
     "php artisan migrate --force", 
-    
-    # OPCIONAL: Si necesitas seeders (solo si son necesarios para el deploy)
-    # "php artisan db:seed --force", 
+    # Aquí puedes añadir otros comandos de configuración, como:
+    # "php artisan config:cache", 
+    # "php artisan route:cache",
 
     # ----------------------------------------
     # III. Permisos y Enlaces (Storage)
