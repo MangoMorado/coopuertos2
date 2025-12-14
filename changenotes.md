@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.5.1*
+- Creado el archivo Nixpacks
+
 ## *v. 0.0.5*
 - Nuevo sistema Carnets
 - Nuevo diseñador de Carnets

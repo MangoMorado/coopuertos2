@@ -1,0 +1,20 @@
+[phases]
+
+# Comandos de Configuración (antes de la construcción principal)
+[phases.setup]
+# Crea los directorios de uploads que están ignorados por Git
+cmds = [
+    "mkdir -p public/uploads/{carnets,conductores,pqrs,vehiculos}"
+]
+
+# Comandos de Construcción (donde se asignan permisos y se linkea el storage)
+[phases.build]
+# Asigna permisos a los directorios de Laravel y a las nuevas carpetas
+# Nixpacks generalmente usa un usuario no-root para correr el proceso de build,
+# por lo que evitamos `sudo` y solo confiamos en el `chmod`
+cmds = [
+    "chmod -R 775 storage bootstrap/cache",
+    "chmod -R 775 public/uploads",
+    # php artisan storage:link DEBE ejecutarse para crear el symlink en `public`
+    "php artisan storage:link"
+]
