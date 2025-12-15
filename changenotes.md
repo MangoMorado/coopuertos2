@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.5.5*
+- Eliminado el archivo de configuración de nixpacks
+
 ## *v. 0.0.5.4*
 - Ultima oportunidad al Nixpacks xd
 
