@@ -88,7 +88,7 @@
                     </div>
                     <div>
                         <label class="block font-semibold text-gray-700 mb-1">Fecha de Nacimiento</label>
-                        <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $conductor->fecha_nacimiento) }}"
+                        <input type="date" name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $conductor->fecha_nacimiento ? $conductor->fecha_nacimiento->format('Y-m-d') : '') }}"
                                class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
@@ -165,10 +165,10 @@
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <a href="{{ route('conductores.index') }}" class="btn btn-gray">
+                    <a href="{{ route('conductores.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md shadow-sm">
                         Cancelar
                     </a>
-                    <button type="submit" class="btn btn-blue">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-sm">
                         Actualizar
                     </button>
                 </div>

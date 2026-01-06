@@ -166,10 +166,10 @@
                 </div>
 
                 <div class="flex justify-end space-x-3 pt-4">
-                    <a href="{{ route('conductores.index') }}" class="btn btn-gray">
+                    <a href="{{ route('conductores.index') }}" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md shadow-sm">
                         Cancelar
                     </a>
-                    <button type="submit" class="btn btn-blue">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-sm">
                         Guardar
                     </button>
                 </div>

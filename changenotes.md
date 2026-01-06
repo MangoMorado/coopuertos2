@@ -1,5 +1,10 @@
 # Coopuertos App
 
+## *v. 0.0.5.6*
+- Se creo el documento Roadmap para definir nuevas caracteristicas y requerimiento de desarrollo
+- Instalada Dependencia usada via CDN CropperJS, ahora funciona en local
+- Se actualizaron las dependencias
+
 ## *v. 0.0.5.5*
 - Eliminado el archivo de configuración de nixpacks
 
