@@ -9,6 +9,8 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\PqrController;
 use App\Http\Controllers\CarnetController;
+use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\UserController;
 // Ruta pública principal
 Route::get('/', function () {
     return view('welcome');
@@ -40,6 +42,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 	Route::get('/conductores/{conductor}/carnet', [ConductorController::class, 'generarCarnet'])
     ->name('conductores.carnet');
+    Route::get('/conductores/{conductor}/info', [ConductorController::class, 'info'])
+    ->name('conductores.info');
 
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -80,6 +84,28 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     Route::post('/carnets/descargar-todos', [CarnetController::class, 'descargarTodos'])->name('carnets.descargar-todos');
     Route::get('/carnets/progreso/{sessionId}', [CarnetController::class, 'obtenerProgreso'])->name('carnets.progreso');
     Route::get('/carnets/descargar/{sessionId}', [CarnetController::class, 'descargarZip'])->name('carnets.descargar-zip');
+    
+    // Usuarios
+    Route::middleware('permission:ver usuarios')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    });
+    Route::middleware('permission:crear usuarios')->group(function () {
+        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    });
+    Route::middleware('permission:editar usuarios')->group(function () {
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    });
+    Route::middleware('permission:eliminar usuarios')->group(function () {
+        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
+    
+    // Configuración (solo para rol Mango)
+    Route::middleware('permission:gestionar configuracion')->group(function () {
+        Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
+        Route::put('/configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
+    });
 });
 
 // Rutas de autenticación generadas por Laravel Breeze/Jetstream

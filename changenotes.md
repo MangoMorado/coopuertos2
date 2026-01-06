@@ -1,5 +1,12 @@
 # Coopuertos App
 
+## *v. 0.0.5.7*
+- Se establecieron 7 fases de desarrollo para la app
+- Sistema de roles y permisos con Spatie Permission (Mango, Admin, User)
+- Módulo CRUD de usuarios con gestión de roles
+- Vista de configuración de permisos por módulo (solo Mango)
+- Mejoras en la vista de conductores
+
 ## *v. 0.0.5.6*
 - Se creo el documento Roadmap para definir nuevas caracteristicas y requerimiento de desarrollo
 - Instalada Dependencia usada via CDN CropperJS, ahora funciona en local
@@ -67,7 +74,7 @@
 - 📝 Notificaciones por email
 - 📝 Dashboard con más métricas
 - 📝 API REST para integraciones
-- 📝 Sistema de roles y permisos de usuario
+- ✅ Sistema de roles y permisos de usuario
 - 📝 Historial de auditoría y logs de cambios
 - 📝 Importación masiva de datos desde Excel/CSV
 - 📝 Sistema de notificaciones push en tiempo real

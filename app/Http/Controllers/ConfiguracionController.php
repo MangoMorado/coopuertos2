@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
+
+class ConfiguracionController extends Controller
+{
+    
+    public function index()
+    {
+        $roles = Role::whereIn('name', ['Mango', 'Admin', 'User'])->get();
+        
+        // Módulos disponibles
+        $modulos = [
+            'conductores' => 'Conductores',
+            'vehiculos' => 'Vehículos',
+            'propietarios' => 'Propietarios',
+            'carnets' => 'Carnets',
+            'dashboard' => 'Dashboard',
+            'usuarios' => 'Usuarios',
+        ];
+
+        // Obtener permisos actuales de cada rol por módulo
+        $modulosPorRol = [];
+        foreach ($roles as $role) {
+            $rolePermissions = $role->permissions->pluck('name')->toArray();
+            $modulosPorRol[$role->name] = [];
+            
+            foreach ($modulos as $modulo => $nombre) {
+                // Un módulo está activo si el rol tiene al menos el permiso "ver"
+                $modulosPorRol[$role->name][$modulo] = in_array("ver {$modulo}", $rolePermissions);
+            }
+        }
+
+        return view('configuracion.index', compact('roles', 'modulos', 'modulosPorRol'));
+    }
+
+    public function update(Request $request)
+    {
+        $request->validate([
+            'modulos' => 'required|array',
+            'modulos.*' => 'array',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $roles = Role::whereIn('name', ['Mango', 'Admin', 'User'])->get();
+            
+            foreach ($roles as $role) {
+                $roleName = $role->name;
+                
+                // Mango siempre tiene todos los permisos
+                if ($roleName === 'Mango') {
+                    $allPermissions = Permission::all();
+                    $role->syncPermissions($allPermissions);
+                    continue;
+                }
+
+                // Para Admin y User, aplicar permisos basados en módulos activos
+                $permisosSeleccionados = [];
+                
+                if (isset($request->modulos[$roleName])) {
+                    $modulosActivos = $request->modulos[$roleName];
+                    
+                    foreach ($modulosActivos as $modulo) {
+                        // Si el módulo está activo, dar todos los permisos básicos
+                        $permisosSeleccionados[] = Permission::where('name', "ver {$modulo}")->first();
+                        $permisosSeleccionados[] = Permission::where('name', "crear {$modulo}")->first();
+                        $permisosSeleccionados[] = Permission::where('name', "editar {$modulo}")->first();
+                        $permisosSeleccionados[] = Permission::where('name', "eliminar {$modulo}")->first();
+                    }
+                }
+                
+                // Filtrar nulls por si algún permiso no existe
+                $permisosSeleccionados = array_filter($permisosSeleccionados);
+                
+                $role->syncPermissions($permisosSeleccionados);
+            }
+
+            DB::commit();
+            
+            return redirect()->route('configuracion.index')
+                ->with('success', 'Permisos actualizados correctamente.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('configuracion.index')
+                ->with('error', 'Error al actualizar permisos: ' . $e->getMessage());
+        }
+    }
+}
+

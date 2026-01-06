@@ -12,41 +12,39 @@
     <thead class="{{ $bgHeader }} {{ $textHeader }} uppercase text-sm">
         <tr>
             <th class="text-left px-4 py-3">Cédula</th>
-            <th class="text-left px-4 py-3">Nombres</th>
-            <th class="text-left px-4 py-3">Apellidos</th>
-            <th class="text-left px-4 py-3">Estado</th>
-            <th class="text-center px-4 py-3">QR</th>
+            <th class="text-left px-4 py-3">Nombre Completo</th>
+            <th class="text-left px-4 py-3">Vehículo Asignado</th>
             <th class="text-center px-4 py-3">Acciones</th>
         </tr>
     </thead>
     <tbody class="text-sm">
         @forelse($conductores as $c)
+            @php
+                $vehiculo = $c->asignacionActiva && $c->asignacionActiva->vehicle ? $c->asignacionActiva->vehicle : null;
+            @endphp
             <tr class="border-t {{ $borderRow }} {{ $hoverRow }} transition">
                 <td class="px-4 py-3 {{ $textBody }}">{{ $c->cedula }}</td>
-                <td class="px-4 py-3 {{ $textBody }}">{{ $c->nombres }}</td>
-                <td class="px-4 py-3 {{ $textBody }}">{{ $c->apellidos }}</td>
-                <td class="px-4 py-3">
-                    <span class="px-2 py-1 text-xs rounded-full 
-                        {{ $c->estado === 'activo' ? ($isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800') : ($isDark ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800') }}">
-                        {{ ucfirst($c->estado) }}
-                    </span>
-                </td>
-                <td class="text-center py-3">
-                    {!! QrCode::size(70)->generate(route('conductor.public', $c->uuid)) !!}
+                <td class="px-4 py-3 {{ $textBody }}">{{ $c->nombres }} {{ $c->apellidos }}</td>
+                <td class="px-4 py-3 {{ $textBody }}">
+                    @if($vehiculo)
+                        {{ $vehiculo->placa }} - {{ $vehiculo->marca ?? '' }} {{ $vehiculo->modelo ?? '' }}
+                    @else
+                        <span class="{{ $textEmpty }}">Sin asignar</span>
+                    @endif
                 </td>
                 <td class="text-center py-3">
                     <div class="flex justify-center space-x-2">
+                        <a href="{{ route('conductores.info', $c) }}"
+                           class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
+                            Info
+                        </a>
                         <a href="{{ route('conductor.public', $c->uuid) }}"
                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
-                            Ver
+                            Carnet
                         </a>
                         <a href="{{ route('conductores.edit', $c) }}"
                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
                             Editar
-                        </a>
-                        <a href="{{ route('conductores.carnet', $c) }}"
-                           class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm shadow-sm">
-                           Generar Carnet
                         </a>
                         <form method="POST" action="{{ route('conductores.destroy', $c) }}" onsubmit="return confirm('¿Eliminar este conductor?')">
                             @csrf @method('DELETE')
@@ -59,7 +57,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="6" class="text-center py-6 {{ $textEmpty }}">No se encontraron conductores.</td>
+                <td colspan="4" class="text-center py-6 {{ $textEmpty }}">No se encontraron conductores.</td>
             </tr>
         @endforelse
     </tbody>

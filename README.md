@@ -118,6 +118,7 @@ composer run dev
 - **Generación de PDFs**: DomPDF
 - **Generación de QR**: SimpleSoftwareIO/simple-qrcode
 - **Autenticación**: Laravel Breeze
+- **Roles y Permisos**: Spatie Laravel Permission
 - **Base de datos**: MySQL/PostgreSQL/SQLite
 
 ## 📁 Estructura del Proyecto
@@ -147,9 +148,65 @@ coopuertos2/
 - **Tests**: `composer run test` - Ejecuta las pruebas
 - **Setup completo**: `composer run setup` - Instalación completa
 
+## 🔐 Sistema de Roles y Permisos
+
+El sistema utiliza **Spatie Laravel Permission** para gestionar roles y permisos de manera granular.
+
+### Roles Disponibles
+
+- **Mango**: Rol SuperAdmin con acceso completo a todos los módulos y configuración
+- **Admin**: Rol administrativo con acceso a todos los módulos excepto configuración
+- **User**: Rol de usuario básico con acceso de solo lectura
+
+### Módulos y Permisos
+
+Cada módulo tiene 4 permisos base que controlan las acciones:
+
+- `ver {modulo}`: Ver/Listar elementos del módulo
+- `crear {modulo}`: Crear nuevos elementos
+- `editar {modulo}`: Editar elementos existentes
+- `eliminar {modulo}`: Eliminar elementos
+
+#### Módulos Disponibles
+
+1. **Dashboard** (`dashboard`)
+   - Ver panel de control y estadísticas
+
+2. **Conductores** (`conductores`)
+   - Ver, crear, editar y eliminar conductores
+   - Generar carnets
+   - Ver información detallada
+
+3. **Vehículos** (`vehiculos`)
+   - Ver, crear, editar y eliminar vehículos
+   - Asociar con conductores
+
+4. **Propietarios** (`propietarios`)
+   - Ver, crear, editar y eliminar propietarios
+
+5. **Carnets** (`carnets`)
+   - Ver, crear, editar y eliminar carnets
+   - Personalizar plantillas
+   - Generar carnets masivos
+
+6. **Configuración** (`configuracion`) - Solo para rol Mango
+   - Gestionar permisos por módulo y rol
+   - Configurar acceso de usuarios
+
+### Configuración de Permisos
+
+- Los módulos aparecen automáticamente en el navbar según los permisos del usuario
+- El rol Mango tiene acceso completo y no puede ser modificado
+- Los permisos se pueden gestionar desde la vista de Configuración (solo Mango)
+- Los permisos se aplican tanto en rutas como en vistas mediante directivas `@can` y middleware
+
 ## 📝 Notas de Versión
 
 Para ver el historial completo de cambios y mejoras, consulta el archivo [changenotes.md](changenotes.md).
+
+## 📝 Roadmap
+
+Para ver el progreso de la App y su bitacora de cambios, consulta el archivo [roadmap.md](roadmap.md).
 
 ## 📄 Licencia
 

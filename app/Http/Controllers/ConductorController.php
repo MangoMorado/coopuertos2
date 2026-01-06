@@ -26,7 +26,7 @@ public function index(Request $request)
         });
     }
 
-    $conductores = $query->latest()->paginate(10)->withQueryString();
+    $conductores = $query->with(['asignacionActiva.vehicle'])->latest()->paginate(10)->withQueryString();
 
     if ($request->ajax() || $request->has('ajax')) {
         $theme = Auth::user()->theme ?? 'light';
@@ -85,6 +85,14 @@ public function generarCarnet(Conductor $conductor)
     // Ejemplo simple: devolver PDF o vista del carnet
     // Aquí puedes usar un paquete como barryvdh/laravel-dompdf para generar PDF
     return view('conductores.carnet', compact('conductor'));
+}
+
+public function info(Conductor $conductor)
+{
+    // Cargar relaciones necesarias
+    $conductor->load(['asignacionActiva.vehicle', 'asignaciones.vehicle']);
+    
+    return view('conductores.info', compact('conductor'));
 }
 
 
