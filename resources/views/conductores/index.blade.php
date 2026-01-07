@@ -25,10 +25,18 @@
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold {{ $textTitle }}">Conductores</h2>
             <div class="flex space-x-2">
+            @can('crear conductores')
+                <a href="{{ route('conductores.import') }}"
+                   class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg shadow-md transition">
+                   Importar Conductores
+                </a>
+                @endcan
+            @can('crear conductores')
                 <a href="{{ route('conductores.create') }}"
                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
                    + Nuevo Conductor
                 </a>
+                @endcan
             </div>
         </div>
 

@@ -13,21 +13,18 @@
         <tr>
             <th class="text-left px-4 py-3">Cédula</th>
             <th class="text-left px-4 py-3">Nombre Completo</th>
-            <th class="text-left px-4 py-3">Vehículo Asignado</th>
+            <th class="text-left px-4 py-3">Vehiculo</th>
             <th class="text-center px-4 py-3">Acciones</th>
         </tr>
     </thead>
     <tbody class="text-sm">
         @forelse($conductores as $c)
-            @php
-                $vehiculo = $c->asignacionActiva && $c->asignacionActiva->vehicle ? $c->asignacionActiva->vehicle : null;
-            @endphp
             <tr class="border-t {{ $borderRow }} {{ $hoverRow }} transition">
                 <td class="px-4 py-3 {{ $textBody }}">{{ $c->cedula }}</td>
                 <td class="px-4 py-3 {{ $textBody }}">{{ $c->nombres }} {{ $c->apellidos }}</td>
                 <td class="px-4 py-3 {{ $textBody }}">
-                    @if($vehiculo)
-                        {{ $vehiculo->placa }} - {{ $vehiculo->marca ?? '' }} {{ $vehiculo->modelo ?? '' }}
+                    @if($c->vehiculo)
+                        {{ $c->vehiculo }}
                     @else
                         <span class="{{ $textEmpty }}">Sin asignar</span>
                     @endif

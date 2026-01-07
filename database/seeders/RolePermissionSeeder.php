@@ -26,32 +26,34 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($modules as $module) {
-            Permission::firstOrCreate(['name' => "ver {$module}"]);
-            Permission::firstOrCreate(['name' => "crear {$module}"]);
-            Permission::firstOrCreate(['name' => "editar {$module}"]);
-            Permission::firstOrCreate(['name' => "eliminar {$module}"]);
+            Permission::firstOrCreate(['name' => "ver {$module}", 'guard_name' => 'web']);
+            Permission::firstOrCreate(['name' => "crear {$module}", 'guard_name' => 'web']);
+            Permission::firstOrCreate(['name' => "editar {$module}", 'guard_name' => 'web']);
+            Permission::firstOrCreate(['name' => "eliminar {$module}", 'guard_name' => 'web']);
         }
 
         // Permiso especial de configuración (solo para Mango)
-        Permission::firstOrCreate(['name' => 'gestionar configuracion']);
+        Permission::firstOrCreate(['name' => 'gestionar configuracion', 'guard_name' => 'web']);
 
         // Crear roles
-        $roleMango = Role::firstOrCreate(['name' => 'Mango']);
-        $roleAdmin = Role::firstOrCreate(['name' => 'Admin']);
-        $roleUser = Role::firstOrCreate(['name' => 'User']);
+        $roleMango = Role::firstOrCreate(['name' => 'Mango', 'guard_name' => 'web']);
+        $roleAdmin = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
+        $roleUser = Role::firstOrCreate(['name' => 'User', 'guard_name' => 'web']);
 
         // Asignar todos los permisos a Mango
-        $allPermissions = Permission::all();
+        $allPermissions = Permission::where('guard_name', 'web')->get();
         $roleMango->syncPermissions($allPermissions);
 
         // Asignar permisos a Admin (todos excepto configuración, pero incluyendo usuarios)
-        $adminPermissions = Permission::where('name', '!=', 'gestionar configuracion')
+        $adminPermissions = Permission::where('guard_name', 'web')
+            ->where('name', '!=', 'gestionar configuracion')
             ->where('name', 'not like', '%configuracion%')
             ->get();
         $roleAdmin->syncPermissions($adminPermissions);
 
         // Asignar permisos básicos a User (solo ver)
-        $userPermissions = Permission::where('name', 'like', 'ver %')
+        $userPermissions = Permission::where('guard_name', 'web')
+            ->where('name', 'like', 'ver %')
             ->where('name', 'not like', '%configuracion%')
             ->get();
         $roleUser->syncPermissions($userPermissions);

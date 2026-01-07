@@ -11,6 +11,7 @@ use App\Http\Controllers\PqrController;
 use App\Http\Controllers\CarnetController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ConductorImportController;
 // Ruta pública principal
 Route::get('/', function () {
     return view('welcome');
@@ -40,19 +41,24 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-	Route::get('/conductores/{conductor}/carnet', [ConductorController::class, 'generarCarnet'])
-    ->name('conductores.carnet');
-    Route::get('/conductores/{conductor}/info', [ConductorController::class, 'info'])
-    ->name('conductores.info');
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware(['auth'])
+        ->name('dashboard');
 
-
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth'])
-    ->name('dashboard');
-
-
-    // CRUD completo de conductores (excepto show)
-    Route::resource('conductores', ConductorController::class)->except('show');
+    // Conductores
+    Route::middleware('permission:ver conductores')->group(function () {
+        Route::get('/conductores/{conductor}/carnet', [ConductorController::class, 'generarCarnet'])->name('conductores.carnet');
+        Route::get('/conductores/{conductor}/info', [ConductorController::class, 'info'])->name('conductores.info');
+        Route::resource('conductores', ConductorController::class)->except('show');
+    });
+    
+    // Importación de conductores (requiere permiso de crear)
+    Route::middleware('permission:crear conductores')->group(function () {
+        Route::get('/conductores/importar', [ConductorImportController::class, 'showImportForm'])->name('conductores.import');
+        Route::post('/conductores/importar', [ConductorImportController::class, 'import'])->name('conductores.import.store');
+        Route::get('/conductores/import/progreso/{sessionId}', [ConductorImportController::class, 'obtenerProgreso'])->name('conductores.import.progreso');
+    });
 
     // Vehículos
     Route::resource('vehiculos', VehicleController::class);

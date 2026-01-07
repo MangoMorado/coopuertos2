@@ -19,11 +19,13 @@ class Conductor extends Model
         'conductor_tipo',
         'rh',
         'numero_interno',
+        'vehiculo',
         'celular',
         'correo',
         'fecha_nacimiento',
         'otra_profesion',
         'nivel_estudios',
+        'relevo',
         'foto',
         'estado',
     ];
@@ -31,6 +33,7 @@ class Conductor extends Model
     // Casts para convertir automáticamente tipos
     protected $casts = [
         'fecha_nacimiento' => 'date',
+        'relevo' => 'boolean',
     ];
 
     // Generar UUID automáticamente al crear un registro

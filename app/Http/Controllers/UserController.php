@@ -34,11 +34,11 @@ class UserController extends Controller
 
         // Mango puede crear User, Admin y Mango
         if ($user->hasRole('Mango')) {
-            $roles = Role::whereIn('name', ['User', 'Admin', 'Mango'])->get();
+            $roles = Role::whereIn('name', ['User', 'Admin', 'Mango'])->where('guard_name', 'web')->get();
         }
         // Admin solo puede crear User
         elseif ($user->hasRole('Admin')) {
-            $roles = Role::where('name', 'User')->get();
+            $roles = Role::where('name', 'User')->where('guard_name', 'web')->get();
         }
 
         return view('users.create', compact('roles'));
@@ -88,7 +88,7 @@ class UserController extends Controller
 
         // Mango puede editar cualquier usuario y asignar cualquier rol
         if ($authUser->hasRole('Mango')) {
-            $roles = Role::whereIn('name', ['User', 'Admin', 'Mango'])->get();
+            $roles = Role::whereIn('name', ['User', 'Admin', 'Mango'])->where('guard_name', 'web')->get();
         }
         // Admin solo puede editar usuarios User
         elseif ($authUser->hasRole('Admin')) {
@@ -96,7 +96,7 @@ class UserController extends Controller
                 return redirect()->route('users.index')
                     ->with('error', 'No tienes permisos para editar este usuario.');
             }
-            $roles = Role::where('name', 'User')->get();
+            $roles = Role::where('name', 'User')->where('guard_name', 'web')->get();
         }
 
         return view('users.edit', compact('user', 'roles'));

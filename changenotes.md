@@ -1,5 +1,16 @@
 # Coopuertos App
 
+## *v. 0.0.5.8*
+- Sistema de importación masiva de conductores desde Excel/CSV con procesamiento en segundo plano
+- Implementado Job worker para procesar importaciones de forma asíncrona (ProcesarImportacionConductores)
+- Nueva tabla `import_logs` para almacenar progreso y logs de importaciones de forma persistente
+- Vista de importación en `/conductores/importar` con seguimiento de progreso en tiempo real
+- Muestra tiempo transcurrido y tiempo estimado restante durante la importación
+- Logs persistentes que permiten salir y regresar a la página para ver el progreso guardado
+- Validación automática de columnas CSV con detección de delimitadores (coma o punto y coma)
+- Manejo de duplicados, errores y reportes detallados de importación
+- Descarga automática de fotos desde URLs de Google Drive durante la importación
+
 ## *v. 0.0.5.7*
 - Se establecieron 7 fases de desarrollo para la app
 - Sistema de roles y permisos con Spatie Permission (Mango, Admin, User)
@@ -76,6 +87,6 @@
 - 📝 API REST para integraciones
 - ✅ Sistema de roles y permisos de usuario
 - 📝 Historial de auditoría y logs de cambios
-- 📝 Importación masiva de datos desde Excel/CSV
+- ✅ Importación masiva de datos desde Excel/CSV
 - 📝 Sistema de notificaciones push en tiempo real
 - 📝 App móvil para consulta de información

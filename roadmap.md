@@ -8,15 +8,9 @@ Fase 1: CRUDS Basicos
   - ✅ Conductores
   - ✅ Propietarios
   - ✅ Vehiculos
-  - ✅ Usuarios, crear modulo usuario, con funciones CRUD, un administrador puede crear usuarios con rol user, un rol mango puede crear users, admin y mango, debe tener un boton en el navbar y agregar en /configuración la nueva vista (visible para Admin y Mango)
+  - ✅ Módulo CRUD de usuarios con gestión de roles (Admin: solo User, Mango: User/Admin/Mango), integrado en navbar y configuración
   - ✅ Sistema de roles y permisos (Mango/Admin/User) con permisos granulares por módulo, vista de configuración para Mango y navbar dinámico según permisos
-  - Importación masiva de datos
-    - Importar conductores desde Excel/CSV
-    - Importar vehículos desde Excel/CSV
-    - Validación de datos durante importación
-    - Manejo de errores y reportes de importación
-    - Manejo de duplicados
-  - Test de la fase
+  - ✅ Importación masiva de conductores desde Excel/CSV con procesamiento en segundo plano, validación de datos, manejo de errores/duplicados, descarga de fotos desde Google Drive y seguimiento de progreso en tiempo real
 
 Fase 2: Carnets
   - ✅ Generador de QR

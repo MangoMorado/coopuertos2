@@ -12,7 +12,7 @@ class ConfiguracionController extends Controller
     
     public function index()
     {
-        $roles = Role::whereIn('name', ['Mango', 'Admin', 'User'])->get();
+        $roles = Role::whereIn('name', ['Mango', 'Admin', 'User'])->where('guard_name', 'web')->get();
         
         // Módulos disponibles
         $modulos = [
@@ -48,7 +48,7 @@ class ConfiguracionController extends Controller
 
         DB::beginTransaction();
         try {
-            $roles = Role::whereIn('name', ['Mango', 'Admin', 'User'])->get();
+            $roles = Role::whereIn('name', ['Mango', 'Admin', 'User'])->where('guard_name', 'web')->get();
             
             foreach ($roles as $role) {
                 $roleName = $role->name;
@@ -68,10 +68,10 @@ class ConfiguracionController extends Controller
                     
                     foreach ($modulosActivos as $modulo) {
                         // Si el módulo está activo, dar todos los permisos básicos
-                        $permisosSeleccionados[] = Permission::where('name', "ver {$modulo}")->first();
-                        $permisosSeleccionados[] = Permission::where('name', "crear {$modulo}")->first();
-                        $permisosSeleccionados[] = Permission::where('name', "editar {$modulo}")->first();
-                        $permisosSeleccionados[] = Permission::where('name', "eliminar {$modulo}")->first();
+                        $permisosSeleccionados[] = Permission::where('name', "ver {$modulo}")->where('guard_name', 'web')->first();
+                        $permisosSeleccionados[] = Permission::where('name', "crear {$modulo}")->where('guard_name', 'web')->first();
+                        $permisosSeleccionados[] = Permission::where('name', "editar {$modulo}")->where('guard_name', 'web')->first();
+                        $permisosSeleccionados[] = Permission::where('name', "eliminar {$modulo}")->where('guard_name', 'web')->first();
                     }
                 }
                 

@@ -204,7 +204,7 @@ Cada módulo tiene 4 permisos base que controlan las acciones:
 
 Para ver el historial completo de cambios y mejoras, consulta el archivo [changenotes.md](changenotes.md).
 
-## 📝 Roadmap
+## 🛣️ Roadmap
 
 Para ver el progreso de la App y su bitacora de cambios, consulta el archivo [roadmap.md](roadmap.md).
 
