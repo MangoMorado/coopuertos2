@@ -89,6 +89,8 @@ class ProcesarImportacionConductores implements ShouldQueue
                 'logs' => array_merge($importLog->logs ?? [], [['mensaje' => '✅ Importación completada exitosamente', 'tipo' => 'success']]),
             ]);
 
+            // La generación de carnets ahora es manual desde /carnets/exportar
+
             // Limpiar archivo temporal
             if (file_exists($fullPath)) {
                 @unlink($fullPath);

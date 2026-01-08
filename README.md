@@ -1,4 +1,4 @@
-# Coopuertos - Sistema de Gestión de Cooperativa de Puertos
+# Coopuertos - ERP
 
 Sistema web desarrollado con Laravel 12 para la gestión integral de conductores, vehículos, propietarios y PQRS (Peticiones, Quejas, Reclamos y Sugerencias) de una cooperativa de puertos.
 

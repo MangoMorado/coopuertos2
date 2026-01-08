@@ -27,6 +27,7 @@ class Conductor extends Model
         'nivel_estudios',
         'relevo',
         'foto',
+        'ruta_carnet',
         'estado',
     ];
 
@@ -48,16 +49,16 @@ class Conductor extends Model
     public function vehicles()
     {
         return $this->belongsToMany(Vehicle::class, 'conductor_vehicle')
-                    ->withPivot('estado', 'fecha_asignacion', 'fecha_desasignacion', 'observaciones')
-                    ->withTimestamps();
+            ->withPivot('estado', 'fecha_asignacion', 'fecha_desasignacion', 'observaciones')
+            ->withTimestamps();
     }
 
     // Obtener el vehículo activo del conductor
     public function vehiculoActivo()
     {
         return $this->vehicles()
-                    ->wherePivot('estado', 'activo')
-                    ->first();
+            ->wherePivot('estado', 'activo')
+            ->first();
     }
 
     // Obtener todas las asignaciones (activas e inactivas)
@@ -70,7 +71,7 @@ class Conductor extends Model
     public function asignacionActiva()
     {
         return $this->hasOne(ConductorVehicle::class)
-                    ->where('estado', 'activo');
+            ->where('estado', 'activo');
     }
 
     /**
@@ -103,16 +104,17 @@ class Conductor extends Model
     public function desasignarVehiculo($observaciones = null)
     {
         $asignacionActiva = $this->asignacionActiva()->first();
-        
+
         if ($asignacionActiva) {
             $asignacionActiva->update([
                 'estado' => 'inactivo',
                 'fecha_desasignacion' => now(),
                 'observaciones' => $observaciones,
             ]);
+
             return true;
         }
-        
+
         return false;
     }
 }

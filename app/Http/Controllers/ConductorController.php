@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CarnetTemplate;
 use App\Models\Conductor;
+use App\Services\CarnetGeneratorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ConductorController extends Controller
 {
+    public function __construct(
+        protected CarnetGeneratorService $carnetGenerator
+    ) {}
+
     public function index(Request $request)
     {
         $query = Conductor::query();
@@ -108,9 +115,124 @@ class ConductorController extends Controller
         }
 
         // Obtener plantilla activa de carnet
-        $template = \App\Models\CarnetTemplate::where('activo', true)->first();
+        $template = CarnetTemplate::where('activo', true)->first();
 
-        return view('conductores.show', compact('conductor', 'template'));
+        // Generar imagen de previsualización usando el mismo motor del backend
+        $previewImageUrl = null;
+        if ($template && $template->imagen_plantilla && $template->variables_config) {
+            try {
+                // Crear directorio para imágenes de previsualización en public/storage
+                $publicStorageDir = public_path('storage/carnet_previews');
+                if (! File::exists($publicStorageDir)) {
+                    File::makeDirectory($publicStorageDir, 0755, true);
+                }
+
+                // Generar imagen de previsualización
+                $previewImagePath = $publicStorageDir.'/preview_'.$conductor->uuid.'.png';
+                $this->carnetGenerator->generarCarnetImagen($conductor, $template, $previewImagePath);
+
+                if (File::exists($previewImagePath)) {
+                    // Ruta pública para acceder a la imagen
+                    $previewImageUrl = asset('storage/carnet_previews/preview_'.$conductor->uuid.'.png');
+                }
+            } catch (\Exception $e) {
+                Log::warning('Error generando imagen de previsualización: '.$e->getMessage(), [
+                    'conductor_id' => $conductor->id,
+                    'uuid' => $uuid,
+                ]);
+            }
+        }
+
+        return view('conductores.show', compact('conductor', 'template', 'previewImageUrl'));
+    }
+
+    /**
+     * Generar y descargar carnet individual usando el sistema backend
+     */
+    public function descargarCarnet($uuid)
+    {
+        try {
+            $conductor = Conductor::where('uuid', $uuid)
+                ->with(['asignacionActiva.vehicle'])
+                ->firstOrFail();
+
+            // Verificar que hay una plantilla activa
+            $template = CarnetTemplate::where('activo', true)->first();
+
+            if (! $template) {
+                return redirect()->route('conductor.public', $uuid)
+                    ->with('error', 'No hay plantilla activa para generar el carnet.');
+            }
+
+            // Crear directorio temporal
+            $tempDir = storage_path('app/temp/carnet_individual_'.$conductor->id.'_'.time());
+            if (! File::exists($tempDir)) {
+                File::makeDirectory($tempDir, 0755, true);
+            }
+
+            try {
+                // Generar carnet PDF usando el mismo servicio que el masivo
+                $pdfPath = $this->carnetGenerator->generarCarnetPDF($conductor, $template, $tempDir);
+
+                if (! File::exists($pdfPath)) {
+                    throw new \Exception('No se pudo generar el archivo PDF');
+                }
+
+                // Guardar en storage permanente (como el masivo)
+                $carnetsDir = storage_path('app/carnets');
+                if (! File::exists($carnetsDir)) {
+                    File::makeDirectory($carnetsDir, 0755, true);
+                }
+
+                $nombreArchivo = 'carnet_'.$conductor->cedula.'_'.time().'.pdf';
+                $rutaPermanente = $carnetsDir.'/'.$nombreArchivo;
+
+                // Mover (no copiar) el archivo a la ubicación permanente
+                File::move($pdfPath, $rutaPermanente);
+
+                // Verificar que el archivo se movió correctamente
+                if (! File::exists($rutaPermanente)) {
+                    throw new \Exception('Error al mover el archivo PDF a la ubicación permanente');
+                }
+
+                // Actualizar conductor con ruta del carnet (como el masivo)
+                $rutaRelativa = 'carnets/'.$nombreArchivo;
+                $conductor->update(['ruta_carnet' => $rutaRelativa]);
+
+                // Descargar desde la ruta permanente (como el masivo)
+                $nombreDescarga = 'carnet_'.$conductor->cedula.'_'.date('YmdHis').'.pdf';
+
+                return response()->download($rutaPermanente, $nombreDescarga)
+                    ->deleteFileAfterSend(false); // No eliminar, el archivo se guarda permanentemente
+
+            } catch (\Exception $e) {
+                Log::error('Error generando carnet individual: '.$e->getMessage(), [
+                    'conductor_id' => $conductor->id,
+                    'uuid' => $uuid,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return redirect()->route('conductor.public', $uuid)
+                    ->with('error', 'Error al generar el carnet: '.$e->getMessage());
+            } finally {
+                // Limpiar directorio temporal (solo si no se movió el archivo)
+                if (File::exists($tempDir)) {
+                    try {
+                        File::deleteDirectory($tempDir);
+                    } catch (\Exception $e) {
+                        Log::warning('Error limpiando directorio temporal: '.$e->getMessage());
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error en descargarCarnet: '.$e->getMessage(), [
+                'uuid' => $uuid,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('conductores.index')
+                ->with('error', 'Error al generar el carnet: '.$e->getMessage());
+        }
     }
 
     public function edit(Conductor $conductore)

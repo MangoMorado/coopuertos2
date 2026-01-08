@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.6*
+- Sistema de generación de carnets con jobs en cola (ProcesarGeneracionCarnets, GenerarCarnetJob, FinalizarGeneracionCarnets), modelo CarnetGenerationLog para seguimiento, eliminado código legacy (GenerarCarnetsMasivo, GenerarCarnetPDF, CarnetBatchProcessor), mejoras en vista de exportación
+
 ## *v. 0.0.5.9*
 - Servidor MCP de Coopuertos configurado con herramientas y recursos
 - Laravel Boost instalado e integrado con Cursor para asistencia de IA

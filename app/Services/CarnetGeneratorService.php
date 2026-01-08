@@ -17,6 +17,53 @@ class CarnetGeneratorService
     ) {}
 
     /**
+     * Genera una imagen PNG del carnet (sin convertir a PDF) para previsualización
+     */
+    public function generarCarnetImagen(Conductor $conductor, CarnetTemplate $template, string $outputPath): string
+    {
+        // Preparar datos del conductor
+        $datosConductor = $this->prepararDatosConductor($conductor);
+
+        // Cargar imagen de plantilla
+        $templateImage = $this->cargarImagenPlantilla($template);
+
+        $width = imagesx($templateImage);
+        $height = imagesy($templateImage);
+
+        // Crear directorio temporal para procesamiento (para QR y otros recursos)
+        $outputDir = dirname($outputPath);
+        if (! File::exists($outputDir)) {
+            File::makeDirectory($outputDir, 0755, true);
+        }
+
+        // Crear directorio temporal específico para recursos del QR
+        $tempDir = storage_path('app/temp/preview_'.$conductor->id.'_'.time());
+        if (! File::exists($tempDir)) {
+            File::makeDirectory($tempDir, 0755, true);
+        }
+
+        try {
+            // Renderizar variables sobre la imagen
+            $this->renderizarVariables($templateImage, $template->variables_config, $datosConductor, $conductor, $tempDir, $width);
+
+            // Guardar imagen como PNG
+            imagepng($templateImage, $outputPath, 9);
+            imagedestroy($templateImage);
+        } finally {
+            // Limpiar directorio temporal de recursos
+            if (File::exists($tempDir)) {
+                try {
+                    File::deleteDirectory($tempDir);
+                } catch (\Exception $e) {
+                    Log::warning('Error limpiando directorio temporal de previsualización: '.$e->getMessage());
+                }
+            }
+        }
+
+        return $outputPath;
+    }
+
+    /**
      * Genera un PDF de carnet para un conductor
      */
     public function generarCarnetPDF(Conductor $conductor, CarnetTemplate $template, string $tempDir): string

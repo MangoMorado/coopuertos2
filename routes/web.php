@@ -48,6 +48,7 @@ Route::middleware('auth')->group(function () {
     // Conductores
     Route::middleware('permission:ver conductores')->group(function () {
         Route::get('/conductores/{conductor}/info', [ConductorController::class, 'info'])->name('conductores.info');
+        Route::get('/conductores/{uuid}/carnet/descargar', [ConductorController::class, 'descargarCarnet'])->name('conductores.carnet.descargar');
         Route::resource('conductores', ConductorController::class)->except('show');
     });
 
@@ -84,11 +85,12 @@ Route::middleware('auth')->group(function () {
     // Carnets
     Route::get('/carnets', [CarnetController::class, 'index'])->name('carnets.index');
     Route::get('/carnets/exportar', [CarnetController::class, 'exportar'])->name('carnets.exportar');
+    Route::post('/carnets/generar', [CarnetController::class, 'generar'])->name('carnets.generar');
     Route::get('/carnets/personalizar', [CarnetController::class, 'personalizar'])->name('carnets.personalizar');
     Route::post('/carnets/guardar-plantilla', [CarnetController::class, 'guardarPlantilla'])->name('carnets.guardar-plantilla');
-    Route::post('/carnets/descargar-todos', [CarnetController::class, 'descargarTodos'])->name('carnets.descargar-todos');
     Route::get('/carnets/progreso/{sessionId}', [CarnetController::class, 'obtenerProgreso'])->name('carnets.progreso');
     Route::get('/carnets/descargar/{sessionId}', [CarnetController::class, 'descargarZip'])->name('carnets.descargar-zip');
+    Route::get('/carnets/descargar-ultimo-zip', [CarnetController::class, 'descargarUltimoZip'])->name('carnets.descargar-ultimo-zip');
 
     // Usuarios
     Route::middleware('permission:ver usuarios')->group(function () {

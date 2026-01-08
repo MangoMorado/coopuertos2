@@ -15,8 +15,29 @@
     </x-slot>
 
     <div class="max-w-7xl mx-auto py-8 px-6">
-        <!-- Barra de Progreso -->
+        <!-- Botón de Generación -->
         <div class="mb-6 {{ $bgCard }} shadow border {{ $borderCard }} rounded-lg p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold {{ $textTitle }} mb-2">Generar Carnets</h3>
+                    <p class="text-sm {{ $textBody }}">Haz clic en el botón para iniciar la generación masiva de carnets para todos los conductores.</p>
+                </div>
+                <form action="{{ route('carnets.generar') }}" method="POST" id="form-generar" class="flex-shrink-0">
+                    @csrf
+                    <button type="submit" 
+                            id="btn-generar"
+                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg shadow-md transition flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                        </svg>
+                        <span>Generar Carnets</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Barra de Progreso -->
+        <div class="mb-6 {{ $bgCard }} shadow border {{ $borderCard }} rounded-lg p-6" id="panel-progreso" style="display: none;">
             <div class="mb-4">
                 <h3 class="text-lg font-semibold {{ $textTitle }} mb-4">Progreso de Generación</h3>
                 
@@ -73,7 +94,7 @@
             </div>
         </div>
 
-        <!-- Botón Volver -->
+        <!-- Botones de acción -->
         <div class="mt-6 flex justify-end">
             <a href="{{ route('carnets.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg shadow-md transition flex items-center space-x-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -85,19 +106,67 @@
     </div>
 
     <script>
-        const sessionId = '{{ $sessionId }}';
+        const sessionId = '{{ $sessionId ?? null }}';
         let progressInterval = null;
         let ultimoLogIndex = 0;
 
         // Iniciar polling al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
-            iniciarPolling();
+            if (sessionId) {
+                document.getElementById('panel-progreso').style.display = 'block';
+                iniciarPolling();
+            } else {
+                mostrarMensajeInfo();
+            }
+
+            // Manejar envío del formulario de generación
+            const formGenerar = document.getElementById('form-generar');
+            if (formGenerar) {
+                formGenerar.addEventListener('submit', function(e) {
+                    const btnGenerar = document.getElementById('btn-generar');
+                    if (btnGenerar) {
+                        btnGenerar.disabled = true;
+                        btnGenerar.innerHTML = `
+                            <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                            <span>Iniciando...</span>
+                        `;
+                    }
+                });
+            }
         });
+
+        function mostrarMensajeInfo() {
+            const logMessages = document.getElementById('log-messages');
+            if (logMessages) {
+                logMessages.innerHTML = `
+                    <div class="text-sm {{ $textBody }} space-y-2">
+                        <div class="flex items-start space-x-2">
+                            <svg class="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                            </svg>
+                            <div class="flex-1">
+                                <p class="font-semibold {{ $textTitle }}">Generación Manual de Carnets</p>
+                                <p class="{{ $textBody }} mt-1">Haz clic en el botón "Generar Carnets" para iniciar la generación masiva de carnets para todos los conductores.</p>
+                                <p class="{{ $textBody }} mt-3">El progreso se mostrará aquí una vez que inicies la generación.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
 
         function iniciarPolling() {
             if (!sessionId) {
-                mostrarError('No se encontró ID de sesión');
+                mostrarMensajeInfo();
                 return;
+            }
+
+            // Mostrar panel de progreso
+            const panelProgreso = document.getElementById('panel-progreso');
+            if (panelProgreso) {
+                panelProgreso.style.display = 'block';
             }
 
             progressInterval = setInterval(() => {
@@ -110,14 +179,37 @@
                             
                             if (data.estado === 'completado') {
                                 clearInterval(progressInterval);
-                                mostrarEstado('completado', 'Proceso completado exitosamente');
+                                mostrarEstado('completado', data.mensaje || 'Proceso completado exitosamente');
                                 mostrarBotonDescarga(data.archivo);
+                                // Habilitar botón de generar nuevamente
+                                const btnGenerar = document.getElementById('btn-generar');
+                                if (btnGenerar) {
+                                    btnGenerar.disabled = false;
+                                    btnGenerar.innerHTML = `
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                        </svg>
+                                        <span>Generar Carnets</span>
+                                    `;
+                                }
                             } else if (data.estado === 'error') {
                                 clearInterval(progressInterval);
                                 mostrarEstado('error', 'Error en el proceso');
-                                mostrarError(data.error || 'Error desconocido');
-                            } else if (data.estado === 'procesando') {
-                                mostrarEstado('procesando', 'Procesando carnets...');
+                                mostrarError(data.error || data.mensaje || 'Error desconocido');
+                                // Habilitar botón de generar nuevamente
+                                const btnGenerar = document.getElementById('btn-generar');
+                                if (btnGenerar) {
+                                    btnGenerar.disabled = false;
+                                    btnGenerar.innerHTML = `
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                                        </svg>
+                                        <span>Generar Carnets</span>
+                                    `;
+                                }
+                            } else if (data.estado === 'procesando' || data.estado === 'pendiente') {
+                                const mensaje = data.mensaje || 'Procesando carnets...';
+                                mostrarEstado('procesando', mensaje);
                             }
                         } else {
                             mostrarError(data.message || 'Error al obtener progreso');
@@ -147,7 +239,9 @@
                 porcentajeBarra.textContent = porcentaje.toFixed(1) + '%';
             }
             if (contador) {
-                contador.textContent = `${data.procesados || 0} de ${data.total || 0} carnets procesados`;
+                const exitosos = data.exitosos || 0;
+                const errores = data.errores || 0;
+                contador.textContent = `${data.procesados || 0} de ${data.total || 0} carnets procesados (${exitosos} exitosos, ${errores} errores)`;
             }
         }
 
