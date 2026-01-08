@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.6.2*
+- Mejoras al script de supervisor: detección automática de contenedores (Nixpacks/Docker), soporte para instalación de supervisor vía paquetes APT, actualización de documentación en README para despliegues en contenedores
+
 ## *v. 0.0.6.1*
 - Script de configuración automática de Supervisor para workers de colas en producción (scripts/setup-supervisor.php), integrado en composer post-install-cmd para ejecución automática durante deploy, documentación completa de gestión de colas en README
 

@@ -162,6 +162,16 @@ Durante el despliegue, el script `scripts/setup-supervisor.php` se ejecuta autom
 - Supervisor instalado en el servidor
 - Permisos para escribir en `/etc/supervisor/conf.d/`
 
+#### Para Contenedores (Nixpacks/Docker)
+
+Si estás usando Nixpacks o Docker, agrega `supervisor` a los **Paquetes APT** en la configuración de compilación:
+
+```
+supervisor imagemagick libmagickwand-dev php-imagick
+```
+
+El script detectará automáticamente que está en un contenedor y configurará supervisor para que se inicie cuando el contenedor arranque.
+
 #### Instalación de Supervisor (Ubuntu/Debian)
 
 ```bash
