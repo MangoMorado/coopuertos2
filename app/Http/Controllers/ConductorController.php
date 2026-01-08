@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Conductor;
@@ -10,114 +11,105 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ConductorController extends Controller
 {
-public function index(Request $request)
-{
-    $query = Conductor::query();
+    public function index(Request $request)
+    {
+        $query = Conductor::query();
 
-    if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where(function($q) use ($search) {
-            $q->where('cedula', 'like', '%' . $search . '%')
-              ->orWhere('nombres', 'like', '%' . $search . '%')
-              ->orWhere('apellidos', 'like', '%' . $search . '%')
-              ->orWhere('numero_interno', 'like', '%' . $search . '%')
-              ->orWhere('celular', 'like', '%' . $search . '%')
-              ->orWhere('correo', 'like', '%' . $search . '%');
-        });
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('cedula', 'like', '%'.$search.'%')
+                    ->orWhere('nombres', 'like', '%'.$search.'%')
+                    ->orWhere('apellidos', 'like', '%'.$search.'%')
+                    ->orWhere('numero_interno', 'like', '%'.$search.'%')
+                    ->orWhere('celular', 'like', '%'.$search.'%')
+                    ->orWhere('correo', 'like', '%'.$search.'%');
+            });
+        }
+
+        $conductores = $query->with(['asignacionActiva.vehicle'])->latest()->paginate(10)->withQueryString();
+
+        if ($request->ajax() || $request->has('ajax')) {
+            $theme = Auth::user()->theme ?? 'light';
+            $isDark = $theme === 'dark';
+
+            return response()->json([
+                'html' => view('conductores.partials.table', compact('conductores', 'theme', 'isDark'))->render(),
+                'pagination' => view('conductores.partials.pagination', compact('conductores'))->render(),
+            ]);
+        }
+
+        return view('conductores.index', compact('conductores'));
     }
-
-    $conductores = $query->with(['asignacionActiva.vehicle'])->latest()->paginate(10)->withQueryString();
-
-    if ($request->ajax() || $request->has('ajax')) {
-        $theme = Auth::user()->theme ?? 'light';
-        $isDark = $theme === 'dark';
-        return response()->json([
-            'html' => view('conductores.partials.table', compact('conductores', 'theme', 'isDark'))->render(),
-            'pagination' => view('conductores.partials.pagination', compact('conductores'))->render()
-        ]);
-    }
-
-    return view('conductores.index', compact('conductores'));
-}
-
 
     public function create()
     {
         return view('conductores.create');
     }
 
-public function store(Request $request)
-{
-    $validated = $request->validate([
-        'nombres' => 'required|string|max:255',
-        'apellidos' => 'required|string|max:255',
-        'cedula' => 'required|string|unique:conductors,cedula',
-        'conductor_tipo' => 'required|in:A,B',
-        'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-        'numero_interno' => 'nullable|string|max:50',
-        'celular' => 'nullable|string|max:20',
-        'correo' => 'nullable|email',
-        'fecha_nacimiento' => 'nullable|date',
-        'otra_profesion' => 'nullable|string|max:255',
-        'nivel_estudios' => 'nullable|string|max:255',
-        'foto' => 'nullable|image|max:2048',
-        'estado' => 'required|in:activo,inactivo',
-    ]);
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nombres' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'cedula' => 'required|string|unique:conductors,cedula',
+            'conductor_tipo' => 'required|in:A,B',
+            'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'numero_interno' => 'nullable|string|max:50',
+            'celular' => 'nullable|string|max:20',
+            'correo' => 'nullable|email',
+            'fecha_nacimiento' => 'nullable|date',
+            'otra_profesion' => 'nullable|string|max:255',
+            'nivel_estudios' => 'nullable|string|max:255',
+            'foto' => 'nullable|image|max:2048',
+            'estado' => 'required|in:activo,inactivo',
+        ]);
 
-    // Si correo está vacío, poner "No tiene"
-    if (empty($validated['correo'])) {
-        $validated['correo'] = 'No tiene';
+        // Si correo está vacío, poner "No tiene"
+        if (empty($validated['correo'])) {
+            $validated['correo'] = 'No tiene';
+        }
+
+        // Manejo de la foto si se sube
+        if ($request->hasFile('foto')) {
+            $validated['foto'] = $this->storePhoto($request->file('foto'));
+        }
+
+        Conductor::create($validated);
+
+        return redirect()->route('conductores.index')
+            ->with('success', 'Conductor creado correctamente.');
     }
 
-    // Manejo de la foto si se sube
-    if ($request->hasFile('foto')) {
-        $validated['foto'] = $this->storePhoto($request->file('foto'));
+    public function info(Conductor $conductor)
+    {
+        // Cargar relaciones necesarias
+        $conductor->load(['asignacionActiva.vehicle', 'asignaciones.vehicle']);
+
+        return view('conductores.info', compact('conductor'));
     }
-
-    Conductor::create($validated);
-
-    return redirect()->route('conductores.index')
-                     ->with('success', 'Conductor creado correctamente.');
-}
-
-public function generarCarnet(Conductor $conductor)
-{
-    // Ejemplo simple: devolver PDF o vista del carnet
-    // Aquí puedes usar un paquete como barryvdh/laravel-dompdf para generar PDF
-    return view('conductores.carnet', compact('conductor'));
-}
-
-public function info(Conductor $conductor)
-{
-    // Cargar relaciones necesarias
-    $conductor->load(['asignacionActiva.vehicle', 'asignaciones.vehicle']);
-    
-    return view('conductores.info', compact('conductor'));
-}
-
-
 
     public function show($uuid)
     {
         $conductor = Conductor::where('uuid', $uuid)
             ->with(['asignacionActiva.vehicle'])
             ->firstOrFail();
-        
+
         // Si se solicita solo el QR
         if (request()->has('qr')) {
             $size = (int) request()->get('size', 200);
             // Usar SVG que no requiere imagick
             $qrCode = QrCode::size($size)
                 ->generate(route('conductor.public', $uuid));
-            
+
             return response($qrCode, 200)
                 ->header('Content-Type', 'image/svg+xml')
                 ->header('Content-Disposition', 'inline; filename="qr-code.svg"');
         }
-        
+
         // Obtener plantilla activa de carnet
         $template = \App\Models\CarnetTemplate::where('activo', true)->first();
-        
+
         return view('conductores.show', compact('conductor', 'template'));
     }
 
@@ -126,47 +118,46 @@ public function info(Conductor $conductor)
         return view('conductores.edit', ['conductor' => $conductore]);
     }
 
-public function update(Request $request, Conductor $conductore)
-{
-    $validated = $request->validate([
-        'nombres' => 'required|string|max:255',
-        'apellidos' => 'required|string|max:255',
-        'cedula' => 'required|string|unique:conductors,cedula,' . $conductore->id,
-        'conductor_tipo' => 'required|in:A,B',
-        'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
-        'numero_interno' => 'nullable|string|max:50',
-        'celular' => 'nullable|string|max:20',
-        'correo' => 'nullable|email',
-        'fecha_nacimiento' => 'nullable|date',
-        'otra_profesion' => 'nullable|string|max:255',
-        'nivel_estudios' => 'nullable|string|max:255',
-        'empresa' => 'nullable|string|max:255',
-        'licencia' => 'nullable|string|max:255',
-        'vencimiento_licencia' => 'nullable|date',
-        'foto' => 'nullable|image|max:2048',
-        'estado' => 'required|in:activo,inactivo',
-    ]);
+    public function update(Request $request, Conductor $conductore)
+    {
+        $validated = $request->validate([
+            'nombres' => 'required|string|max:255',
+            'apellidos' => 'required|string|max:255',
+            'cedula' => 'required|string|unique:conductors,cedula,'.$conductore->id,
+            'conductor_tipo' => 'required|in:A,B',
+            'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'numero_interno' => 'nullable|string|max:50',
+            'celular' => 'nullable|string|max:20',
+            'correo' => 'nullable|email',
+            'fecha_nacimiento' => 'nullable|date',
+            'otra_profesion' => 'nullable|string|max:255',
+            'nivel_estudios' => 'nullable|string|max:255',
+            'empresa' => 'nullable|string|max:255',
+            'licencia' => 'nullable|string|max:255',
+            'vencimiento_licencia' => 'nullable|date',
+            'foto' => 'nullable|image|max:2048',
+            'estado' => 'required|in:activo,inactivo',
+        ]);
 
-    // Si correo está vacío, poner "No tiene"
-    if (empty($validated['correo'])) {
-        $validated['correo'] = 'No tiene';
-    }
-
-    // Manejo de la foto si se sube
-    if ($request->hasFile('foto')) {
-        if ($conductore->foto) {
-            $this->deletePhoto($conductore->foto);
+        // Si correo está vacío, poner "No tiene"
+        if (empty($validated['correo'])) {
+            $validated['correo'] = 'No tiene';
         }
-        $validated['foto'] = $this->storePhoto($request->file('foto'));
+
+        // Manejo de la foto si se sube
+        if ($request->hasFile('foto')) {
+            if ($conductore->foto) {
+                $this->deletePhoto($conductore->foto);
+            }
+            $validated['foto'] = $this->storePhoto($request->file('foto'));
+        }
+
+        $conductore->update($validated);
+
+        return redirect()
+            ->route('conductores.index')
+            ->with('success', 'Conductor actualizado correctamente.');
     }
-
-    $conductore->update($validated);
-
-    return redirect()
-        ->route('conductores.index')
-        ->with('success', 'Conductor actualizado correctamente.');
-}
-
 
     public function destroy(Conductor $conductor)
     {
@@ -175,6 +166,7 @@ public function update(Request $request, Conductor $conductore)
         }
 
         $conductor->delete();
+
         return back()->with('success', 'Conductor eliminado.');
     }
 
@@ -186,10 +178,10 @@ public function update(Request $request, Conductor $conductore)
             File::makeDirectory($uploadPath, 0755, true);
         }
 
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
         $file->move($uploadPath, $filename);
 
-        return 'uploads/conductores/' . $filename;
+        return 'uploads/conductores/'.$filename;
     }
 
     protected function deletePhoto(?string $path): void
@@ -209,14 +201,14 @@ public function update(Request $request, Conductor $conductore)
     {
         $query = $request->get('q', '');
         $columns = $request->get('columns', []); // Columnas específicas a buscar
-        
+
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
         // Si se especifican columnas, usar solo esas. Si no, buscar en todas las columnas comunes
-        if (!empty($columns) && is_array($columns)) {
-            $conductores = Conductor::where(function($q) use ($query, $columns) {
+        if (! empty($columns) && is_array($columns)) {
+            $conductores = Conductor::where(function ($q) use ($query, $columns) {
                 foreach ($columns as $column) {
                     if (in_array($column, ['cedula', 'nombres', 'apellidos', 'celular', 'correo', 'numero_interno'])) {
                         $q->orWhere($column, 'like', "%{$query}%");
@@ -225,13 +217,13 @@ public function update(Request $request, Conductor $conductore)
             })->limit(10)->get();
         } else {
             // Búsqueda por defecto en todas las columnas comunes
-            $conductores = Conductor::where(function($q) use ($query) {
+            $conductores = Conductor::where(function ($q) use ($query) {
                 $q->where('nombres', 'like', "%{$query}%")
-                  ->orWhere('apellidos', 'like', "%{$query}%")
-                  ->orWhere('cedula', 'like', "%{$query}%")
-                  ->orWhere('celular', 'like', "%{$query}%")
-                  ->orWhere('correo', 'like', "%{$query}%")
-                  ->orWhere('numero_interno', 'like', "%{$query}%");
+                    ->orWhere('apellidos', 'like', "%{$query}%")
+                    ->orWhere('cedula', 'like', "%{$query}%")
+                    ->orWhere('celular', 'like', "%{$query}%")
+                    ->orWhere('correo', 'like', "%{$query}%")
+                    ->orWhere('numero_interno', 'like', "%{$query}%");
             })->limit(10)->get();
         }
 
@@ -248,5 +240,4 @@ public function update(Request $request, Conductor $conductore)
             ];
         }));
     }
-
 }

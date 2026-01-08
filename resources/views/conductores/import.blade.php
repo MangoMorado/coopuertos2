@@ -217,7 +217,6 @@
             document.getElementById('spinner-container').classList.remove('hidden');
             document.getElementById('btn-importar').disabled = true;
             document.getElementById('btn-text').textContent = 'Procesando...';
-            document.getElementById('btn-spinner').classList.remove('hidden');
             agregarLog('Iniciando carga del archivo...', 'info');
             
             tiempoInicio = Date.now();
@@ -318,7 +317,7 @@
 
         function iniciarContadorTiempo() {
             if (tiempoTranscurridoInterval) {
-                clearInterval(tiemempoTranscurridoInterval);
+                clearInterval(tiempoTranscurridoInterval);
             }
             
             tiempoTranscurridoInterval = setInterval(() => {
@@ -373,12 +372,22 @@
             // Actualizar logs
             if (data.log && data.log.length > 0) {
                 const logContent = document.getElementById('log-content');
-                const existingLogs = Array.from(logContent.children).map(el => el.textContent.trim());
+                // Usar un Set para rastrear logs ya mostrados (mensaje + timestamp)
+                const existingLogKeys = new Set(
+                    Array.from(logContent.children)
+                        .map(el => el.getAttribute('data-log-key'))
+                        .filter(key => key !== null)
+                );
                 
                 data.log.forEach(entry => {
-                    const logExists = existingLogs.some(existing => existing.includes(entry.mensaje));
-                    if (!logExists) {
-                        agregarLog(entry.mensaje, entry.tipo || 'info');
+                    // Crear una clave única usando mensaje + timestamp si existe
+                    const logKey = entry.timestamp 
+                        ? `${entry.mensaje}|${entry.timestamp}` 
+                        : `${entry.mensaje}|${Date.now()}`;
+                    
+                    if (!existingLogKeys.has(logKey)) {
+                        agregarLog(entry.mensaje, entry.tipo || 'info', entry.timestamp);
+                        existingLogKeys.add(logKey);
                     }
                 });
                 
@@ -386,10 +395,10 @@
             }
         }
 
-        function agregarLog(mensaje, tipo = 'info') {
+        function agregarLog(mensaje, tipo = 'info', timestamp = null) {
             const logContent = document.getElementById('log-content');
             const logEntry = document.createElement('div');
-            const timestamp = new Date().toLocaleTimeString();
+            const timeDisplay = timestamp || new Date().toLocaleTimeString();
             
             let colorClass = '';
             let icon = '';
@@ -411,8 +420,12 @@
                     icon = 'ℹ';
             }
             
+            // Crear clave única para el log
+            const logKey = `${mensaje}|${timestamp || Date.now()}`;
+            
             logEntry.className = `mb-1 ${colorClass}`;
-            logEntry.innerHTML = `[${timestamp}] <strong>${icon}</strong> ${mensaje}`;
+            logEntry.setAttribute('data-log-key', logKey);
+            logEntry.innerHTML = `[${timeDisplay}] <strong>${icon}</strong> ${mensaje}`;
             
             logContent.appendChild(logEntry);
             
@@ -437,8 +450,7 @@
             document.getElementById('mensaje-exito').textContent = mensaje;
             document.getElementById('btn-redirigir').classList.remove('hidden');
             document.getElementById('btn-importar').disabled = false;
-            document.getElementById('btn-text').textContent = '📥 Importar Archivo';
-            document.getElementById('btn-spinner').classList.add('hidden');
+            document.getElementById('btn-text').textContent = 'Importar Archivo';
             
             agregarLog('✅ Importación finalizada correctamente', 'success');
         }
@@ -449,8 +461,7 @@
             document.getElementById('mensaje-error').classList.remove('hidden');
             document.getElementById('mensaje-error').textContent = mensaje;
             document.getElementById('btn-importar').disabled = false;
-            document.getElementById('btn-text').textContent = '📥 Importar Archivo';
-            document.getElementById('btn-spinner').classList.add('hidden');
+            document.getElementById('btn-text').textContent = 'Importar Archivo';
             
             agregarLog('✗ Error: ' + mensaje, 'error');
         }

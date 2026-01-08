@@ -56,10 +56,27 @@
                 <div class="mb-4">
                     <p class="text-sm {{ $textBody }} mb-2">Vista previa de la plantilla:</p>
                     <div class="border {{ $borderCard }} rounded-lg p-4 inline-block">
-                        <img src="{{ asset($template->imagen_plantilla) }}" 
-                             alt="Plantilla de carnet" 
-                             class="max-w-full h-auto rounded"
-                             style="max-height: 400px;">
+                        @php
+                            $extension = strtolower(pathinfo($template->imagen_plantilla, PATHINFO_EXTENSION));
+                            $imagePath = public_path($template->imagen_plantilla);
+                        @endphp
+                        @if($extension === 'svg' && file_exists($imagePath))
+                            @php
+                                $svgContent = file_get_contents($imagePath);
+                                // Codificar SVG para uso en data URI
+                                // Usar base64 para evitar problemas con caracteres especiales
+                                $svgEncoded = 'data:image/svg+xml;base64,' . base64_encode($svgContent);
+                            @endphp
+                            <img src="{{ $svgEncoded }}" 
+                                 alt="Plantilla de carnet" 
+                                 class="max-w-full h-auto rounded"
+                                 style="max-height: 400px;">
+                        @else
+                            <img src="{{ asset($template->imagen_plantilla) }}" 
+                                 alt="Plantilla de carnet" 
+                                 class="max-w-full h-auto rounded"
+                                 style="max-height: 400px;">
+                        @endif
                     </div>
                 </div>
             @else
@@ -93,162 +110,13 @@
         <!-- Botón para descargar todos los carnets -->
         <div class="mt-6 {{ $bgCard }} shadow border {{ $borderCard }} rounded-lg p-6">
             <div class="flex justify-center">
-                <button onclick="descargarTodosCarnets()" 
-                        class="w-1/4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center justify-center space-x-2">
+                <a href="{{ route('carnets.exportar') }}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center justify-center space-x-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
                     <span>Descargar todos los carnets</span>
-                </button>
-            </div>
-        </div>
-    </div>
-    
-    <script>
-        let sessionId = null;
-        let progressInterval = null;
-
-        function descargarTodosCarnets() {
-            if (confirm('¿Desea descargar todos los carnets en un archivo ZIP? Esto puede tomar varios minutos.')) {
-                // Mostrar modal de progreso
-                mostrarModalProgreso();
-                
-                // Iniciar descarga
-                fetch('{{ route("carnets.descargar-todos") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        sessionId = data.session_id;
-                        iniciarPolling();
-                    } else {
-                        alert('Error: ' + data.message);
-                        ocultarModalProgreso();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error al iniciar la descarga');
-                    ocultarModalProgreso();
-                });
-            }
-        }
-
-        function mostrarModalProgreso() {
-            const modal = document.getElementById('progreso-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            }
-        }
-
-        function ocultarModalProgreso() {
-            const modal = document.getElementById('progreso-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-            if (progressInterval) {
-                clearInterval(progressInterval);
-                progressInterval = null;
-            }
-        }
-
-        function iniciarPolling() {
-            if (!sessionId) return;
-            
-            progressInterval = setInterval(() => {
-                fetch(`{{ route('carnets.progreso', ':sessionId') }}`.replace(':sessionId', sessionId))
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            actualizarProgreso(data);
-                            
-                            if (data.estado === 'completado') {
-                                clearInterval(progressInterval);
-                                mostrarBotonDescarga(data.archivo);
-                            } else if (data.estado === 'error') {
-                                clearInterval(progressInterval);
-                                mostrarError(data.error);
-                            }
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error al obtener progreso:', error);
-                    });
-            }, 1000); // Polling cada segundo
-        }
-
-        function actualizarProgreso(data) {
-            const barra = document.getElementById('barra-progreso');
-            const porcentaje = document.getElementById('porcentaje-progreso');
-            const contador = document.getElementById('contador-progreso');
-            
-            if (barra) {
-                barra.style.width = data.progreso + '%';
-            }
-            if (porcentaje) {
-                porcentaje.textContent = data.progreso.toFixed(1) + '%';
-            }
-            if (contador) {
-                contador.textContent = `${data.procesados} de ${data.total} carnets procesados`;
-            }
-        }
-
-        function mostrarBotonDescarga(archivo) {
-            const contenedor = document.getElementById('boton-descarga');
-            if (contenedor) {
-                const url = '{{ route("carnets.descargar-zip", ":sessionId") }}'.replace(':sessionId', sessionId);
-                contenedor.innerHTML = `
-                    <a href="${url}"
-                       class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center justify-center space-x-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg>
-                        <span>Descargar ZIP</span>
-                    </a>
-                `;
-            }
-        }
-
-        function mostrarError(mensaje) {
-            const contenedor = document.getElementById('mensaje-error');
-            if (contenedor) {
-                contenedor.classList.remove('hidden');
-                contenedor.textContent = 'Error: ' + mensaje;
-            }
-        }
-    </script>
-
-    <!-- Modal de Progreso -->
-    <div id="progreso-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-        <div class="relative top-20 mx-auto p-5 border w-96 {{ $bgCard }} shadow-lg rounded-md">
-            <div class="mt-3">
-                <h3 class="text-lg font-medium {{ $textTitle }} mb-4">Generando Carnets</h3>
-                
-                <div class="mb-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-sm {{ $textBody }}" id="contador-progreso">0 de 0 carnets procesados</span>
-                        <span class="text-sm font-semibold {{ $textTitle }}" id="porcentaje-progreso">0%</span>
-                    </div>
-                    <div class="w-full {{ $isDark ? 'bg-gray-700' : 'bg-gray-200' }} rounded-full h-4">
-                        <div id="barra-progreso" class="bg-blue-600 h-4 rounded-full transition-all duration-300" style="width: 0%"></div>
-                    </div>
-                </div>
-                
-                <div id="mensaje-error" class="hidden text-red-600 text-sm mb-4"></div>
-                
-                <div id="boton-descarga" class="flex justify-center"></div>
-                
-                <div class="mt-4 flex justify-end">
-                    <button onclick="ocultarModalProgreso()" 
-                            class="px-4 py-2 {{ $isDark ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-300 hover:bg-gray-400' }} text-white rounded-md">
-                        Cerrar
-                    </button>
-                </div>
+                </a>
             </div>
         </div>
     </div>

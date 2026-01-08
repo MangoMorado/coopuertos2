@@ -143,7 +143,7 @@
                                    accept="image/*"
                                    @change="loadImage($event)"
                                    class="w-full {{ $bgInput }} border rounded px-3 py-2 text-sm">
-                            <p class="text-xs {{ $textBody }} mt-1">Formatos: JPG, PNG, GIF. Máximo 5MB</p>
+                            <p class="text-xs {{ $textBody }} mt-1">Formatos: JPG, PNG, GIF, SVG. Máximo 5MB</p>
                         </div>
 
                         <div class="relative border-2 {{ $borderCard }} rounded-lg overflow-auto" 

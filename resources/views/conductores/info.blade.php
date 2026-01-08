@@ -279,10 +279,6 @@
                        class="flex-1 md:flex-none bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg shadow-md transition text-center">
                         Editar Conductor
                     </a>
-                    <a href="{{ route('conductores.carnet', $conductor) }}"
-                       class="flex-1 md:flex-none bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition text-center">
-                        Generar Carnet
-                    </a>
                     <a href="{{ route('conductor.public', $conductor->uuid) }}" target="_blank"
                        class="flex-1 md:flex-none bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg shadow-md transition text-center">
                         Ver Vista Pública

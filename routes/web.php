@@ -1,17 +1,19 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ConductorController;
-
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\VehicleController;
-use App\Http\Controllers\PropietarioController;
-use App\Http\Controllers\PqrController;
 use App\Http\Controllers\CarnetController;
-use App\Http\Controllers\ConfiguracionController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\ConductorController;
 use App\Http\Controllers\ConductorImportController;
+use App\Http\Controllers\ConfiguracionController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PqrController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PropietarioController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\VehicleController;
+use App\Mcp\Servers\CoopuertosServer;
+use Illuminate\Support\Facades\Route;
+use Laravel\Mcp\Facades\Mcp;
+
 // Ruta pública principal
 Route::get('/', function () {
     return view('welcome');
@@ -32,9 +34,6 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-
-
-
 // Rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {
     // Perfil de usuario
@@ -48,11 +47,10 @@ Route::middleware('auth')->group(function () {
 
     // Conductores
     Route::middleware('permission:ver conductores')->group(function () {
-        Route::get('/conductores/{conductor}/carnet', [ConductorController::class, 'generarCarnet'])->name('conductores.carnet');
         Route::get('/conductores/{conductor}/info', [ConductorController::class, 'info'])->name('conductores.info');
         Route::resource('conductores', ConductorController::class)->except('show');
     });
-    
+
     // Importación de conductores (requiere permiso de crear)
     Route::middleware('permission:crear conductores')->group(function () {
         Route::get('/conductores/importar', [ConductorImportController::class, 'showImportForm'])->name('conductores.import');
@@ -67,7 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('propietarios', PropietarioController::class);
     Route::get('/api/propietarios/search', [PropietarioController::class, 'search'])->name('api.propietarios.search');
     Route::get('/api/conductores/search', [ConductorController::class, 'search'])->name('api.conductores.search');
-    
+
     // PQRS (Rutas protegidas)
     Route::get('/pqrs-qr', [PqrController::class, 'generateQR'])->name('pqrs.qr');
     Route::get('/pqrs/formulario/editar', [PqrController::class, 'editFormTemplate'])->name('pqrs.edit-template');
@@ -82,15 +80,16 @@ Route::middleware('auth')->group(function () {
     Route::delete('/pqrs-taquilla/{pqrTaquilla}', [PqrController::class, 'destroyTaquilla'])->name('pqrs-taquilla.destroy');
     Route::delete('/pqrs/{pqr}/adjunto/{index}', [PqrController::class, 'deleteAttachment'])->name('pqrs.adjunto.delete');
     Route::resource('pqrs', PqrController::class);
-    
+
     // Carnets
     Route::get('/carnets', [CarnetController::class, 'index'])->name('carnets.index');
+    Route::get('/carnets/exportar', [CarnetController::class, 'exportar'])->name('carnets.exportar');
     Route::get('/carnets/personalizar', [CarnetController::class, 'personalizar'])->name('carnets.personalizar');
     Route::post('/carnets/guardar-plantilla', [CarnetController::class, 'guardarPlantilla'])->name('carnets.guardar-plantilla');
     Route::post('/carnets/descargar-todos', [CarnetController::class, 'descargarTodos'])->name('carnets.descargar-todos');
     Route::get('/carnets/progreso/{sessionId}', [CarnetController::class, 'obtenerProgreso'])->name('carnets.progreso');
     Route::get('/carnets/descargar/{sessionId}', [CarnetController::class, 'descargarZip'])->name('carnets.descargar-zip');
-    
+
     // Usuarios
     Route::middleware('permission:ver usuarios')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
@@ -106,7 +105,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:eliminar usuarios')->group(function () {
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
-    
+
     // Configuración (solo para rol Mango)
     Route::middleware('permission:gestionar configuracion')->group(function () {
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
@@ -116,3 +115,6 @@ Route::middleware('auth')->group(function () {
 
 // Rutas de autenticación generadas por Laravel Breeze/Jetstream
 require __DIR__.'/auth.php';
+
+// Servidor MCP para Coopuertos
+Mcp::web('/mcp/coopuertos', CoopuertosServer::class);

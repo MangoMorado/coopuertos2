@@ -27,6 +27,7 @@
         'otra_profesion' => $conductor->otra_profesion ?? '',
         'estado' => ucfirst($conductor->estado),
         'foto' => $fotoUrl ?? $fallbackAvatar,
+        'vehiculo' => $conductor->vehiculo ? (string) $conductor->vehiculo : 'Relevo',
         'vehiculo_placa' => $vehiculo ? $vehiculo->placa : 'Sin asignar',
         'vehiculo_marca' => $vehiculo ? $vehiculo->marca : '',
         'vehiculo_modelo' => $vehiculo ? $vehiculo->modelo : '',

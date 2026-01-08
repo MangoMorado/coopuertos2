@@ -16,11 +16,14 @@ Fase 2: Carnets
   - ✅ Generador de QR
   - Generador de Carnet Masivos
   - ✅ Diseñador web de Carnets
+  - ✅ Si placa es No Asignado mostrar Relevo
   - Implementar Jobs en cola para generación de carnets masivos
     - Migrar procesamiento actual de `fastcgi_finish_request()` a sistema de colas
     - Configurar worker de colas (Redis/Database Queue)
     - Mejorar seguimiento de progreso en tiempo real
   - Tests de integración para generación de carnets
+  - Para resolver: El backend usa GD library + DomPDF mientras que el frontend usa Canvas + jsPDF. Esto puede producir diferencias menores. Para que sean idénticos, habría que usar un headless browser (Puppeteer/Chrome Headless) para renderizar la vista del frontend y convertirla a PDF, lo cual requiere Node.js.
+  - ✅ Laravel Boost configurado e integrado con Cursor
 
 Fase 3: UI/UX
   - UX: Tutorial guiado, una unica vez, debe explicar las realciones entre los CRUDS
@@ -106,5 +109,16 @@ Fase 7: Tests y Performance
     - Implementar caché para consultas frecuentes
     - Caché de vistas y queries pesadas
     - Optimización de assets (CSS/JS)
+
+Fase 8: MCP y Herramientas de IA
+  - ✅ Servidor MCP configurado (CoopuertosServer) con rutas en `/mcp/coopuertos`
+  - ✅ Herramientas MCP: BuscarConductor, BuscarVehiculo, BuscarPropietario, ObtenerEstadisticas, ListarRutas
+  - ✅ Recursos MCP: DocumentacionProyecto, RoadmapProyecto
+  - Autenticación OAuth para proteger el servidor MCP
+  - Herramientas CRUD (crear, editar, eliminar) mediante MCP
+  - Herramientas para gestión de PQRS y carnets
+  - Prompts MCP para tareas comunes y automatizables
+  - Integración con sistemas externos mediante herramientas MCP
+  - Herramientas de monitoreo y salud del sistema
 
 ---

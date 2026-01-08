@@ -13,10 +13,12 @@ class CarnetDownload extends Model
         'estado',
         'archivo_zip',
         'error',
+        'logs',
     ];
 
     protected $casts = [
         'total' => 'integer',
         'procesados' => 'integer',
+        'logs' => 'array',
     ];
 }

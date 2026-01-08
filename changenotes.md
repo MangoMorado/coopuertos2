@@ -1,5 +1,15 @@
 # Coopuertos App
 
+## *v. 0.0.5.9*
+- Servidor MCP de Coopuertos configurado con herramientas y recursos
+- Laravel Boost instalado e integrado con Cursor para asistencia de IA
+- Refactorizado CarnetController: dividido en servicios especializados (FontManager, ImageProcessorService, CarnetPdfConverter, CarnetGeneratorService, CarnetBatchProcessor, CarnetTemplateService)
+- Corregida variable "vehiculo" en diseñador de carnets y vista pública del conductor
+- Creado seeder CarnetTemplateSeeder con plantilla predeterminada "Coopuertos" y configuración de variables 
+- Ahora el worker de importación de conductores trabaja cada nuevo registro de forma individual
+- Se elimino generación individual basica de carnets para centralizar todo en el modelo del diseñador de carnets
+- Nueva vista /carnets/exportar para centralizar la exportación de carnets
+
 ## *v. 0.0.5.8*
 - Sistema de importación masiva de conductores desde Excel/CSV con procesamiento en segundo plano
 - Implementado Job worker para procesar importaciones de forma asíncrona (ProcesarImportacionConductores)
