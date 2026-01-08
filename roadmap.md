@@ -17,13 +17,10 @@ Fase 2: Carnets
   - Generador de Carnet Masivos
   - ✅ Diseñador web de Carnets
   - ✅ Si placa es No Asignado mostrar Relevo
-  - Implementar Jobs en cola para generación de carnets masivos
-    - Migrar procesamiento actual de `fastcgi_finish_request()` a sistema de colas
-    - Configurar worker de colas (Redis/Database Queue)
-    - Mejorar seguimiento de progreso en tiempo real
-  - Tests de integración para generación de carnets
-  - Para resolver: El backend usa GD library + DomPDF mientras que el frontend usa Canvas + jsPDF. Esto puede producir diferencias menores. Para que sean idénticos, habría que usar un headless browser (Puppeteer/Chrome Headless) para renderizar la vista del frontend y convertirla a PDF, lo cual requiere Node.js.
+  - ✅ Implementar Jobs en cola para generación de carnets masivos
   - ✅ Laravel Boost configurado e integrado con Cursor
+  - ✅ Supervisor para gestión automatica de workers en producción
+  - Configuración de instalaccion de Imagick en producción
 
 Fase 3: UI/UX
   - UX: Tutorial guiado, una unica vez, debe explicar las realciones entre los CRUDS

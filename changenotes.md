@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.6.1*
+- Script de configuración automática de Supervisor para workers de colas en producción (scripts/setup-supervisor.php), integrado en composer post-install-cmd para ejecución automática durante deploy, documentación completa de gestión de colas en README
+
 ## *v. 0.0.6*
 - Sistema de generación de carnets con jobs en cola (ProcesarGeneracionCarnets, GenerarCarnetJob, FinalizarGeneracionCarnets), modelo CarnetGenerationLog para seguimiento, eliminado código legacy (GenerarCarnetsMasivo, GenerarCarnetPDF, CarnetBatchProcessor), mejoras en vista de exportación
 

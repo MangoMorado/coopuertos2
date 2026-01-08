@@ -147,6 +147,96 @@ coopuertos2/
 - **Desarrollo**: `composer run dev` - Inicia servidor, cola y logs
 - **Tests**: `composer run test` - Ejecuta las pruebas
 - **Setup completo**: `composer run setup` - Instalación completa
+- **Cola de desarrollo**: `composer run dev:queue` - Inicia el worker de colas para desarrollo
+
+## 🔄 Sistema de Colas y Supervisor
+
+El sistema utiliza **Laravel Queue** para procesar trabajos en segundo plano, como la generación masiva de carnets y la importación de conductores.
+
+### Configuración Automática en Producción
+
+Durante el despliegue, el script `scripts/setup-supervisor.php` se ejecuta automáticamente para configurar Supervisor y mantener el worker de colas ejecutándose de forma persistente.
+
+#### Requisitos
+
+- Supervisor instalado en el servidor
+- Permisos para escribir en `/etc/supervisor/conf.d/`
+
+#### Instalación de Supervisor (Ubuntu/Debian)
+
+```bash
+sudo apt-get update
+sudo apt-get install supervisor
+sudo systemctl enable supervisor
+sudo systemctl start supervisor
+```
+
+#### Configuración Automática
+
+El script se ejecuta automáticamente durante `composer install` y:
+
+1. Detecta automáticamente la ruta del proyecto, usuario y PHP
+2. Crea el archivo de configuración en `/etc/supervisor/conf.d/laravel-worker.conf`
+3. Intenta habilitar el servicio automáticamente
+4. Muestra instrucciones si requiere intervención manual
+
+#### Configuración Manual (si es necesario)
+
+Si el script automático no puede configurar supervisor, ejecuta manualmente:
+
+```bash
+# Verificar que el archivo de configuración existe
+sudo cat /etc/supervisor/conf.d/laravel-worker.conf
+
+# Recargar configuración de supervisor
+sudo supervisorctl reread
+sudo supervisorctl update
+
+# Iniciar el worker
+sudo supervisorctl start laravel-worker:*
+```
+
+#### Comandos de Gestión del Worker
+
+```bash
+# Ver estado del worker
+sudo supervisorctl status laravel-worker:*
+
+# Ver logs en tiempo real
+sudo supervisorctl tail -f laravel-worker:*
+
+# Reiniciar el worker
+sudo supervisorctl restart laravel-worker:*
+
+# Detener el worker
+sudo supervisorctl stop laravel-worker:*
+
+# Ver logs del worker
+tail -f storage/logs/worker.log
+```
+
+#### Configuración del Worker
+
+El worker está configurado para:
+- **Colas**: `importaciones`, `carnets` (en ese orden de prioridad)
+- **Reintentos**: 3 intentos por trabajo fallido
+- **Timeout**: 600 segundos (10 minutos) por trabajo
+- **Max time**: 3600 segundos (1 hora) antes de reiniciar el proceso
+- **Auto-reinicio**: Se reinicia automáticamente si falla
+
+#### Desarrollo Local
+
+Para desarrollo local, puedes ejecutar el worker manualmente:
+
+```bash
+php artisan queue:work --queue=importaciones,carnets --tries=3
+```
+
+O usar el script de composer:
+
+```bash
+composer run dev:queue
+```
 
 ## 🔐 Sistema de Roles y Permisos
 
