@@ -69,6 +69,8 @@ function message(string $text, string $type = 'info'): void
 $isContainer = file_exists('/.dockerenv') || 
                !empty(getenv('CONTAINER')) || 
                !empty(getenv('NIXPACKS')) ||
+               !empty(getenv('RAILWAY_ENVIRONMENT')) ||
+               !empty(getenv('RAILWAY_SERVICE_NAME')) ||
                file_exists('/app/.nixpacks');
 
 // Verificar si supervisor está instalado
@@ -76,7 +78,7 @@ $supervisorInstalled = shell_exec('which supervisorctl 2>/dev/null');
 if (empty($supervisorInstalled)) {
     if ($isContainer) {
         message("📦 Detectado entorno de contenedor. Supervisor se instalará durante el build.", 'info');
-        message("   Asegúrate de agregar 'supervisor' a los paquetes APT en la configuración de Nixpacks.", 'info');
+        message("   Asegúrate de agregar 'supervisor' a los paquetes del sistema en la configuración de buildpacks.", 'info');
     } else {
         message("⚠️  Supervisor no está instalado. El archivo de configuración se creará pero no se habilitará automáticamente.", 'warning');
         message("   Instala supervisor con: sudo apt-get install supervisor (Ubuntu/Debian)", 'info');
@@ -105,7 +107,9 @@ message("   Proyecto: {$projectPath}", 'info');
 message("   Usuario: {$currentUser}", 'info');
 message("   PHP: {$phpBinary}", 'info');
 if ($isContainer) {
-    message("   Entorno: Contenedor (Nixpacks)", 'info');
+    $buildpack = !empty(getenv('RAILWAY_ENVIRONMENT')) ? 'Railway Buildpacks' : 
+                 (!empty(getenv('NIXPACKS')) ? 'Nixpacks' : 'Buildpacks');
+    message("   Entorno: Contenedor ({$buildpack})", 'info');
 }
 
 if ($canWrite || $useSudo) {
@@ -185,5 +189,5 @@ if ($isContainer && !$canEnable) {
     message("\n💡 Nota para contenedores:", 'info');
     message("   Si supervisor está instalado pero no se detecta durante el build,", 'info');
     message("   el servicio se iniciará automáticamente cuando el contenedor arranque.", 'info');
-    message("   Verifica que 'supervisor' esté en los paquetes APT de Nixpacks.", 'info');
+    message("   Verifica que 'supervisor' esté configurado en los paquetes del sistema de buildpacks.", 'info');
 }

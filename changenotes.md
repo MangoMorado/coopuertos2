@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.6.3*
+- Migración de Nixpacks a Railway Buildpacks: actualizado script de supervisor con detección automática de Railway Buildpacks, referencias genéricas para compatibilidad con múltiples buildpacks, actualización de documentación en README para Railway Buildpacks
+
 ## *v. 0.0.6.2*
 - Mejoras al script de supervisor: detección automática de contenedores (Nixpacks/Docker), soporte para instalación de supervisor vía paquetes APT, actualización de documentación en README para despliegues en contenedores
 
