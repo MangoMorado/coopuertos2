@@ -1,31 +1,7 @@
 # Coopuertos App
 
-## *v. 0.0.6.4.10*
+## *v. 0.0.6.5 | 0.0.6.4.2*
 - Nixpacks.toml editado
-
-## *v. 0.0.6.4.9*
-- Nixpacks.toml editado
-
-## *v. 0.0.6.4.8*
-- Nixpacks.toml editado
-
-## *v. 0.0.6.4.7*
-- Nixpacks.toml editado
-
-## *v. 0.0.6.4.6*
-- Nixpacks.toml editado
-
-## *v. 0.0.6.4.5*
-- Nixpacks.toml editado
-
-## *v. 0.0.6.4.4*
-- Nixpacks.toml editado
-
-## *v. 0.0.6.4.3*
-- Nixpacks.toml editado
-
-## *v. 0.0.6.4.2*
-- Creado archivo nixpacks.toml para resolver error de detección automática de npm-9_x que no existe en nixpkgs, configuración manual de paquetes Nix para evitar detección incorrecta
 
 ## *v. 0.0.6.4.1*
 - Actualización del script de creación de directorios
