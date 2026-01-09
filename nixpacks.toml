@@ -1,0 +1,30 @@
+# Configuración de Nixpacks para Coopuertos
+# Forzamos el uso de npm estándar en lugar de npm-9_x que no existe en nixpkgs
+
+[phases.setup]
+nixPkgs = [
+    "php82.withExtensions (pe: pe.enabled ++ [])",
+    "nginx",
+    "libmysqlclient",
+    "phpPackages.composer",
+    "nodejs_18",
+    "imagemagick",
+    "phpPackages.imagick",
+]
+
+[phases.install]
+cmds = [
+    "mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx",
+    "composer install --ignore-platform-reqs",
+    "npm ci",
+]
+
+[phases.build]
+cmds = [
+    "npm run build",
+    "chmod -R 775 storage bootstrap/cache public/uploads",
+    "php artisan storage:link",
+]
+
+[start]
+cmd = "chmod -R 775 /app/storage /app/bootstrap/cache /app/public/uploads && php /app/artisan storage:setup-directories && php /app/artisan storage:link && php-fpm"
