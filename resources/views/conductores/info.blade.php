@@ -11,15 +11,9 @@
     $borderCard = $isDark ? 'border-gray-700' : 'border-gray-200';
     $bgSection = $isDark ? 'bg-gray-700' : 'bg-gray-50';
     
+    use App\Helpers\StorageHelper;
     // Foto del conductor
-    $fotoUrl = null;
-    if ($conductor->foto) {
-        if (\Illuminate\Support\Str::startsWith($conductor->foto, 'uploads/')) {
-            $fotoUrl = asset($conductor->foto);
-        } else {
-            $fotoUrl = asset('storage/' . $conductor->foto);
-        }
-    }
+    $fotoUrl = StorageHelper::getFotoUrl($conductor->foto);
     $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conductor->nombres . ' ' . $conductor->apellidos) . '&background=1e3a8a&color=fff';
     
     // Vehículo activo
@@ -186,7 +180,7 @@
                         <div>
                             <p class="{{ $textSubtitle }} text-sm mb-1">Fecha de Asignación</p>
                             <p class="{{ $textBody }} font-medium">
-                                {{ \Carbon\Carbon::parse($asignacion->fecha_asignacion)->format('d/m/Y') }}
+                                {{ $asignacion->fecha_asignacion ? \Carbon\Carbon::parse($asignacion->fecha_asignacion)->format('d/m/Y') : 'No registrada' }}
                             </p>
                         </div>
                         @endif
@@ -228,7 +222,7 @@
                                         <p class="{{ $textSubtitle }} text-sm">
                                             Asignado: {{ $asignacion->fecha_asignacion ? \Carbon\Carbon::parse($asignacion->fecha_asignacion)->format('d/m/Y') : 'No registrada' }}
                                             @if($asignacion->fecha_desasignacion)
-                                                | Desasignado: {{ \Carbon\Carbon::parse($asignacion->fecha_desasignacion)->format('d/m/Y') }}
+                                                | Desasignado: {{ $asignacion->fecha_desasignacion ? \Carbon\Carbon::parse($asignacion->fecha_desasignacion)->format('d/m/Y') : 'No registrada' }}
                                             @endif
                                         </p>
                                     </div>

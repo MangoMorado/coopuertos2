@@ -9,7 +9,6 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 class ProcesarImportacionConductores implements ShouldQueue
 {
@@ -540,27 +539,14 @@ class ProcesarImportacionConductores implements ShouldQueue
 
             $this->agregarLog($importLog, "      ✓ Imagen válida: {$imageInfo['mime']} ({$imageInfo[0]}x{$imageInfo[1]})", 'info');
 
-            // Generar nombre único
-            $extension = $this->getImageExtension($imageInfo['mime']);
-            $uploadPath = public_path('uploads/conductores');
+            // Convertir a base64
+            $this->agregarLog($importLog, '      💾 Convirtiendo imagen a base64...', 'info');
+            $base64 = base64_encode($imageContent);
+            $base64String = 'data:'.$imageInfo['mime'].';base64,'.$base64;
 
-            // Crear directorio si no existe
-            if (! File::exists($uploadPath)) {
-                $this->agregarLog($importLog, '      📁 Creando directorio de uploads...', 'info');
-                File::makeDirectory($uploadPath, 0755, true);
-            }
+            $this->agregarLog($importLog, '      ✅ Imagen convertida a base64 exitosamente ('.strlen($base64String).' caracteres)', 'success');
 
-            $filename = Str::uuid().'.'.$extension;
-            $fullPath = $uploadPath.'/'.$filename;
-
-            $this->agregarLog($importLog, "      💾 Guardando imagen: {$filename}...", 'info');
-
-            // Guardar la imagen
-            file_put_contents($fullPath, $imageContent);
-
-            $this->agregarLog($importLog, "      ✅ Imagen guardada exitosamente en: uploads/conductores/{$filename}", 'success');
-
-            return 'uploads/conductores/'.$filename;
+            return $base64String;
 
         } catch (\Exception $e) {
             $this->agregarLog($importLog, '      ❌ Error descargando imagen: '.$e->getMessage(), 'error');

@@ -114,14 +114,8 @@
                         @if($conductor->foto)
                             <div class="mb-2">
                                 @php
-                                    $fotoUrl = null;
-                                    if ($conductor->foto) {
-                                        if (\Illuminate\Support\Str::startsWith($conductor->foto, 'uploads/')) {
-                                            $fotoUrl = asset($conductor->foto);
-                                        } else {
-                                            $fotoUrl = asset('storage/' . $conductor->foto);
-                                        }
-                                    }
+                                    use App\Helpers\StorageHelper;
+                                    $fotoUrl = StorageHelper::getFotoUrl($conductor->foto);
                                 @endphp
                                 <img src="{{ $fotoUrl }}" alt="Foto Conductor" class="w-32 h-32 object-cover rounded">
                             </div>

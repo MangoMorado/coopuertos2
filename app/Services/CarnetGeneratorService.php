@@ -6,7 +6,6 @@ use App\Models\CarnetTemplate;
 use App\Models\Conductor;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class CarnetGeneratorService
 {
@@ -113,14 +112,8 @@ class CarnetGeneratorService
             ? $conductor->asignacionActiva->vehicle
             : null;
 
-        $fotoUrl = null;
-        if ($conductor->foto) {
-            if (Str::startsWith($conductor->foto, 'uploads/')) {
-                $fotoUrl = public_path($conductor->foto);
-            } else {
-                $fotoUrl = storage_path('app/public/'.$conductor->foto);
-            }
-        }
+        // La foto es base64
+        $fotoBase64 = $conductor->foto;
 
         return [
             'nombres' => $conductor->nombres,
@@ -136,7 +129,7 @@ class CarnetGeneratorService
             'nivel_estudios' => $conductor->nivel_estudios ?? '',
             'otra_profesion' => $conductor->otra_profesion ?? '',
             'estado' => ucfirst($conductor->estado),
-            'foto' => $fotoUrl,
+            'foto' => $fotoBase64,
             'vehiculo' => $conductor->vehiculo ? (string) $conductor->vehiculo : 'Relevo',
             'vehiculo_placa' => $vehiculo ? $vehiculo->placa : 'Sin asignar',
             'vehiculo_marca' => $vehiculo ? $vehiculo->marca : '',
@@ -190,7 +183,7 @@ class CarnetGeneratorService
             if (isset($config['activo']) && $config['activo'] && isset($config['x']) && isset($config['y'])) {
                 $value = $datosConductor[$key] ?? '';
 
-                if ($key === 'foto' && $datosConductor['foto'] && File::exists($datosConductor['foto'])) {
+                if ($key === 'foto' && $datosConductor['foto']) {
                     $this->renderizarFoto($templateImage, $datosConductor['foto'], $config);
                 } elseif ($key === 'qr_code') {
                     $this->renderizarQR($templateImage, $datosConductor['qr_code'], $config, $conductor, $tempDir);
@@ -202,12 +195,18 @@ class CarnetGeneratorService
     }
 
     /**
-     * Renderiza la foto del conductor
+     * Renderiza la foto del conductor desde base64
      */
-    protected function renderizarFoto($templateImage, string $fotoUrl, array $config): void
+    protected function renderizarFoto($templateImage, string $fotoBase64, array $config): void
     {
         $fotoSize = $config['size'] ?? 100;
-        $fotoImg = $this->imageProcessor->loadImage($fotoUrl);
+
+        // Debe ser base64
+        if (! str_starts_with($fotoBase64, 'data:')) {
+            return;
+        }
+
+        $fotoImg = $this->imageProcessor->loadImage($fotoBase64);
         if ($fotoImg) {
             imagecopyresampled(
                 $templateImage, $fotoImg,

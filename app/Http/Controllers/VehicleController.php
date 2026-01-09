@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Vehicle;
 use App\Models\Conductor;
 use App\Models\ConductorVehicle;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
 class VehicleController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Vehicle::with(['asignaciones' => function($q) {
+        $query = Vehicle::with(['asignaciones' => function ($q) {
             $q->where('estado', 'activo')->with('conductor');
         }]);
 
@@ -21,18 +20,18 @@ class VehicleController extends Controller
             $s = $request->search;
             $query->where(function ($q) use ($s) {
                 $q->where('placa', 'like', "%$s%")
-                  ->orWhere('marca', 'like', "%$s%")
-                  ->orWhere('modelo', 'like', "%$s%")
-                  ->orWhere('tipo', 'like', "%$s%")
-                  ->orWhere('propietario_nombre', 'like', "%$s%")
-                  ->orWhereHas('asignaciones.conductor', function($q) use ($s) {
-                      $q->where('estado', 'activo')
-                        ->where(function($query) use ($s) {
-                            $query->where('nombres', 'like', "%$s%")
-                                  ->orWhere('apellidos', 'like', "%$s%")
-                                  ->orWhere('cedula', 'like', "%$s%");
-                        });
-                  });
+                    ->orWhere('marca', 'like', "%$s%")
+                    ->orWhere('modelo', 'like', "%$s%")
+                    ->orWhere('tipo', 'like', "%$s%")
+                    ->orWhere('propietario_nombre', 'like', "%$s%")
+                    ->orWhereHas('asignaciones.conductor', function ($q) use ($s) {
+                        $q->where('estado', 'activo')
+                            ->where(function ($query) use ($s) {
+                                $query->where('nombres', 'like', "%$s%")
+                                    ->orWhere('apellidos', 'like', "%$s%")
+                                    ->orWhere('cedula', 'like', "%$s%");
+                            });
+                    });
             });
         }
 
@@ -78,12 +77,14 @@ class VehicleController extends Controller
     public function show(Vehicle $vehiculo)
     {
         $vehiculo->load('conductor');
+
         return view('vehiculos.show', compact('vehiculo'));
     }
 
     public function edit(Vehicle $vehiculo)
     {
         $vehiculo->load('conductor');
+
         return view('vehiculos.edit', compact('vehiculo'));
     }
 
@@ -94,9 +95,6 @@ class VehicleController extends Controller
         $validated['placa'] = Str::upper($validated['placa']);
 
         if ($request->hasFile('foto')) {
-            if ($vehiculo->foto) {
-                $this->deletePhoto($vehiculo->foto);
-            }
             $validated['foto'] = $this->storePhoto($request->file('foto'));
         }
 
@@ -132,7 +130,7 @@ class VehicleController extends Controller
                             'estado' => 'inactivo',
                             'fecha_desasignacion' => now(),
                         ]);
-                    
+
                     // Crear o activar la asignación para este vehículo
                     ConductorVehicle::updateOrCreate(
                         [
@@ -157,9 +155,6 @@ class VehicleController extends Controller
 
     public function destroy(Vehicle $vehiculo)
     {
-        if ($vehiculo->foto) {
-            $this->deletePhoto($vehiculo->foto);
-        }
         $vehiculo->delete();
 
         return back()->with('success', 'Vehículo eliminado.');
@@ -171,8 +166,8 @@ class VehicleController extends Controller
             'tipo' => 'required|in:Bus,Camioneta,Taxi',
             'marca' => 'required|string|max:255',
             'modelo' => 'required|string|max:255',
-            'anio_fabricacion' => 'required|integer|min:1900|max:' . now()->year,
-            'placa' => 'required|string|max:20|unique:vehicles,placa,' . ($id ?? 'NULL') . ',id',
+            'anio_fabricacion' => 'required|integer|min:1900|max:'.now()->year,
+            'placa' => 'required|string|max:20|unique:vehicles,placa,'.($id ?? 'NULL').',id',
             'chasis_vin' => 'nullable|string|max:255',
             'capacidad_pasajeros' => 'nullable|integer|min:0',
             'capacidad_carga_kg' => 'nullable|integer|min:0',
@@ -187,43 +182,30 @@ class VehicleController extends Controller
 
     protected function storePhoto($file): string
     {
-        $uploadPath = public_path('uploads/vehiculos');
+        // Leer el contenido del archivo
+        $imageContent = file_get_contents($file->getRealPath());
 
-        if (! File::exists($uploadPath)) {
-            File::makeDirectory($uploadPath, 0755, true);
-        }
+        // Obtener el MIME type
+        $mimeType = $file->getMimeType();
 
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
-        $file->move($uploadPath, $filename);
+        // Convertir a base64 con el formato data URI
+        $base64 = base64_encode($imageContent);
 
-        return 'uploads/vehiculos/' . $filename;
-    }
-
-    protected function deletePhoto(?string $path): void
-    {
-        if (! $path) {
-            return;
-        }
-
-        $fullPath = public_path($path);
-
-        if (File::exists($fullPath)) {
-            File::delete($fullPath);
-        }
+        return 'data:'.$mimeType.';base64,'.$base64;
     }
 
     public function search(Request $request)
     {
         $query = $request->get('q', '');
         $columns = $request->get('columns', []); // Columnas específicas a buscar
-        
+
         if (strlen($query) < 1) {
             return response()->json([]);
         }
 
         // Si se especifican columnas, usar solo esas. Si no, buscar en todas las columnas comunes
-        if (!empty($columns) && is_array($columns)) {
-            $vehicles = Vehicle::where(function($q) use ($query, $columns) {
+        if (! empty($columns) && is_array($columns)) {
+            $vehicles = Vehicle::where(function ($q) use ($query, $columns) {
                 foreach ($columns as $column) {
                     if (in_array($column, ['placa', 'marca', 'modelo', 'anio_fabricacion', 'chasis_vin', 'capacidad_pasajeros', 'tipo'])) {
                         $q->orWhere($column, 'like', "%{$query}%");
@@ -232,14 +214,14 @@ class VehicleController extends Controller
             })->limit(10)->get();
         } else {
             // Búsqueda por defecto en todas las columnas comunes
-            $vehicles = Vehicle::where(function($q) use ($query) {
+            $vehicles = Vehicle::where(function ($q) use ($query) {
                 $q->where('placa', 'like', "%{$query}%")
-                  ->orWhere('marca', 'like', "%{$query}%")
-                  ->orWhere('modelo', 'like', "%{$query}%")
-                  ->orWhere('anio_fabricacion', 'like', "%{$query}%")
-                  ->orWhere('chasis_vin', 'like', "%{$query}%")
-                  ->orWhere('capacidad_pasajeros', 'like', "%{$query}%")
-                  ->orWhere('tipo', 'like', "%{$query}%");
+                    ->orWhere('marca', 'like', "%{$query}%")
+                    ->orWhere('modelo', 'like', "%{$query}%")
+                    ->orWhere('anio_fabricacion', 'like', "%{$query}%")
+                    ->orWhere('chasis_vin', 'like', "%{$query}%")
+                    ->orWhere('capacidad_pasajeros', 'like', "%{$query}%")
+                    ->orWhere('tipo', 'like', "%{$query}%");
             })->limit(10)->get();
         }
 

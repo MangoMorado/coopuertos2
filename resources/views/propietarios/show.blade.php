@@ -33,8 +33,8 @@
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Dirección de Contacto:</strong> {{ $propietario->direccion_contacto ?? '-' }}</p>
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Teléfono de Contacto:</strong> {{ $propietario->telefono_contacto ?? '-' }}</p>
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Correo Electrónico:</strong> {{ $propietario->correo_electronico ?? '-' }}</p>
-                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Fecha de Registro:</strong> {{ $propietario->created_at->format('d/m/Y H:i') }}</p>
-                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Última Actualización:</strong> {{ $propietario->updated_at->format('d/m/Y H:i') }}</p>
+                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Fecha de Registro:</strong> {{ $propietario->created_at?->format('d/m/Y H:i') ?? 'N/A' }}</p>
+                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Última Actualización:</strong> {{ $propietario->updated_at?->format('d/m/Y H:i') ?? 'N/A' }}</p>
                 </div>
             </div>
 

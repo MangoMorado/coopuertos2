@@ -8,10 +8,16 @@ use Illuminate\Support\Facades\Log;
 class ImageProcessorService
 {
     /**
-     * Carga una imagen desde una ruta (soporta JPG, PNG, GIF, SVG)
+     * Carga una imagen desde una ruta o base64 (soporta JPG, PNG, GIF, SVG)
      */
     public function loadImage(string $path)
     {
+        // Si es base64 (data URI)
+        if (str_starts_with($path, 'data:')) {
+            return $this->loadImageFromBase64($path);
+        }
+
+        // Si es una ruta de archivo
         if (! File::exists($path)) {
             return null;
         }
@@ -37,6 +43,46 @@ class ImageProcessorService
                 return imagecreatefromgif($path);
             default:
                 return null;
+        }
+    }
+
+    /**
+     * Carga una imagen desde un string base64 (data URI)
+     */
+    public function loadImageFromBase64(string $base64String)
+    {
+        try {
+            // Extraer el base64 del data URI
+            if (preg_match('/^data:([^;]+);base64,(.+)$/', $base64String, $matches)) {
+                $mimeType = $matches[1];
+                $base64Data = $matches[2];
+            } else {
+                // Si no tiene el prefijo data:, asumir que es solo base64
+                $base64Data = $base64String;
+                $mimeType = 'image/jpeg'; // Por defecto
+            }
+
+            // Decodificar base64
+            $imageData = base64_decode($base64Data, true);
+            if ($imageData === false) {
+                Log::warning('Error decodificando base64');
+
+                return null;
+            }
+
+            // Crear imagen desde string usando imagecreatefromstring
+            $image = @imagecreatefromstring($imageData);
+            if ($image === false) {
+                Log::warning('Error creando imagen desde base64');
+
+                return null;
+            }
+
+            return $image;
+        } catch (\Exception $e) {
+            Log::error('Error cargando imagen desde base64: '.$e->getMessage());
+
+            return null;
         }
     }
 

@@ -1,5 +1,11 @@
 # Coopuertos App
 
+## *v. 0.0.7*
+- Cambio arquitectónico mayor: fotos de conductores y vehículos ahora se guardan como base64 en la base de datos en lugar de archivos locales
+- Migraciones modificadas: columna `foto` en tablas `conductors` y `vehicles` cambiada de `string` a `longText` para soportar base64
+- Actualizados controladores, servicios e importaciones para convertir y manejar fotos en base64
+- Corrección crítica de error "Call to a member function format() on null" en producción: agregada validación null-safe para fechas (created_at, updated_at, fecha, hora) en vistas users/index, propietarios/show, pqrs/show-taquilla, pqrs/show, pqrs/index y conductores/info, ahora muestra 'N/A' o 'No registrada' cuando las fechas son null
+
 ## *v. 0.0.6.5.5 | 0.0.6.4.2*
 - Nixpacks.toml editado
 

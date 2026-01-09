@@ -18,7 +18,7 @@
         <div class="{{ $bgCard }} shadow border {{ $borderCard }} rounded-lg p-6 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="space-y-3">
-                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Fecha:</strong> {{ $pqr->fecha->format('d/m/Y') }}</p>
+                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Fecha:</strong> {{ $pqr->fecha?->format('d/m/Y') ?? 'N/A' }}</p>
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Nombre:</strong> {{ $pqr->nombre }}</p>
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Vehículo:</strong> {{ $pqr->vehiculo_placa ?? '-' }}</p>
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Número de Tiquete:</strong> {{ $pqr->numero_tiquete ?? '-' }}</p>

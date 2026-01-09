@@ -92,7 +92,7 @@
                 <tbody class="text-sm">
                     @forelse($pqrs as $pqr)
                         <tr class="border-t {{ $borderRow }} {{ $hoverRow }} transition">
-                            <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->fecha->format('d/m/Y') }}</td>
+                            <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->fecha?->format('d/m/Y') ?? 'N/A' }}</td>
                             <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->nombre }}</td>
                             <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->vehiculo_placa ?? '-' }}</td>
                             <td class="px-4 py-3">
@@ -241,8 +241,8 @@
                     <tbody class="text-sm">
                         @forelse($pqrsTaquilla ?? [] as $pqr)
                             <tr class="border-t {{ $borderRow }} {{ $hoverRow }} transition">
-                                <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->fecha->format('d/m/Y') }}</td>
-                                <td class="px-4 py-3 {{ $textBody }}">{{ \Carbon\Carbon::parse($pqr->hora)->format('H:i') }}</td>
+                                <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->fecha?->format('d/m/Y') ?? 'N/A' }}</td>
+                                <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->hora ? \Carbon\Carbon::parse($pqr->hora)->format('H:i') : 'N/A' }}</td>
                                 <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->nombre }}</td>
                                 <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->sede ?? '-' }}</td>
                                 <td class="px-4 py-3">

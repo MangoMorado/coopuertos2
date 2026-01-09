@@ -9,7 +9,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ConductorController extends Controller
@@ -268,9 +267,6 @@ class ConductorController extends Controller
 
         // Manejo de la foto si se sube
         if ($request->hasFile('foto')) {
-            if ($conductore->foto) {
-                $this->deletePhoto($conductore->foto);
-            }
             $validated['foto'] = $this->storePhoto($request->file('foto'));
         }
 
@@ -283,10 +279,6 @@ class ConductorController extends Controller
 
     public function destroy(Conductor $conductor)
     {
-        if ($conductor->foto) {
-            $this->deletePhoto($conductor->foto);
-        }
-
         $conductor->delete();
 
         return back()->with('success', 'Conductor eliminado.');
@@ -294,29 +286,16 @@ class ConductorController extends Controller
 
     protected function storePhoto($file): string
     {
-        $uploadPath = public_path('uploads/conductores');
+        // Leer el contenido del archivo
+        $imageContent = file_get_contents($file->getRealPath());
 
-        if (! File::exists($uploadPath)) {
-            File::makeDirectory($uploadPath, 0755, true);
-        }
+        // Obtener el MIME type
+        $mimeType = $file->getMimeType();
 
-        $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
-        $file->move($uploadPath, $filename);
+        // Convertir a base64 con el formato data URI
+        $base64 = base64_encode($imageContent);
 
-        return 'uploads/conductores/'.$filename;
-    }
-
-    protected function deletePhoto(?string $path): void
-    {
-        if (! $path) {
-            return;
-        }
-
-        $fullPath = public_path($path);
-
-        if (File::exists($fullPath)) {
-            File::delete($fullPath);
-        }
+        return 'data:'.$mimeType.';base64,'.$base64;
     }
 
     public function search(Request $request)

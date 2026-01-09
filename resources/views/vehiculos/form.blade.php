@@ -169,7 +169,8 @@
         <label class="block font-semibold {{ $label }}">Foto del Vehículo</label>
         @if(!empty($vehiculo?->foto))
             @php
-                $fotoUrl = \Illuminate\Support\Str::startsWith($vehiculo->foto, 'uploads/') ? asset($vehiculo->foto) : asset('storage/' . $vehiculo->foto);
+                use App\Helpers\StorageHelper;
+                $fotoUrl = StorageHelper::getFotoUrl($vehiculo->foto);
             @endphp
             <div class="mb-2">
                 <img src="{{ $fotoUrl }}" alt="Foto vehículo" class="w-40 h-40 object-cover rounded border {{ $isDark ? 'border-gray-700' : 'border-gray-200' }}">

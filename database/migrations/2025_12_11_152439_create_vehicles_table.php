@@ -26,7 +26,7 @@ return new class extends Migration
             $table->enum('estado', ['Activo', 'En Mantenimiento', 'Fuera de Servicio'])->default('Activo');
             $table->string('propietario_nombre');
             $table->foreignId('conductor_id')->nullable()->constrained('conductors')->nullOnDelete();
-            $table->string('foto')->nullable(); // Ruta de la foto del vehículo
+            $table->longText('foto')->nullable();
             $table->timestamps();
         });
     }

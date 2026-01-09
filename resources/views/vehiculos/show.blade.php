@@ -33,7 +33,8 @@
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Conductor ID:</strong> {{ $vehiculo->conductor_id ?? '-' }}</p>
                     @if($vehiculo->foto)
                         @php
-                            $fotoUrl = \Illuminate\Support\Str::startsWith($vehiculo->foto, 'uploads/') ? asset($vehiculo->foto) : asset('storage/' . $vehiculo->foto);
+                            use App\Helpers\StorageHelper;
+                            $fotoUrl = StorageHelper::getFotoUrl($vehiculo->foto);
                         @endphp
                         <div class="mt-3">
                             <img src="{{ $fotoUrl }}" alt="Foto vehículo" class="w-48 h-48 object-cover rounded border {{ $isDark ? 'border-gray-700' : 'border-gray-200' }}">

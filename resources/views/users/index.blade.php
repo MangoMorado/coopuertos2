@@ -110,7 +110,7 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm {{ $textBody }}">
-                                    {{ $user->created_at->format('d/m/Y') }}
+                                    {{ $user->created_at?->format('d/m/Y') ?? 'N/A' }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex justify-end gap-2">

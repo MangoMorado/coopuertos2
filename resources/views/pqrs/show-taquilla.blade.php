@@ -18,8 +18,8 @@
         <div class="{{ $bgCard }} shadow border {{ $borderCard }} rounded-lg p-6 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="space-y-3">
-                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Fecha:</strong> {{ $pqrTaquilla->fecha->format('d/m/Y') }}</p>
-                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Hora:</strong> {{ \Carbon\Carbon::parse($pqrTaquilla->hora)->format('H:i') }}</p>
+                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Fecha:</strong> {{ $pqrTaquilla->fecha?->format('d/m/Y') ?? 'N/A' }}</p>
+                    <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Hora:</strong> {{ $pqrTaquilla->hora ? \Carbon\Carbon::parse($pqrTaquilla->hora)->format('H:i') : 'N/A' }}</p>
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Nombre:</strong> {{ $pqrTaquilla->nombre }}</p>
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Sede:</strong> {{ $pqrTaquilla->sede ?? '-' }}</p>
                     <p class="{{ $textMuted }}"><strong class="{{ $textTitle }}">Tipo:</strong> 

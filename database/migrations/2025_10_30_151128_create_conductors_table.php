@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('correo')->nullable();
             $table->date('fecha_nacimiento')->nullable();
             $table->string('otra_profesion')->nullable();
-            $table->string('foto')->nullable();
+            $table->longText('foto')->nullable();
             $table->string('nivel_estudios')->nullable();
             $table->enum('estado', ['activo', 'inactivo'])->default('activo');
             $table->timestamps();
@@ -39,4 +39,3 @@ return new class extends Migration
         Schema::dropIfExists('conductors');
     }
 };
-

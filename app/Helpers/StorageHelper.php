@@ -55,4 +55,25 @@ class StorageHelper
             throw $e;
         }
     }
+
+    /**
+     * Obtiene la URL de la foto desde base64
+     *
+     * @param  string|null  $foto  Base64 de la foto
+     * @return string|null Base64 de la foto o null si no existe
+     */
+    public static function getFotoUrl(?string $foto): ?string
+    {
+        if (! $foto) {
+            return null;
+        }
+
+        // Debe ser base64 (empieza con "data:")
+        if (str_starts_with($foto, 'data:')) {
+            return $foto;
+        }
+
+        // Si no es base64, retornar null (datos inválidos)
+        return null;
+    }
 }

@@ -1467,22 +1467,11 @@ class ConductorImportController extends Controller
                 return null;
             }
 
-            // Generar nombre único
-            $extension = $this->getImageExtension($imageInfo['mime']);
-            $uploadPath = public_path('uploads/conductores');
+            // Convertir a base64
+            $base64 = base64_encode($imageContent);
+            $base64String = 'data:'.$imageInfo['mime'].';base64,'.$base64;
 
-            // Crear directorio si no existe
-            if (! File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-
-            $filename = Str::uuid().'.'.$extension;
-            $fullPath = $uploadPath.'/'.$filename;
-
-            // Guardar la imagen
-            file_put_contents($fullPath, $imageContent);
-
-            return 'uploads/conductores/'.$filename;
+            return $base64String;
 
         } catch (\Exception $e) {
             \Log::error('Error descargando imagen de Google Drive: '.$e->getMessage());
