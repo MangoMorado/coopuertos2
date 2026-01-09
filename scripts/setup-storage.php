@@ -14,29 +14,41 @@ if (! $projectPath) {
 }
 
 // Función para crear directorio con permisos adecuados
-function crearDirectorio(string $ruta, int $permisos = 0755): bool
+function crearDirectorio(string $ruta, int $permisos = 0775): bool
 {
-    if (file_exists($ruta)) {
-        return true;
-    }
+    $creado = false;
 
-    // Intentar crear el directorio padre primero
-    $directorioPadre = dirname($ruta);
-    if (! file_exists($directorioPadre)) {
-        crearDirectorio($directorioPadre, $permisos);
-    }
-
-    try {
-        if (mkdir($ruta, $permisos, true)) {
-            echo "✅ Directorio creado: {$ruta}\n";
-
-            return true;
+    if (! file_exists($ruta)) {
+        // Intentar crear el directorio padre primero
+        $directorioPadre = dirname($ruta);
+        if (! file_exists($directorioPadre)) {
+            crearDirectorio($directorioPadre, $permisos);
         }
-    } catch (\Exception $e) {
-        echo "⚠️  Error al crear directorio {$ruta}: {$e->getMessage()}\n";
+
+        try {
+            if (mkdir($ruta, $permisos, true)) {
+                echo "✅ Directorio creado: {$ruta}\n";
+                $creado = true;
+            }
+        } catch (\Exception $e) {
+            echo "⚠️  Error al crear directorio {$ruta}: {$e->getMessage()}\n";
+
+            return false;
+        }
+    } else {
+        $creado = true;
     }
 
-    return false;
+    // Establecer permisos (incluso si ya existe)
+    if ($creado && PHP_OS_FAMILY !== 'Windows') {
+        try {
+            chmod($ruta, $permisos);
+        } catch (\Exception $e) {
+            echo "⚠️  No se pudieron establecer permisos en {$ruta}: {$e->getMessage()}\n";
+        }
+    }
+
+    return $creado;
 }
 
 echo "📁 Configurando directorios de almacenamiento...\n";
@@ -63,7 +75,7 @@ $creados = 0;
 $errores = 0;
 
 foreach ($directoriosPublic as $directorio) {
-    if (crearDirectorio($directorio)) {
+    if (crearDirectorio($directorio, 0775)) {
         $creados++;
     } else {
         $errores++;
@@ -71,10 +83,41 @@ foreach ($directoriosPublic as $directorio) {
 }
 
 foreach ($directoriosStorage as $directorio) {
-    if (crearDirectorio($directorio)) {
+    if (crearDirectorio($directorio, 0775)) {
         $creados++;
     } else {
         $errores++;
+    }
+}
+
+// Establecer permisos recursivos en public/uploads y storage/app
+if (PHP_OS_FAMILY !== 'Windows') {
+    $directoriosPermisos = [
+        $projectPath.'/public/uploads',
+        $projectPath.'/storage/app',
+    ];
+
+    foreach ($directoriosPermisos as $dir) {
+        if (file_exists($dir)) {
+            try {
+                // Establecer permisos recursivos
+                $iterator = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
+
+                foreach ($iterator as $item) {
+                    if ($item->isDir()) {
+                        @chmod($item->getPathname(), 0775);
+                    } else {
+                        @chmod($item->getPathname(), 0664);
+                    }
+                }
+                @chmod($dir, 0775);
+            } catch (\Exception $e) {
+                echo "⚠️  No se pudieron establecer permisos recursivos en {$dir}: {$e->getMessage()}\n";
+            }
+        }
     }
 }
 

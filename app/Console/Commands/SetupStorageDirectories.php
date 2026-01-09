@@ -46,19 +46,30 @@ class SetupStorageDirectories extends Command
         $errores = 0;
 
         foreach ($directorios as $directorio) {
-            if (File::exists($directorio)) {
-                $this->line("⏭️  Ya existe: {$directorio}");
+            $existe = File::exists($directorio);
 
-                continue;
+            if (! $existe) {
+                try {
+                    File::makeDirectory($directorio, 0775, true);
+                    $this->info("✅ Creado: {$directorio}");
+                    $creados++;
+                } catch (\Exception $e) {
+                    $this->error("❌ Error al crear {$directorio}: {$e->getMessage()}");
+                    $errores++;
+
+                    continue;
+                }
+            } else {
+                $this->line("⏭️  Ya existe: {$directorio}");
             }
 
-            try {
-                File::makeDirectory($directorio, 0755, true);
-                $this->info("✅ Creado: {$directorio}");
-                $creados++;
-            } catch (\Exception $e) {
-                $this->error("❌ Error al crear {$directorio}: {$e->getMessage()}");
-                $errores++;
+            // Establecer permisos (incluso si ya existe)
+            if (PHP_OS_FAMILY !== 'Windows') {
+                try {
+                    chmod($directorio, 0775);
+                } catch (\Exception $e) {
+                    $this->warn("⚠️  No se pudieron establecer permisos en {$directorio}");
+                }
             }
         }
 

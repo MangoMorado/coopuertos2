@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.6.4.1*
+- Actualización del script de creación de directorios
+
 ## *v. 0.0.6.4*
 - Solución de error de permisos en producción: script automático de creación de directorios (scripts/setup-storage.php), comando Artisan `storage:setup-directories`, helper StorageHelper para manejo de errores, integrado en composer post-install-cmd/post-update-cmd
 
