@@ -1,6 +1,6 @@
 # Coopuertos App
 
-## *v. 0.0.6.5.3 | 0.0.6.4.2*
+## *v. 0.0.6.5.4 | 0.0.6.4.2*
 - Nixpacks.toml editado
 
 ## *v. 0.0.6.4.1*

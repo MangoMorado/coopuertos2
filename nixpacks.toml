@@ -25,15 +25,8 @@ cmds = [
     "npm run build",
     "chmod -R 775 storage bootstrap/cache public/uploads",
     "php artisan storage:link || true",
-    "echo '=== Verificación de Imagick ==='",
-    "php -m | grep -i imagick && echo '✓ Imagick está instalado' || echo '✗ Imagick NO está instalado'",
-    "php --ri imagick 2>/dev/null || echo '⚠️ Imagick no está habilitado en PHP'",
-    "echo 'Buscando imagick.so en el sistema...'",
-    "find /nix/store -name 'imagick.so' 2>/dev/null | head -3 || echo 'No se encontró imagick.so'",
-    "echo 'Ruta de PHP:'",
-    "which php || echo 'PHP no encontrado en PATH'",
-    "echo 'Información de PHP:'",
-    "php --version || echo 'Error al obtener versión de PHP'",
+    "chmod +x scripts/enable-imagick.sh || true",
+    "bash scripts/enable-imagick.sh || echo '⚠️ No se pudo habilitar imagick automáticamente'",
 ]
 
 [start]
