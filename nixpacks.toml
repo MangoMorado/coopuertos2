@@ -1,9 +1,6 @@
 # Configuración completa de Nixpacks para Coopuertos
-# Configuración manual para evitar detección automática que genera npm-9_x
-# Incluye todos los paquetes necesarios: PHP, Node.js, Nginx, MySQL, ImageMagick
 
 [phases.setup]
-# Paquetes Nix
 nixPkgs = [
     "php82",
     "php82Extensions.imagick",
@@ -12,6 +9,7 @@ nixPkgs = [
     "phpPackages.composer",
     "nodejs_22",
     "imagemagick",
+    "supervisord",
 ]
 
 [phases.install]
@@ -30,4 +28,4 @@ cmds = [
 ]
 
 [start]
-cmd = "chmod -R 775 /app/storage /app/bootstrap/cache /app/public/uploads && php /app/artisan storage:setup-directories && (php /app/artisan storage:link || true) && php-fpm"
+cmd = "chmod -R 775 /app/storage /app/bootstrap/cache /app/public/uploads && php /app/artisan storage:setup-directories && (php /app/artisan storage:link || true) && (supervisord -c /etc/supervisor/supervisord.conf &) && (php-fpm &) && nginx -g 'daemon off;'"
