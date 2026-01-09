@@ -9,7 +9,7 @@ nixPkgs = [
     "phpPackages.composer",
     "nodejs_22",
     "imagemagick",
-    "supervisord",
+    "python313Packages.supervisor",
 ]
 
 [phases.install]
