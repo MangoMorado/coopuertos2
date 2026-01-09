@@ -10,7 +10,7 @@ nixPkgs = [
     "nginx",
     "libmysqlclient",
     "phpPackages.composer",
-    "nodejs_24",
+    "nodejs_22",
     "imagemagick",
 ]
 
