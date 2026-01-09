@@ -29,13 +29,20 @@ class SetupStorageDirectories extends Command
         $this->info('📁 Configurando directorios de almacenamiento...');
 
         $directorios = [
-            // Public
+            // Storage logs y framework
+            storage_path('logs'),
+            storage_path('framework/cache'),
+            storage_path('framework/sessions'),
+            storage_path('framework/views'),
+            // Public uploads
             public_path('uploads/conductores'),
             public_path('uploads/vehiculos'),
             public_path('uploads/pqrs'),
             public_path('uploads/carnets'),
+            // Public storage
             public_path('storage/carnets'),
-            // Storage
+            public_path('storage/carnet_previews'),
+            // Storage app
             storage_path('app/carnets'),
             storage_path('app/temp'),
             storage_path('app/temp_imports'),
@@ -67,6 +74,10 @@ class SetupStorageDirectories extends Command
             if (PHP_OS_FAMILY !== 'Windows') {
                 try {
                     chmod($directorio, 0775);
+                    // Si es un directorio de storage, también establecer permisos recursivos en archivos
+                    if (str_contains($directorio, storage_path())) {
+                        $this->setRecursivePermissions($directorio);
+                    }
                 } catch (\Exception $e) {
                     $this->warn("⚠️  No se pudieron establecer permisos en {$directorio}");
                 }
@@ -101,7 +112,8 @@ class SetupStorageDirectories extends Command
             $this->warn('⚠️  Algunos directorios no pudieron crearse automáticamente.');
             $this->line('   En producción, asegúrate de que el usuario del proceso PHP tenga permisos para escribir en:');
             $this->line('   - /public/uploads/');
-            $this->line('   - /storage/app/');
+            $this->line('   - /public/storage/');
+            $this->line('   - /storage/');
 
             return Command::FAILURE;
         }
@@ -109,5 +121,33 @@ class SetupStorageDirectories extends Command
         $this->info('   ✨ Configuración completada exitosamente.');
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Establecer permisos recursivos en un directorio
+     */
+    protected function setRecursivePermissions(string $dir): void
+    {
+        if (! File::exists($dir) || PHP_OS_FAMILY === 'Windows') {
+            return;
+        }
+
+        try {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            foreach ($iterator as $item) {
+                if ($item->isDir()) {
+                    @chmod($item->getPathname(), 0775);
+                } else {
+                    @chmod($item->getPathname(), 0664);
+                }
+            }
+            @chmod($dir, 0775);
+        } catch (\Exception $e) {
+            // Silenciar errores de permisos
+        }
     }
 }

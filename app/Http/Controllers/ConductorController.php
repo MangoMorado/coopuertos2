@@ -123,16 +123,32 @@ class ConductorController extends Controller
                 // Crear directorio para imágenes de previsualización en public/storage
                 $publicStorageDir = public_path('storage/carnet_previews');
                 if (! File::exists($publicStorageDir)) {
-                    File::makeDirectory($publicStorageDir, 0755, true);
+                    try {
+                        File::makeDirectory($publicStorageDir, 0775, true);
+                        // Establecer permisos si no es Windows
+                        if (PHP_OS_FAMILY !== 'Windows') {
+                            @chmod($publicStorageDir, 0775);
+                        }
+                    } catch (\Exception $e) {
+                        Log::warning('No se pudo crear directorio de previsualización: '.$e->getMessage(), [
+                            'conductor_id' => $conductor->id,
+                            'uuid' => $uuid,
+                            'path' => $publicStorageDir,
+                        ]);
+                        // Continuar sin previsualización si no se puede crear el directorio
+                        $publicStorageDir = null;
+                    }
                 }
 
-                // Generar imagen de previsualización
-                $previewImagePath = $publicStorageDir.'/preview_'.$conductor->uuid.'.png';
-                $this->carnetGenerator->generarCarnetImagen($conductor, $template, $previewImagePath);
+                if ($publicStorageDir && File::exists($publicStorageDir) && is_writable($publicStorageDir)) {
+                    // Generar imagen de previsualización
+                    $previewImagePath = $publicStorageDir.'/preview_'.$conductor->uuid.'.png';
+                    $this->carnetGenerator->generarCarnetImagen($conductor, $template, $previewImagePath);
 
-                if (File::exists($previewImagePath)) {
-                    // Ruta pública para acceder a la imagen
-                    $previewImageUrl = asset('storage/carnet_previews/preview_'.$conductor->uuid.'.png');
+                    if (File::exists($previewImagePath)) {
+                        // Ruta pública para acceder a la imagen
+                        $previewImageUrl = asset('storage/carnet_previews/preview_'.$conductor->uuid.'.png');
+                    }
                 }
             } catch (\Exception $e) {
                 Log::warning('Error generando imagen de previsualización: '.$e->getMessage(), [

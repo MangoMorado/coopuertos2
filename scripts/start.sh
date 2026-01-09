@@ -3,9 +3,17 @@ set -e
 
 echo "=== Iniciando servicios de Coopuertos ==="
 
+# Configurar permisos y crear directorios necesarios
+mkdir -p /app/storage/logs /app/storage/framework/cache /app/storage/framework/sessions /app/storage/framework/views
+mkdir -p /app/bootstrap/cache
+mkdir -p /app/public/uploads/conductores /app/public/uploads/vehiculos /app/public/uploads/pqrs /app/public/uploads/carnets
+mkdir -p /app/public/storage/carnet_previews /app/public/storage/carnets
+mkdir -p /app/storage/app/carnets /app/storage/app/temp /app/storage/app/temp_imports /app/storage/app/public
+
 # Configurar permisos
 chmod -R 775 /app/storage /app/bootstrap/cache
 chmod -R 777 /app/public/uploads
+chmod -R 777 /app/public/storage 2>/dev/null || true
 
 # Configurar directorios de almacenamiento
 php /app/artisan storage:setup-directories 2>/dev/null || true

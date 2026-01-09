@@ -1,5 +1,10 @@
 # Coopuertos App
 
+## *v. 0.0.7.1*
+- Corrección de permisos en producción: actualizado script `start.sh` para crear directorios `storage/logs` y `public/storage/carnet_previews` antes de establecer permisos
+- Actualizado comando Artisan `storage:setup-directories` para incluir todos los directorios necesarios de storage y framework
+- Mejorado manejo de errores en `ConductorController` al crear directorios de previsualización de carnets
+
 ## *v. 0.0.7*
 - Cambio arquitectónico mayor: fotos de conductores y vehículos ahora se guardan como base64 en la base de datos en lugar de archivos locales
 - Migraciones modificadas: columna `foto` en tablas `conductors` y `vehicles` cambiada de `string` a `longText` para soportar base64

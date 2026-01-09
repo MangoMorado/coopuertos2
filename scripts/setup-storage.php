@@ -53,17 +53,22 @@ function crearDirectorio(string $ruta, int $permisos = 0775): bool
 
 echo "📁 Configurando directorios de almacenamiento...\n";
 
-// Directorios en public/uploads
+// Directorios en public/uploads y public/storage
 $directoriosPublic = [
     $projectPath.'/public/uploads/conductores',
     $projectPath.'/public/uploads/vehiculos',
     $projectPath.'/public/uploads/pqrs',
     $projectPath.'/public/uploads/carnets',
     $projectPath.'/public/storage/carnets',
+    $projectPath.'/public/storage/carnet_previews',
 ];
 
-// Directorios en storage/app
+// Directorios en storage
 $directoriosStorage = [
+    $projectPath.'/storage/logs',
+    $projectPath.'/storage/framework/cache',
+    $projectPath.'/storage/framework/sessions',
+    $projectPath.'/storage/framework/views',
     $projectPath.'/storage/app/carnets',
     $projectPath.'/storage/app/temp',
     $projectPath.'/storage/app/temp_imports',
@@ -90,11 +95,12 @@ foreach ($directoriosStorage as $directorio) {
     }
 }
 
-// Establecer permisos recursivos en public/uploads y storage/app
+// Establecer permisos recursivos en public/uploads, public/storage y storage
 if (PHP_OS_FAMILY !== 'Windows') {
     $directoriosPermisos = [
         $projectPath.'/public/uploads',
-        $projectPath.'/storage/app',
+        $projectPath.'/public/storage',
+        $projectPath.'/storage',
     ];
 
     foreach ($directoriosPermisos as $dir) {
