@@ -4,9 +4,10 @@
 
 [phases.setup]
 # Paquetes Nix - npm viene incluido con nodejs_18, no se especifica por separado
-# php82 incluye las extensiones básicas, imagick se agrega como extensión
+# php82 con extensión imagick usando la sintaxis correcta de Nixpacks
 nixPkgs = [
-    "php82.withExtensions (pe: [ pe.imagick ])",
+    "php82",
+    "php82Extensions.imagick",
     "nginx",
     "libmysqlclient",
     "phpPackages.composer",
