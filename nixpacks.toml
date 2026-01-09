@@ -18,6 +18,9 @@ cmds = [
     "mkdir -p /var/cache/nginx",
     "composer install --ignore-platform-reqs",
     "npm ci",
+    "echo 'Verificando extensión Imagick...'",
+    "php -m | grep -i imagick && echo '✓ Imagick está instalado' || echo '✗ Imagick NO está instalado'",
+    "php --ri imagick 2>/dev/null || echo 'Imagick no está habilitado en PHP'",
 ]
 
 [phases.build]
