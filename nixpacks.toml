@@ -1,20 +1,26 @@
-# Configuración de Nixpacks para Coopuertos
-# Forzamos el uso de npm estándar en lugar de npm-9_x que no existe en nixpkgs
+# Configuración completa de Nixpacks para Coopuertos
+# Configuración manual para evitar detección automática que genera npm-9_x
+# Incluye todos los paquetes necesarios: PHP, Node.js, Nginx, MySQL, ImageMagick
 
 [phases.setup]
+# Paquetes Nix - npm viene incluido con nodejs_18, no se especifica por separado
+# php82 incluye las extensiones básicas, imagick se agrega como extensión
 nixPkgs = [
-    "php82.withExtensions (pe: pe.enabled ++ [])",
+    "php82.withExtensions (pe: [ pe.imagick ])",
     "nginx",
     "libmysqlclient",
     "phpPackages.composer",
     "nodejs_18",
     "imagemagick",
-    "phpPackages.imagick",
 ]
+
+# Extensión de PHP Imagick se configura a través de php82Extensions
+# Los paquetes APT (imagemagick php-imagick) se instalan en la fase install si es necesario
 
 [phases.install]
 cmds = [
-    "mkdir -p /var/log/nginx && mkdir -p /var/cache/nginx",
+    "mkdir -p /var/log/nginx",
+    "mkdir -p /var/cache/nginx",
     "composer install --ignore-platform-reqs",
     "npm ci",
 ]

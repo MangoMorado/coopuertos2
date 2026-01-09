@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.0.6.4.3*
+- Nixpacks.toml editado
+
 ## *v. 0.0.6.4.2*
 - Creado archivo nixpacks.toml para resolver error de detección automática de npm-9_x que no existe en nixpkgs, configuración manual de paquetes Nix para evitar detección incorrecta
 
