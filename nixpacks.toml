@@ -3,20 +3,16 @@
 # Incluye todos los paquetes necesarios: PHP, Node.js, Nginx, MySQL, ImageMagick
 
 [phases.setup]
-# Paquetes Nix - npm viene incluido con nodejs_18, no se especifica por separado
-# php82 con extensión imagick usando la sintaxis correcta de Nixpacks
+# Paquetes Nix
 nixPkgs = [
     "php82",
     "php82Extensions.imagick",
     "nginx",
     "libmysqlclient",
     "phpPackages.composer",
-    "nodejs_18",
+    "nodejs_24",
     "imagemagick",
 ]
-
-# Extensión de PHP Imagick se configura a través de php82Extensions
-# Los paquetes APT (imagemagick php-imagick) se instalan en la fase install si es necesario
 
 [phases.install]
 cmds = [
@@ -30,8 +26,8 @@ cmds = [
 cmds = [
     "npm run build",
     "chmod -R 775 storage bootstrap/cache public/uploads",
-    "php artisan storage:link",
+    "php artisan storage:link || true",
 ]
 
 [start]
-cmd = "chmod -R 775 /app/storage /app/bootstrap/cache /app/public/uploads && php /app/artisan storage:setup-directories && php /app/artisan storage:link && php-fpm"
+cmd = "chmod -R 775 /app/storage /app/bootstrap/cache /app/public/uploads && php /app/artisan storage:setup-directories && (php /app/artisan storage:link || true) && php-fpm"
