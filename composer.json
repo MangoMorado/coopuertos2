@@ -51,6 +51,9 @@
         "setup-supervisor": [
             "@php scripts/setup-supervisor.php"
         ],
+        "setup-storage": [
+            "@php scripts/setup-storage.php"
+        ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#fdba74\" \"php artisan serve\" \"npm run dev\" --names=server,vite"
@@ -68,10 +71,12 @@
         ],
         "post-install-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "@setup-supervisor"
+            "@setup-supervisor",
+            "@setup-storage"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "@setup-storage"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

@@ -14,7 +14,7 @@ Fase 1: CRUDS Basicos
 
 Fase 2: Carnets
   - ✅ Generador de QR
-  - Generador de Carnet Masivos
+  - ✅ Generador de Carnet Masivos
   - ✅ Diseñador web de Carnets
   - ✅ Si placa es No Asignado mostrar Relevo
   - ✅ Implementar Jobs en cola para generación de carnets masivos

@@ -56,7 +56,7 @@ Sistema web desarrollado con Laravel 12 para la gestión integral de conductores
 
 1. Clonar el repositorio:
 ```bash
-git clone [url-del-repositorio]
+git clone https://github.com/MangoMorado/coopuertos2.git
 cd coopuertos2
 ```
 
