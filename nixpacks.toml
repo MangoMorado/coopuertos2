@@ -28,4 +28,4 @@ cmds = [
 ]
 
 [start]
-cmd = "chmod -R 775 /app/storage /app/bootstrap/cache /app/public/uploads && php /app/artisan storage:setup-directories && (php /app/artisan storage:link || true) && (supervisord -c /etc/supervisor/supervisord.conf &) && node /assets/scripts/prestart.mjs /assets/nginx.template.conf /nginx.conf && (php-fpm -y /assets/php-fpm.conf & nginx -c /nginx.conf)"
+cmd = "chmod -R 775 /app/storage /app/bootstrap/cache && chmod -R 777 /app/public/uploads && php /app/artisan storage:setup-directories && chmod -R 777 /app/public/uploads/conductores /app/public/uploads/vehiculos /app/public/uploads/pqrs /app/public/uploads/carnets 2>/dev/null || true && (php /app/artisan storage:link || true) && (supervisord -c /etc/supervisor/supervisord.conf &) && node /assets/scripts/prestart.mjs /assets/nginx.template.conf /nginx.conf && (php-fpm -y /assets/php-fpm.conf & nginx -c /nginx.conf)"
