@@ -161,6 +161,23 @@
                 </div>
             </main>
 
+            {{-- Contenedor de Toasts --}}
+            <x-toast-container />
+
+            {{-- Mensajes de sesión ocultos para integración con toasts --}}
+            @if(session('success'))
+                <div data-session-success="{{ session('success') }}" class="hidden"></div>
+            @endif
+            @if(session('error'))
+                <div data-session-error="{{ session('error') }}" class="hidden"></div>
+            @endif
+            @if(session('warning'))
+                <div data-session-warning="{{ session('warning') }}" class="hidden"></div>
+            @endif
+            @if(session('info'))
+                <div data-session-info="{{ session('info') }}" class="hidden"></div>
+            @endif
+
             <!-- FOOTER -->
             <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
                 <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400 text-sm">

@@ -1,6 +1,5 @@
 @php
-    use App\Helpers\StorageHelper;
-    $fotoUrl = StorageHelper::getFotoUrl($conductor->foto);
+    $fotoUrl = \App\Helpers\StorageHelper::getFotoUrl($conductor->foto);
     $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conductor->nombres . ' ' . $conductor->apellidos) . '&background=1e3a8a&color=fff';
     
     // Preparar datos del conductor para las variables

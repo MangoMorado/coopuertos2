@@ -41,12 +41,6 @@
             </div>
         </div>
 
-        @if (session('success'))
-            <div class="mb-4 bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-2 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <div class="mb-4">
             <form method="GET" action="{{ route('pqrs.index') }}" class="flex space-x-2">
                 <input type="text" name="search" placeholder="Buscar por nombre, correo, tiquete, placa, tipo, estado, usuario..." value="{{ request('search') }}"

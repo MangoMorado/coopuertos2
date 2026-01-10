@@ -55,7 +55,6 @@ echo "📁 Configurando directorios de almacenamiento...\n";
 
 // Directorios en public/uploads y public/storage
 $directoriosPublic = [
-    $projectPath.'/public/uploads/pqrs',
     $projectPath.'/public/uploads/carnets',
     $projectPath.'/public/storage/carnets',
     $projectPath.'/public/storage/carnet_previews',
@@ -152,10 +151,8 @@ echo "   ✅ Directorios creados: {$creados}\n";
 if ($errores > 0) {
     echo "   ⚠️  Errores: {$errores}\n";
     echo "\n⚠️  Algunos directorios no pudieron crearse automáticamente.\n";
-    echo "   En producción, asegúrate de que el usuario del proceso PHP tenga permisos para escribir en:\n";
-    echo "   - /public/uploads/pqrs (para adjuntos de PQRS)\n";
     echo "   - /public/uploads/carnets (para plantillas de carnets)\n";
-    echo "   - /public/storage/ (para previsualizaciones de carnets)\n";
+    echo "   - /public/storage/ (para previsualizaciones y ZIPs de carnets)\n";
     echo "   - /storage/app/ (para carnets generados y archivos temporales)\n";
     exit(1);
 }

@@ -4,6 +4,15 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 
+// Importar componentes de toast
+import { toastContainer } from './alpine-toast';
+import { toastNotification } from './alpine-toast';
+import * as toastUtils from './toast';
+
+// Registrar componentes Alpine
+Alpine.data('toastContainer', toastContainer);
+Alpine.data('toastNotification', toastNotification);
+
 // Store global para el estado del sidebar
 // Usar estado inicial desde script inline si está disponible (para evitar flash)
 Alpine.store('sidebar', {
@@ -61,6 +70,10 @@ Alpine.store('theme', {
         }
     },
 });
+
+// Hacer disponibles las funciones de toast globalmente
+window.initToastContainer = toastUtils.initToastContainer;
+window.initSessionMessages = toastUtils.initSessionMessages;
 
 Alpine.start();
 

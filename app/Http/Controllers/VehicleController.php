@@ -37,6 +37,13 @@ class VehicleController extends Controller
 
         $vehiculos = $query->latest()->paginate(10)->withQueryString();
 
+        if ($request->ajax() || $request->has('ajax')) {
+            return response()->json([
+                'html' => view('vehiculos.partials.table', compact('vehiculos'))->render(),
+                'pagination' => view('vehiculos.partials.pagination', compact('vehiculos'))->render(),
+            ]);
+        }
+
         return view('vehiculos.index', compact('vehiculos'));
     }
 

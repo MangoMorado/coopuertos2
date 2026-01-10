@@ -34,12 +34,13 @@
                     </p>
                     @if($vehiculo->foto)
                         @php
-                            use App\Helpers\StorageHelper;
-                            $fotoUrl = StorageHelper::getFotoUrl($vehiculo->foto);
+                            $fotoUrl = \App\Helpers\StorageHelper::getFotoUrl($vehiculo->foto);
                         @endphp
-                        <div class="mt-3">
-                            <img src="{{ $fotoUrl }}" alt="Foto vehículo" class="w-48 h-48 object-cover rounded border border-gray-200 dark:border-gray-700">
-                        </div>
+                        @if($fotoUrl)
+                            <div class="mt-3">
+                                <img src="{{ $fotoUrl }}" alt="Foto vehículo" class="w-48 h-48 object-cover rounded border border-gray-200 dark:border-gray-700">
+                            </div>
+                        @endif
                     @endif
                 </div>
             </div>

@@ -16,12 +16,6 @@
     </x-slot>
 
     <div class="max-w-7xl mx-auto py-8 px-6" x-data="carnetEditor()">
-        @if (session('success'))
-            <div class="mb-4 {{ $isDark ? 'bg-green-900 border-green-700 text-green-200' : 'bg-green-100 border-green-300 text-green-800' }} border px-4 py-2 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <form method="POST" action="{{ route('carnets.guardar-plantilla') }}" enctype="multipart/form-data" id="carnet-form">
             @csrf
             

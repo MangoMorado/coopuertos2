@@ -11,9 +11,8 @@
     $borderCard = $isDark ? 'border-gray-700' : 'border-gray-200';
     $bgSection = $isDark ? 'bg-gray-700' : 'bg-gray-50';
     
-    use App\Helpers\StorageHelper;
     // Foto del conductor
-    $fotoUrl = StorageHelper::getFotoUrl($conductor->foto);
+    $fotoUrl = \App\Helpers\StorageHelper::getFotoUrl($conductor->foto);
     $fallbackAvatar = 'https://ui-avatars.com/api/?name=' . urlencode($conductor->nombres . ' ' . $conductor->apellidos) . '&background=1e3a8a&color=fff';
     
     // Vehículo activo

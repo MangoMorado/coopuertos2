@@ -22,18 +22,6 @@
     </x-slot>
 
     <div class="max-w-7xl mx-auto py-8 px-6">
-        @if (session('success'))
-            <div class="mb-4 {{ $bgSuccess }} border {{ $textSuccess }} px-4 py-3 rounded-lg">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="mb-4 {{ $bgError }} border {{ $textError }} px-4 py-3 rounded-lg">
-                {{ session('error') }}
-            </div>
-        @endif
-
         <div class="{{ $bgCard }} rounded-lg shadow-md border {{ $borderCard }} p-6">
             <div class="mb-6">
                 <h3 class="text-2xl font-bold {{ $textTitle }} mb-2">Gestión de Módulos por Rol</h3>

@@ -28,18 +28,6 @@
     </x-slot>
 
     <div class="max-w-6xl mx-auto py-8 px-6 space-y-6">
-        @if (session('success'))
-            <div class="{{ $bgSuccess }} border {{ $textSuccess }} px-4 py-3 rounded-lg">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="{{ $bgError }} border {{ $textError }} px-4 py-3 rounded-lg">
-                {{ session('error') }}
-            </div>
-        @endif
-
         <!-- Formulario de importación -->
         <div class="{{ $bgCard }} rounded-lg shadow-md border {{ $borderCard }} p-6">
             <div class="mb-6">

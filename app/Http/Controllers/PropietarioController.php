@@ -24,6 +24,13 @@ class PropietarioController extends Controller
 
         $propietarios = $query->latest()->paginate(10)->withQueryString();
 
+        if ($request->ajax() || $request->has('ajax')) {
+            return response()->json([
+                'html' => view('propietarios.partials.table', compact('propietarios'))->render(),
+                'pagination' => view('propietarios.partials.pagination', compact('propietarios'))->render(),
+            ]);
+        }
+
         return view('propietarios.index', compact('propietarios'));
     }
 

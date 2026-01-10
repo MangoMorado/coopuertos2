@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="max-w-6xl mx-auto py-8 px-6">
+    <div class="max-w-8xl mx-auto py-8 px-6">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Conductores</h2>
             <div class="flex space-x-2">
@@ -24,11 +24,6 @@
             </div>
         </div>
 
-        @if (session('success'))
-            <div class="mb-4 bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-2 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
 <div class="mb-4">
     <div class="flex space-x-2">
         <input type="text" id="search-input" placeholder="Buscar por cédula, nombre, apellido, placa, celular, correo..." 
@@ -42,6 +37,12 @@
         @endif
     </div>
 </div>
+        {{-- Contenedor para skeleton loader durante búsqueda --}}
+        <div id="skeleton-container" class="hidden">
+            <x-skeleton-table :rows="5" :columns="6" />
+        </div>
+
+        {{-- Contenedor para la tabla real --}}
         <div id="table-container" class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
             @include('conductores.partials.table', ['conductores' => $conductores])
         </div>
@@ -59,12 +60,20 @@
         const paginationContainer = document.getElementById('pagination-container');
 
         if (searchInput) {
+            const skeletonContainer = document.getElementById('skeleton-container');
+            
             searchInput.addEventListener('input', function(e) {
                 clearTimeout(searchTimeout);
                 const searchTerm = e.target.value;
 
                 searchTimeout = setTimeout(function() {
                     if (searchTerm.length >= 2 || searchTerm.length === 0) {
+                        // Mostrar skeleton loader durante la búsqueda
+                        if (skeletonContainer) {
+                            skeletonContainer.classList.remove('hidden');
+                            tableContainer.classList.add('hidden');
+                        }
+                        
                         fetch(`{{ route('conductores.index') }}?search=${encodeURIComponent(searchTerm)}&ajax=1`, {
                             headers: {
                                 'X-Requested-With': 'XMLHttpRequest',
@@ -73,6 +82,12 @@
                         })
                         .then(response => response.json())
                         .then(data => {
+                            // Ocultar skeleton y mostrar resultados
+                            if (skeletonContainer) {
+                                skeletonContainer.classList.add('hidden');
+                            }
+                            tableContainer.classList.remove('hidden');
+                            
                             tableContainer.className = 'bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden';
                             tableContainer.innerHTML = data.html;
                             paginationContainer.innerHTML = data.pagination;
@@ -88,6 +103,16 @@
                         })
                         .catch(error => {
                             console.error('Error en la búsqueda:', error);
+                            // Ocultar skeleton en caso de error
+                            if (skeletonContainer) {
+                                skeletonContainer.classList.add('hidden');
+                            }
+                            tableContainer.classList.remove('hidden');
+                            
+                            // Mostrar toast de error
+                            if (window.toast) {
+                                window.toast.error('Error al realizar la búsqueda. Por favor, intenta de nuevo.');
+                            }
                         });
                     }
                 }, 300); // Esperar 300ms después de que el usuario deje de escribir

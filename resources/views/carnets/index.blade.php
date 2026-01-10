@@ -6,12 +6,6 @@
     </x-slot>
 
     <div class="max-w-7xl mx-auto py-8 px-6">
-        @if (session('success'))
-            <div class="mb-4 bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-2 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-
         <!-- Información de Tamaños Recomendados -->
         <div class="mb-6 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
             <div class="flex items-start space-x-3">

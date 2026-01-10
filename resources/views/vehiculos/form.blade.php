@@ -92,7 +92,19 @@
                 required>
             <input type="hidden" name="propietario_nombre" x-model="valorSeleccionado">
             
-            <div x-show="mostrarDropdown && resultados.length > 0" 
+            {{-- Skeleton loader durante búsqueda --}}
+            <div x-show="mostrarDropdown && buscando" 
+                 x-transition
+                 class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-2"
+                 style="display: none;">
+                <div class="space-y-2">
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse"></div>
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse" style="animation-delay: 0.1s;"></div>
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse" style="animation-delay: 0.2s;"></div>
+                </div>
+            </div>
+            
+            <div x-show="mostrarDropdown && !buscando && resultados.length > 0" 
                  x-transition
                  class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto"
                  style="display: none;">
@@ -128,7 +140,19 @@
                 class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             <input type="hidden" name="conductor_id" x-model="valorSeleccionado">
             
-            <div x-show="mostrarDropdown && resultados.length > 0" 
+            {{-- Skeleton loader durante búsqueda --}}
+            <div x-show="mostrarDropdown && buscando" 
+                 x-transition
+                 class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-2"
+                 style="display: none;">
+                <div class="space-y-2">
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse"></div>
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse" style="animation-delay: 0.1s;"></div>
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse" style="animation-delay: 0.2s;"></div>
+                </div>
+            </div>
+            
+            <div x-show="mostrarDropdown && !buscando && resultados.length > 0" 
                  x-transition
                  class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto"
                  style="display: none;">
@@ -159,12 +183,13 @@
         <label class="block font-semibold text-gray-700 dark:text-gray-300">Foto del Vehículo</label>
         @if(!empty($vehiculo?->foto))
             @php
-                use App\Helpers\StorageHelper;
-                $fotoUrl = StorageHelper::getFotoUrl($vehiculo->foto);
+                $fotoUrl = \App\Helpers\StorageHelper::getFotoUrl($vehiculo->foto);
             @endphp
-            <div class="mb-2">
-                <img src="{{ $fotoUrl }}" alt="Foto vehículo" class="w-40 h-40 object-cover rounded border border-gray-200 dark:border-gray-700">
-            </div>
+            @if($fotoUrl)
+                <div class="mb-2">
+                    <img src="{{ $fotoUrl }}" alt="Foto vehículo" class="w-40 h-40 object-cover rounded border border-gray-200 dark:border-gray-700">
+                </div>
+            @endif
         @endif
         <input type="file" name="foto" accept="image/*" class="mt-1 block w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
     </div>
@@ -179,13 +204,19 @@ function propietarioAutocomplete(valorInicial = '') {
         mostrarDropdown: false,
         selectedIndex: -1,
         valorSeleccionado: valorInicial,
+        buscando: false,
         
         buscar() {
             if (this.search.length < 2) {
                 this.resultados = [];
                 this.mostrarDropdown = false;
+                this.buscando = false;
                 return;
             }
+            
+            // Mostrar skeleton loader
+            this.buscando = true;
+            this.mostrarDropdown = true;
             
             fetch(`{{ route('api.propietarios.search') }}?q=${encodeURIComponent(this.search)}`)
                 .then(response => response.json())
@@ -193,10 +224,16 @@ function propietarioAutocomplete(valorInicial = '') {
                     this.resultados = data;
                     this.mostrarDropdown = data.length > 0;
                     this.selectedIndex = -1;
+                    this.buscando = false;
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     this.resultados = [];
+                    this.mostrarDropdown = false;
+                    this.buscando = false;
+                    if (window.toast) {
+                        window.toast.error('Error al buscar propietarios');
+                    }
                 });
         },
         
@@ -230,13 +267,19 @@ function conductorAutocomplete(valorInicial = '', nombreInicial = '') {
         mostrarDropdown: false,
         selectedIndex: -1,
         valorSeleccionado: valorInicial,
+        buscando: false,
         
         buscar() {
             if (this.search.length < 2) {
                 this.resultados = [];
                 this.mostrarDropdown = false;
+                this.buscando = false;
                 return;
             }
+            
+            // Mostrar skeleton loader
+            this.buscando = true;
+            this.mostrarDropdown = true;
             
             fetch(`{{ route('api.conductores.search') }}?q=${encodeURIComponent(this.search)}`)
                 .then(response => response.json())
@@ -244,10 +287,16 @@ function conductorAutocomplete(valorInicial = '', nombreInicial = '') {
                     this.resultados = data;
                     this.mostrarDropdown = data.length > 0;
                     this.selectedIndex = -1;
+                    this.buscando = false;
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     this.resultados = [];
+                    this.mostrarDropdown = false;
+                    this.buscando = false;
+                    if (window.toast) {
+                        window.toast.error('Error al buscar conductores');
+                    }
                 });
         },
         

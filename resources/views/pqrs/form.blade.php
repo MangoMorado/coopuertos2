@@ -53,7 +53,19 @@
                 class="mt-1 block w-full {{ $bgInput }} rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
             <input type="hidden" name="vehiculo_placa" x-model="valorSeleccionado">
             
-            <div x-show="mostrarDropdown && resultados.length > 0" 
+            {{-- Skeleton loader durante búsqueda --}}
+            <div x-show="mostrarDropdown && buscando" 
+                 x-transition
+                 class="absolute z-50 w-full mt-1 {{ $isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300' }} border rounded-md shadow-lg p-2"
+                 style="display: none;">
+                <div class="space-y-2">
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse"></div>
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse" style="animation-delay: 0.1s;"></div>
+                    <div class="h-12 bg-gray-200 dark:bg-gray-700 rounded animate-skeleton-pulse" style="animation-delay: 0.2s;"></div>
+                </div>
+            </div>
+            
+            <div x-show="mostrarDropdown && !buscando && resultados.length > 0" 
                  x-transition
                  class="absolute z-50 w-full mt-1 {{ $isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-300' }} border rounded-md shadow-lg max-h-60 overflow-auto"
                  style="display: none;">
@@ -215,13 +227,19 @@ function vehiculoAutocomplete(valorInicial = '') {
         mostrarDropdown: false,
         selectedIndex: -1,
         valorSeleccionado: valorInicial,
+        buscando: false,
         
         buscar() {
             if (this.search.length < 1) {
                 this.resultados = [];
                 this.mostrarDropdown = false;
+                this.buscando = false;
                 return;
             }
+            
+            // Mostrar skeleton loader
+            this.buscando = true;
+            this.mostrarDropdown = true;
             
             fetch(`{{ route('api.vehiculos.search') }}?q=${encodeURIComponent(this.search)}`)
                 .then(response => response.json())
@@ -229,10 +247,16 @@ function vehiculoAutocomplete(valorInicial = '') {
                     this.resultados = data;
                     this.mostrarDropdown = data.length > 0;
                     this.selectedIndex = -1;
+                    this.buscando = false;
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     this.resultados = [];
+                    this.mostrarDropdown = false;
+                    this.buscando = false;
+                    if (window.toast) {
+                        window.toast.error('Error al buscar vehículos');
+                    }
                 });
         },
         

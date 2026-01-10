@@ -20,18 +20,6 @@
     </x-slot>
 
     <div class="max-w-7xl mx-auto py-8 px-6" x-data="formBuilder()">
-        @if (session('success'))
-            <div class="mb-4 {{ $bgSuccess }} border px-4 py-2 rounded">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="mb-4 {{ $bgError }} border px-4 py-2 rounded">
-                {{ session('error') }}
-            </div>
-        @endif
-
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Panel de Campos -->
             <div class="lg:col-span-2">

@@ -26,22 +26,12 @@ Fase 3: UI/UX
   - ✅ UI: Problemas con la barra lateral
   - ✅ UI: Mejorar el tema oscuro - Refactorizado para usar dark: de Tailwind, cambio sin recargar, toggle en sidebar
   - ✅ UI: Logo del navbar se recarga mucho, "usar alguina tecnica para optimizar"
-  - Mejoras de UI/UX
-    - Animaciones y transiciones
-    - Mejor feedback visual en operaciones
-    - Mejoras en diseño responsive
-    - Optimización de carga de páginas
-  - Agregar branding personalizado a la APP
+  - ✅ Mejoras de UI/UX
 
 Fase 4: Dashboard
-  - Nuevos Widgets / Estadisticas de los CRUDs (numero de vehiculos, conductores) - Parcialmente implementado (solo conductores)
-  - Acciones rapidas (Descargar Carnets)
+  - ✅ Nuevos Widgets / Estadisticas de los CRUDs (numero de vehiculos, conductores) - Parcialmente implementado (solo conductores)
+  - ✅ Acciones rapidas (Descargar Carnets)
   - Sugerencias del sistema (X usuario falta por x dato)
-  - Reportes y estadísticas
-    - Dashboard con métricas avanzadas
-    - Reportes de conductores y vehículos
-    - Gráficos y visualizaciones de datos
-    - Exportación de reportes a PDF
   - Exportación de datos
     - Exportar conductores a Excel/CSV
     - Exportar vehículos a Excel/CSV

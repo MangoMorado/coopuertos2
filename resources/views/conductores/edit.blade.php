@@ -114,8 +114,7 @@
                         @if($conductor->foto)
                             <div class="mb-2">
                                 @php
-                                    use App\Helpers\StorageHelper;
-                                    $fotoUrl = StorageHelper::getFotoUrl($conductor->foto);
+                                    $fotoUrl = \App\Helpers\StorageHelper::getFotoUrl($conductor->foto);
                                 @endphp
                                 <img src="{{ $fotoUrl }}" alt="Foto Conductor" class="w-32 h-32 object-cover rounded border border-gray-200 dark:border-gray-700">
                             </div>

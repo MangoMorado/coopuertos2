@@ -6,7 +6,7 @@ echo "=== Iniciando servicios de Coopuertos ==="
 # Configurar permisos y crear directorios necesarios
 mkdir -p /app/storage/logs /app/storage/framework/cache /app/storage/framework/sessions /app/storage/framework/views
 mkdir -p /app/bootstrap/cache
-mkdir -p /app/public/uploads/pqrs /app/public/uploads/carnets
+mkdir -p /app/public/uploads/carnets
 mkdir -p /app/public/storage/carnet_previews /app/public/storage/carnets
 mkdir -p /app/storage/app/carnets /app/storage/app/temp /app/storage/app/temp_imports /app/storage/app/public
 
@@ -17,7 +17,6 @@ chmod -R 777 /app/public/storage 2>/dev/null || true
 
 # Configurar directorios de almacenamiento
 php /app/artisan storage:setup-directories 2>/dev/null || true
-chmod -R 777 /app/public/uploads/vehiculos /app/public/uploads/pqrs /app/public/uploads/carnets 2>/dev/null || true
 
 # Crear enlace simbólico de storage
 php /app/artisan storage:link 2>/dev/null || true

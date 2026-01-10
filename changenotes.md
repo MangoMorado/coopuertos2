@@ -1,5 +1,14 @@
 # Coopuertos App
 
+## *v. 0.1*
+- Sistema de notificaciones Toast con auto-cierre y barra de progreso visual
+- Skeleton loaders para tablas, tarjetas y formularios con animaciones optimizadas
+- Reemplazo de mensajes de sesión antiguos por toasts automáticos en todas las vistas
+- Búsqueda automática en tiempo real (sin botones) para vehículos, propietarios y usuarios
+- Coherencia visual unificada entre todas las tablas de listado (max-w-8xl)
+- Skeleton loaders en búsquedas AJAX y formularios con autocomplete
+- Vehículos ahora también guarda imágenes como base64 (igual que conductores)
+
 ## *v. 0.0.9*
 - Correcciones de errores
 - Implementadas mejoras de UI/UX
