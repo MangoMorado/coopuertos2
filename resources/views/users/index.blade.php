@@ -1,156 +1,125 @@
 @php
     $theme = Auth::user()->theme ?? 'light';
     $isDark = $theme === 'dark';
-    
-    // Colores según el tema
-    $bgCard = $isDark ? 'bg-gray-800' : 'bg-white';
     $textTitle = $isDark ? 'text-gray-100' : 'text-gray-800';
-    $textSubtitle = $isDark ? 'text-gray-400' : 'text-gray-600';
+    $bgCard = $isDark ? 'bg-gray-800' : 'bg-white';
+    $bgInput = $isDark ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900';
+    $bgSuccess = $isDark ? 'bg-green-900 border-green-700 text-green-200' : 'bg-green-100 border-green-300 text-green-800';
+    $bgError = $isDark ? 'bg-red-900 border-red-700 text-red-200' : 'bg-red-100 border-red-300 text-red-800';
+    $bgHeader = $isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700';
     $textBody = $isDark ? 'text-gray-300' : 'text-gray-700';
-    $borderCard = $isDark ? 'border-gray-700' : 'border-gray-200';
-    $bgInput = $isDark ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300';
-    $bgSuccess = $isDark ? 'bg-green-900 border-green-700' : 'bg-green-100 border-green-300';
-    $textSuccess = $isDark ? 'text-green-200' : 'text-green-800';
-    $bgError = $isDark ? 'bg-red-900 border-red-700' : 'bg-red-100 border-red-300';
-    $textError = $isDark ? 'text-red-200' : 'text-red-800';
+    $borderRow = $isDark ? 'border-gray-700' : 'border-gray-200';
+    $hoverRow = $isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
+    $textEmpty = $isDark ? 'text-gray-400' : 'text-gray-500';
 @endphp
 
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
-                {{ __('Usuarios') }}
-            </h2>
-            @can('crear usuarios')
-            <a href="{{ route('users.create') }}"
-               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
-                {{ __('Nuevo Usuario') }}
-            </a>
-            @endcan
-        </div>
+        <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
+            Usuarios
+        </h2>
     </x-slot>
 
     <div class="max-w-7xl mx-auto py-8 px-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold {{ $textTitle }}">Usuarios</h2>
+            <div class="flex space-x-2">
+                @can('crear usuarios')
+                <a href="{{ route('usuarios.create') }}"
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
+                   + Nuevo Usuario
+                </a>
+                @endcan
+            </div>
+        </div>
+
         @if (session('success'))
-            <div class="mb-4 {{ $bgSuccess }} border {{ $textSuccess }} px-4 py-3 rounded-lg">
+            <div class="mb-4 {{ $bgSuccess }} border px-4 py-2 rounded">
                 {{ session('success') }}
             </div>
         @endif
 
         @if (session('error'))
-            <div class="mb-4 {{ $bgError }} border {{ $textError }} px-4 py-3 rounded-lg">
+            <div class="mb-4 {{ $bgError }} border px-4 py-2 rounded">
                 {{ session('error') }}
             </div>
         @endif
 
-        <div class="{{ $bgCard }} rounded-lg shadow-md border {{ $borderCard }} p-6">
-            <!-- Barra de búsqueda -->
-            <form method="GET" action="{{ route('users.index') }}" class="mb-6">
-                <div class="flex gap-4">
-                    <input type="text"
-                           name="search"
-                           value="{{ request('search') }}"
-                           placeholder="Buscar por nombre o email..."
-                           class="flex-1 px-4 py-2 {{ $bgInput }} {{ $textBody }} rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                    <button type="submit"
-                            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">
-                        Buscar
-                    </button>
-                    @if(request('search'))
-                        <a href="{{ route('users.index') }}"
-                           class="px-6 py-2 {{ $isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-300 hover:bg-gray-400' }} text-white rounded-lg transition">
-                            Limpiar
-                        </a>
-                    @endif
-                </div>
+        <div class="mb-4">
+            <form method="GET" action="{{ route('usuarios.index') }}" class="flex space-x-2">
+                <input type="text" name="search" placeholder="Buscar por nombre o email..." value="{{ request('search') }}"
+                       class="{{ $bgInput }} border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400">
+                @if(request('search'))
+                    <a href="{{ route('usuarios.index') }}"
+                       class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md transition">
+                       Limpiar
+                    </a>
+                @endif
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition" type="submit">Buscar</button>
             </form>
+        </div>
 
-            <!-- Tabla de usuarios -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y {{ $isDark ? 'divide-gray-700' : 'divide-gray-200' }}">
-                    <thead class="{{ $isDark ? 'bg-gray-700' : 'bg-gray-50' }}">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium {{ $textSubtitle }} uppercase tracking-wider">
-                                Nombre
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium {{ $textSubtitle }} uppercase tracking-wider">
-                                Email
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium {{ $textSubtitle }} uppercase tracking-wider">
-                                Rol
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium {{ $textSubtitle }} uppercase tracking-wider">
-                                Fecha de creación
-                            </th>
-                            <th class="px-6 py-3 text-right text-xs font-medium {{ $textSubtitle }} uppercase tracking-wider">
-                                Acciones
-                            </th>
+        <div class="{{ $bgCard }} shadow-md rounded-lg overflow-hidden">
+            <table class="w-full border-collapse text-sm">
+                <thead class="{{ $bgHeader }} uppercase text-sm">
+                    <tr>
+                        <th class="text-left px-4 py-3">Nombre</th>
+                        <th class="text-left px-4 py-3">Email</th>
+                        <th class="text-left px-4 py-3">Rol</th>
+                        <th class="text-left px-4 py-3">Fecha de creación</th>
+                        <th class="text-center px-4 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm">
+                    @forelse($users as $user)
+                        <tr class="border-t {{ $borderRow }} {{ $hoverRow }} transition">
+                            <td class="px-4 py-3 {{ $textBody }}">{{ $user->name }}</td>
+                            <td class="px-4 py-3 {{ $textBody }}">{{ $user->email }}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-1 text-xs rounded-full
+                                    @if($user->hasRole('Mango'))
+                                        {{ $isDark ? 'bg-purple-900 text-purple-200' : 'bg-purple-100 text-purple-800' }}
+                                    @elseif($user->hasRole('Admin'))
+                                        {{ $isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800' }}
+                                    @else
+                                        {{ $isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800' }}
+                                    @endif">
+                                    {{ $user->roles->first()->name ?? 'Sin rol' }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 {{ $textBody }}">{{ $user->created_at?->format('d/m/Y') ?? 'N/A' }}</td>
+                            <td class="text-center py-3">
+                                <div class="flex justify-center space-x-2">
+                                    @can('editar usuarios')
+                                    <a href="{{ route('usuarios.edit', $user) }}"
+                                       class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
+                                        Editar
+                                    </a>
+                                    @endcan
+                                    @can('eliminar usuarios')
+                                    @if($user->id !== auth()->id())
+                                        <form method="POST" action="{{ route('usuarios.destroy', $user) }}" onsubmit="return confirm('¿Eliminar este usuario?')" class="inline">
+                                            @csrf @method('DELETE')
+                                            <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
+                                                Eliminar
+                                            </button>
+                                        </form>
+                                    @endif
+                                    @endcan
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody class="{{ $isDark ? 'bg-gray-800 divide-gray-700' : 'bg-white divide-gray-200' }}">
-                        @forelse($users as $user)
-                            <tr class="{{ $isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50' }}">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium {{ $textBody }}">
-                                        {{ $user->name }}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm {{ $textBody }}">
-                                        {{ $user->email }}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                        @if($user->hasRole('Mango')) bg-purple-100 text-purple-800
-                                        @elseif($user->hasRole('Admin')) bg-blue-100 text-blue-800
-                                        @else bg-gray-100 text-gray-800
-                                        @endif">
-                                        {{ $user->roles->first()->name ?? 'Sin rol' }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm {{ $textBody }}">
-                                    {{ $user->created_at?->format('d/m/Y') ?? 'N/A' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <div class="flex justify-end gap-2">
-                                        @can('editar usuarios')
-                                        <a href="{{ route('users.edit', $user) }}"
-                                           class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
-                                            Editar
-                                        </a>
-                                        @endcan
-                                        @can('eliminar usuarios')
-                                        @if($user->id !== auth()->id())
-                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline"
-                                                  onsubmit="return confirm('¿Estás seguro de eliminar este usuario?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded transition">
-                                                    Eliminar
-                                                </button>
-                                            </form>
-                                        @endif
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center {{ $textBody }}">
-                                    No se encontraron usuarios.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="text-center py-6 {{ $textEmpty }}">No se encontraron usuarios.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-            <!-- Paginación -->
-            <div class="mt-6">
-                {{ $users->links() }}
-            </div>
+        <div class="mt-6">
+            {{ $users->links() }}
         </div>
     </div>
 </x-app-layout>

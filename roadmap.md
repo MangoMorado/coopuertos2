@@ -20,11 +20,10 @@ Fase 2: Carnets
   - ✅ Implementar Jobs en cola para generación de carnets masivos
   - ✅ Laravel Boost configurado e integrado con Cursor
   - ✅ Supervisor para gestión automatica de workers en producción
-  - Configuración de instalaccion de Imagick en producción
+  - ✅ Configuración de instalaccion de Imagick en producción
 
 Fase 3: UI/UX
-  - UX: Tutorial guiado, una unica vez, debe explicar las realciones entre los CRUDS
-  - UI: Problemas con la barra lateral
+  - ✅ UI: Problemas con la barra lateral
   - UI: Mejorar el tema oscuro
   - UI: Logo del navbar se recarga mucho, "usar alguina tecnica para optimizar"
   - Mejoras de UI/UX
@@ -117,5 +116,6 @@ Fase 8: MCP y Herramientas de IA
   - Prompts MCP para tareas comunes y automatizables
   - Integración con sistemas externos mediante herramientas MCP
   - Herramientas de monitoreo y salud del sistema
+  - UX: Tutorial y documentación de uso de la App
 
 ---

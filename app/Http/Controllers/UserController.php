@@ -77,7 +77,7 @@ class UserController extends Controller
         // Asignar rol
         $newUser->assignRole($validated['role']);
 
-        return redirect()->route('users.index')
+        return redirect()->route('usuarios.index')
             ->with('success', 'Usuario creado exitosamente.');
     }
 
@@ -93,7 +93,7 @@ class UserController extends Controller
         // Admin solo puede editar usuarios User
         elseif ($authUser->hasRole('Admin')) {
             if (!$user->hasRole('User')) {
-                return redirect()->route('users.index')
+                return redirect()->route('usuarios.index')
                     ->with('error', 'No tienes permisos para editar este usuario.');
             }
             $roles = Role::where('name', 'User')->where('guard_name', 'web')->get();
@@ -118,7 +118,7 @@ class UserController extends Controller
         if ($authUser->hasRole('Admin')) {
             // Admin solo puede editar usuarios User
             if (!$user->hasRole('User')) {
-                return redirect()->route('users.index')
+                return redirect()->route('usuarios.index')
                     ->with('error', 'No tienes permisos para editar este usuario.');
             }
             // Admin solo puede asignar rol User
@@ -145,7 +145,7 @@ class UserController extends Controller
         // Actualizar rol
         $user->syncRoles([$validated['role']]);
 
-        return redirect()->route('users.index')
+        return redirect()->route('usuarios.index')
             ->with('success', 'Usuario actualizado exitosamente.');
     }
 
@@ -153,7 +153,7 @@ class UserController extends Controller
     {
         // No permitir eliminar a uno mismo
         if ($user->id === auth()->id()) {
-            return redirect()->route('users.index')
+            return redirect()->route('usuarios.index')
                 ->with('error', 'No puedes eliminar tu propio usuario.');
         }
 
@@ -163,14 +163,14 @@ class UserController extends Controller
         if ($authUser->hasRole('Admin')) {
             // Admin solo puede eliminar usuarios User
             if (!$user->hasRole('User')) {
-                return redirect()->route('users.index')
+                return redirect()->route('usuarios.index')
                     ->with('error', 'No tienes permisos para eliminar este usuario.');
             }
         }
 
         $user->delete();
 
-        return redirect()->route('users.index')
+        return redirect()->route('usuarios.index')
             ->with('success', 'Usuario eliminado exitosamente.');
     }
 }

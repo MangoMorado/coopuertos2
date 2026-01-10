@@ -262,6 +262,22 @@ El sistema utiliza **Spatie Laravel Permission** para gestionar roles y permisos
 - **Admin**: Rol administrativo con acceso a todos los módulos excepto configuración
 - **User**: Rol de usuario básico con acceso de solo lectura
 
+#### Asignar Rol Mango a un Usuario
+
+Para asignar el rol Mango a un usuario, utiliza el comando Artisan:
+
+```bash
+php artisan new-mango correo@correo.com
+```
+
+Este comando busca al usuario por email y le asigna el rol Mango si no lo tiene. También puedes asignar roles desde la interfaz web editando un usuario (si tienes permisos) o mediante Tinker:
+
+```php
+php artisan tinker
+$user = App\Models\User::where('email', 'usuario@ejemplo.com')->first();
+$user->assignRole('Mango');
+```
+
 ### Módulos y Permisos
 
 Cada módulo tiene 4 permisos base que controlan las acciones:

@@ -34,9 +34,6 @@ class SetupStorageDirectories extends Command
             storage_path('framework/cache'),
             storage_path('framework/sessions'),
             storage_path('framework/views'),
-            // Public uploads
-            public_path('uploads/conductores'),
-            public_path('uploads/vehiculos'),
             public_path('uploads/pqrs'),
             public_path('uploads/carnets'),
             // Public storage
@@ -111,9 +108,10 @@ class SetupStorageDirectories extends Command
             $this->newLine();
             $this->warn('⚠️  Algunos directorios no pudieron crearse automáticamente.');
             $this->line('   En producción, asegúrate de que el usuario del proceso PHP tenga permisos para escribir en:');
-            $this->line('   - /public/uploads/');
-            $this->line('   - /public/storage/');
-            $this->line('   - /storage/');
+            $this->line('   - /public/uploads/pqrs (para adjuntos de PQRS)');
+            $this->line('   - /public/uploads/carnets (para plantillas de carnets)');
+            $this->line('   - /public/storage/ (para previsualizaciones de carnets)');
+            $this->line('   - /storage/ (para carnets generados y archivos temporales)');
 
             return Command::FAILURE;
         }

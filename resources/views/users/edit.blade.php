@@ -32,7 +32,7 @@
         @endif
 
         <div class="{{ $bgCard }} rounded-lg shadow-md border {{ $borderCard }} p-6">
-            <form method="POST" action="{{ route('users.update', $user) }}" class="space-y-6">
+            <form method="POST" action="{{ route('usuarios.update', $user) }}" class="space-y-6">
                 @csrf
                 @method('PUT')
 
@@ -115,7 +115,7 @@
 
                 <!-- Botones -->
                 <div class="flex justify-end space-x-4 pt-4">
-                    <a href="{{ route('users.index') }}"
+                    <a href="{{ route('usuarios.index') }}"
                        class="px-6 py-2 {{ $isDark ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-600 hover:bg-gray-700' }} text-white rounded-lg transition">
                         Cancelar
                     </a>

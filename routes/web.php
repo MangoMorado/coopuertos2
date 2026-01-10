@@ -94,18 +94,18 @@ Route::middleware('auth')->group(function () {
 
     // Usuarios
     Route::middleware('permission:ver usuarios')->group(function () {
-        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/usuarios', [UserController::class, 'index'])->name('usuarios.index');
     });
     Route::middleware('permission:crear usuarios')->group(function () {
-        Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
-        Route::post('/users', [UserController::class, 'store'])->name('users.store');
+        Route::get('/usuarios/create', [UserController::class, 'create'])->name('usuarios.create');
+        Route::post('/usuarios', [UserController::class, 'store'])->name('usuarios.store');
     });
     Route::middleware('permission:editar usuarios')->group(function () {
-        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
-        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('usuarios.edit');
+        Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('usuarios.update');
     });
     Route::middleware('permission:eliminar usuarios')->group(function () {
-        Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+        Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('usuarios.destroy');
     });
 
     // Configuración (solo para rol Mango)
