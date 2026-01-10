@@ -24,8 +24,8 @@ Fase 2: Carnets
 
 Fase 3: UI/UX
   - ✅ UI: Problemas con la barra lateral
-  - UI: Mejorar el tema oscuro
-  - UI: Logo del navbar se recarga mucho, "usar alguina tecnica para optimizar"
+  - ✅ UI: Mejorar el tema oscuro - Refactorizado para usar dark: de Tailwind, cambio sin recargar, toggle en sidebar
+  - ✅ UI: Logo del navbar se recarga mucho, "usar alguina tecnica para optimizar"
   - Mejoras de UI/UX
     - Animaciones y transiciones
     - Mejor feedback visual en operaciones

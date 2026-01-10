@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.0.9*
+- Correcciones de errores
+- Implementadas mejoras de UI/UX
+
 ## *v. 0.0.8*
 - Nuevo comando Artisan `new-mango` para asignar el rol Mango a usuarios por email
 - Cambios generales en el navbar

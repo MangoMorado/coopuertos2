@@ -1,6 +1,6 @@
 @php
-    $theme = Auth::user()->theme ?? 'light';
-    $isDark = $theme === 'dark';
+    // Obtener tema del usuario autenticado o usar 'light' por defecto
+    $theme = Auth::check() ? (Auth::user()->theme ?? 'light') : 'light';
     
     // Leer estado del sidebar desde cookie (si está disponible)
     $sidebarCollapsed = isset($_COOKIE['sidebar-collapsed']) 
@@ -8,21 +8,12 @@
         : null;
     
     // Determinar ancho inicial del contenido basado en cookie
-    // Si no hay cookie, por defecto será expandido (false)
     $initialSidebarCollapsed = $sidebarCollapsed ?? false;
     $initialContentMargin = $initialSidebarCollapsed ? 'ml-16' : 'ml-64';
-    
-    // Colores según el tema
-    $bgBody = $isDark ? 'bg-gray-900' : 'bg-gray-100';
-    $textBody = $isDark ? 'text-gray-100' : 'text-gray-900';
-    $bgHeader = $isDark ? 'bg-gray-800' : 'bg-white';
-    $bgFooter = $isDark ? 'bg-gray-800' : 'bg-white';
-    $textFooter = $isDark ? 'text-gray-400' : 'text-gray-500';
-    $borderFooter = $isDark ? 'border-gray-700' : 'border-gray-200';
 @endphp
 
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ $theme === 'dark' ? 'dark' : '' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,7 +21,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-    <!-- Script inline para leer localStorage ANTES del render y evitar flash -->
+    <!-- Script inline para inicializar tema y sidebar ANTES del render y evitar flash -->
     <script>
         (function() {
             // Función helper para establecer cookie
@@ -52,7 +43,24 @@
                 return null;
             }
             
-            // Leer estado desde localStorage
+            // Inicializar tema: priorizar tema del servidor, luego localStorage, por defecto 'light'
+            const serverTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            const savedTheme = localStorage.getItem('theme');
+            
+            // Si el servidor tiene un tema definido, usarlo; si no, usar localStorage; por defecto 'light'
+            let currentTheme = serverTheme || savedTheme || 'light';
+            
+            // Aplicar tema inmediatamente al elemento html
+            if (currentTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            
+            // Guardar tema actual en window para uso global
+            window.__currentTheme = currentTheme;
+            
+            // Leer estado desde localStorage para sidebar
             let sidebarCollapsed = false;
             const savedState = localStorage.getItem('sidebar-collapsed');
             const isMobile = window.innerWidth < 768;
@@ -65,17 +73,13 @@
             // Sincronizar con cookie (para disponibilidad en servidor)
             const cookieState = getCookie('sidebar-collapsed');
             if (cookieState !== null && !isMobile) {
-                // Si hay cookie, usarla (preferencia por localStorage, pero cookie como respaldo)
                 sidebarCollapsed = cookieState === 'true';
-                // Sincronizar localStorage con cookie si difieren
                 if (savedState !== sidebarCollapsed.toString()) {
                     localStorage.setItem('sidebar-collapsed', sidebarCollapsed.toString());
                 }
             } else if (savedState !== null && !isMobile) {
-                // Si no hay cookie pero hay localStorage, sincronizar
                 setCookie('sidebar-collapsed', savedState, 365);
             } else if (!isMobile) {
-                // Si no hay ni cookie ni localStorage, establecer cookie por defecto (expandido)
                 setCookie('sidebar-collapsed', 'false', 365);
             }
             
@@ -95,7 +99,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="font-sans antialiased {{ $bgBody }} {{ $textBody }}">
+<body class="font-sans antialiased bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
 
     <!-- Contenedor principal -->
     <div class="min-h-screen">
@@ -143,7 +147,7 @@
 
             <!-- HEADER (opcional según vista) -->
             @isset($header)
-                <header class="{{ $bgHeader }} shadow border-b {{ $isDark ? 'border-gray-700' : 'border-gray-200' }}">
+                <header class="bg-white dark:bg-gray-800 shadow border-b border-gray-200 dark:border-gray-700">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -158,8 +162,8 @@
             </main>
 
             <!-- FOOTER -->
-            <footer class="{{ $bgFooter }} border-t {{ $borderFooter }} mt-auto">
-                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center {{ $textFooter }} text-sm">
+            <footer class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-auto">
+                <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-gray-500 dark:text-gray-400 text-sm">
                     © {{ date('Y') }} {{ config('app.name', 'Coopuertos') }}.
                 </div>
             </footer>

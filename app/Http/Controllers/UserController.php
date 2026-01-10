@@ -18,7 +18,7 @@ class UserController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -54,6 +54,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string|in:User,Admin,Mango',
+            'theme' => ['nullable', 'string', 'in:light,dark'],
         ]);
 
         // Verificar permisos según rol
@@ -72,6 +73,7 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'theme' => $validated['theme'] ?? 'light',
         ]);
 
         // Asignar rol
@@ -92,7 +94,7 @@ class UserController extends Controller
         }
         // Admin solo puede editar usuarios User
         elseif ($authUser->hasRole('Admin')) {
-            if (!$user->hasRole('User')) {
+            if (! $user->hasRole('User')) {
                 return redirect()->route('usuarios.index')
                     ->with('error', 'No tienes permisos para editar este usuario.');
             }
@@ -109,15 +111,16 @@ class UserController extends Controller
         // Validación
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:8|confirmed',
             'role' => 'required|string|in:User,Admin,Mango',
+            'theme' => ['nullable', 'string', 'in:light,dark'],
         ]);
 
         // Verificar permisos según rol
         if ($authUser->hasRole('Admin')) {
             // Admin solo puede editar usuarios User
-            if (!$user->hasRole('User')) {
+            if (! $user->hasRole('User')) {
                 return redirect()->route('usuarios.index')
                     ->with('error', 'No tienes permisos para editar este usuario.');
             }
@@ -130,10 +133,16 @@ class UserController extends Controller
         }
 
         // Actualizar usuario
-        $user->update([
+        $updateData = [
             'name' => $validated['name'],
             'email' => $validated['email'],
-        ]);
+        ];
+
+        if (isset($validated['theme'])) {
+            $updateData['theme'] = $validated['theme'];
+        }
+
+        $user->update($updateData);
 
         // Actualizar contraseña si se proporciona
         if ($validated['password']) {
@@ -162,7 +171,7 @@ class UserController extends Controller
         // Verificar permisos
         if ($authUser->hasRole('Admin')) {
             // Admin solo puede eliminar usuarios User
-            if (!$user->hasRole('User')) {
+            if (! $user->hasRole('User')) {
                 return redirect()->route('usuarios.index')
                     ->with('error', 'No tienes permisos para eliminar este usuario.');
             }
@@ -174,4 +183,3 @@ class UserController extends Controller
             ->with('success', 'Usuario eliminado exitosamente.');
     }
 }
-

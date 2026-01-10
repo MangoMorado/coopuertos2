@@ -1,15 +1,5 @@
-@php
-    $isDark = $isDark ?? false;
-    $bgHeader = $isDark ? 'bg-gray-700' : 'bg-gray-100';
-    $textHeader = $isDark ? 'text-gray-200' : 'text-gray-700';
-    $textBody = $isDark ? 'text-gray-300' : 'text-gray-700';
-    $borderRow = $isDark ? 'border-gray-700' : 'border-gray-200';
-    $hoverRow = $isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
-    $textEmpty = $isDark ? 'text-gray-400' : 'text-gray-500';
-@endphp
-
 <table class="w-full border-collapse text-sm">
-    <thead class="{{ $bgHeader }} {{ $textHeader }} uppercase text-sm">
+    <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 uppercase text-sm">
         <tr>
             <th class="text-left px-4 py-3">Cédula</th>
             <th class="text-left px-4 py-3">Nombre Completo</th>
@@ -19,14 +9,14 @@
     </thead>
     <tbody class="text-sm">
         @forelse($conductores as $c)
-            <tr class="border-t {{ $borderRow }} {{ $hoverRow }} transition">
-                <td class="px-4 py-3 {{ $textBody }}">{{ $c->cedula }}</td>
-                <td class="px-4 py-3 {{ $textBody }}">{{ $c->nombres }} {{ $c->apellidos }}</td>
-                <td class="px-4 py-3 {{ $textBody }}">
+            <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $c->cedula }}</td>
+                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $c->nombres }} {{ $c->apellidos }}</td>
+                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
                     @if($c->vehiculo)
                         {{ $c->vehiculo }}
                     @else
-                        <span class="{{ $textEmpty }}">Sin asignar</span>
+                        <span class="text-gray-500 dark:text-gray-400">Sin asignar</span>
                     @endif
                 </td>
                 <td class="text-center py-3">
@@ -54,7 +44,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="4" class="text-center py-6 {{ $textEmpty }}">No se encontraron conductores.</td>
+                <td colspan="4" class="text-center py-6 text-gray-500 dark:text-gray-400">No se encontraron conductores.</td>
             </tr>
         @endforelse
     </tbody>

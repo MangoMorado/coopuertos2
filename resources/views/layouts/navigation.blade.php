@@ -1,7 +1,4 @@
 @php
-    $theme = Auth::user()->theme ?? 'light';
-    $isDark = $theme === 'dark';
-    
     // Leer estado del sidebar desde cookie (si está disponible)
     $sidebarCollapsed = isset($_COOKIE['sidebar-collapsed']) 
         ? $_COOKIE['sidebar-collapsed'] === 'true' 
@@ -9,22 +6,6 @@
     
     // Determinar ancho inicial del navbar basado en cookie
     $initialSidebarWidth = $sidebarCollapsed ? 'w-16' : 'w-64';
-    
-    // Colores según el tema
-    $bgSidebar = $isDark ? 'bg-gray-800' : 'bg-white';
-    $borderColor = $isDark ? 'border-gray-700' : 'border-gray-200';
-    $textPrimary = $isDark ? 'text-white' : 'text-gray-900';
-    $textSecondary = $isDark ? 'text-gray-400' : 'text-gray-600';
-    $textMuted = $isDark ? 'text-gray-300' : 'text-gray-700';
-    $hoverBg = $isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100';
-    $activeBg = $isDark ? 'bg-gray-700' : 'bg-gray-100';
-    $dropdownBg = $isDark ? 'bg-gray-700' : 'bg-white';
-    $dropdownBorder = $isDark ? 'border-gray-600' : 'border-gray-200';
-    $avatarBg = $isDark ? 'bg-gray-600' : 'bg-gray-300';
-    $avatarText = $isDark ? 'text-white' : 'text-gray-800';
-    
-    // Logo según el tema
-    $logoPath = $isDark ? 'images/logo_white.svg' : 'images/logo.svg';
 @endphp
 
 <div 
@@ -125,11 +106,11 @@
     <button
         x-show="!$store.sidebar.mobileOpen"
         @click="toggleMobile()"
-        class="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-lg {{ $bgSidebar }} {{ $borderColor }} border {{ $hoverBg }} transition-colors shadow-lg"
+        class="fixed top-4 left-4 z-50 lg:hidden p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-lg text-gray-900 dark:text-white"
         aria-label="Abrir menú"
         style="display: none;"
     >
-        <svg class="w-6 h-6 {{ $textPrimary }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
         </svg>
     </button>
@@ -141,11 +122,11 @@
             '-translate-x-full': window.innerWidth < 768 && !$store.sidebar.mobileOpen,
             'translate-x-0': $store.sidebar.mobileOpen || window.innerWidth >= 768
         }"
-        class="h-full min-h-screen {{ $bgSidebar }} border-r {{ $borderColor }} flex flex-col fixed left-0 top-0 z-40 transition-all duration-300 ease-in-out {{ $initialSidebarWidth }}"
+        class="h-full min-h-screen bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col fixed left-0 top-0 z-40 transition-all duration-300 ease-in-out {{ $initialSidebarWidth }}"
     >
 
     <!-- Logo y botón de colapsar -->
-    <div class="flex items-center justify-between h-16 border-b {{ $borderColor }} px-3">
+    <div class="flex items-center justify-between h-16 border-b border-gray-200 dark:border-gray-700 px-3">
         <div class="flex items-center flex-1 justify-center">
             <!-- Logo cuando está expandido o en móvil - funciona como enlace -->
             <a 
@@ -154,9 +135,15 @@
                 x-show="!$store.sidebar.collapsed || window.innerWidth < 768"
             >
                 <img 
-                    src="{{ asset($logoPath) }}" 
+                    src="{{ asset('images/logo.svg') }}" 
                     alt="Coopuertos" 
-                    class="w-auto h-8 transition-all duration-300"
+                    class="w-auto h-8 transition-all duration-300 dark:hidden"
+                    loading="lazy"
+                >
+                <img 
+                    src="{{ asset('images/logo_white.svg') }}" 
+                    alt="Coopuertos" 
+                    class="w-auto h-8 transition-all duration-300 hidden dark:block"
                     loading="lazy"
                 >
             </a>
@@ -170,9 +157,15 @@
                 style="display: none;"
             >
                 <img 
-                    src="{{ asset($logoPath) }}" 
+                    src="{{ asset('images/logo.svg') }}" 
                     alt="Coopuertos" 
-                    class="w-auto h-6 transition-all duration-300 cursor-pointer"
+                    class="w-auto h-6 transition-all duration-300 cursor-pointer dark:hidden"
+                    loading="lazy"
+                >
+                <img 
+                    src="{{ asset('images/logo_white.svg') }}" 
+                    alt="Coopuertos" 
+                    class="w-auto h-6 transition-all duration-300 cursor-pointer hidden dark:block"
                     loading="lazy"
                 >
             </button>
@@ -181,7 +174,7 @@
         <button
             x-show="window.innerWidth >= 768 && !$store.sidebar.collapsed"
             @click="toggleCollapse()"
-            class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg {{ $hoverBg }} transition-colors {{ $textSecondary }} hover:{{ $textPrimary }}"
+            class="hidden lg:flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             title="Colapsar menú"
             aria-label="Colapsar menú"
             style="display: none;"
@@ -200,7 +193,7 @@
         <button
             @click="closeMobile()"
             x-show="$store.sidebar.mobileOpen && window.innerWidth < 768"
-            class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg {{ $hoverBg }} transition-colors {{ $textSecondary }} hover:{{ $textPrimary }}"
+            class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             aria-label="Cerrar menú"
             style="display: none;"
         >
@@ -223,7 +216,6 @@
                 <x-sidebar-nav-link 
                     :href="route('dashboard')" 
                     :active="request()->routeIs('dashboard')"
-                    :theme="$theme"
                     :title="__('Panel de control')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -239,7 +231,6 @@
                 <x-sidebar-nav-link 
                     :href="route('conductores.index')" 
                     :active="request()->routeIs('conductores.*')"
-                    :theme="$theme"
                     :title="__('Conductores')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -255,7 +246,6 @@
                 <x-sidebar-nav-link 
                     :href="route('vehiculos.index')" 
                     :active="request()->routeIs('vehiculos.*')"
-                    :theme="$theme"
                     :title="__('Vehículos')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -271,7 +261,6 @@
                 <x-sidebar-nav-link 
                     :href="route('propietarios.index')" 
                     :active="request()->routeIs('propietarios.*')"
-                    :theme="$theme"
                     :title="__('Propietarios')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -287,7 +276,6 @@
                 <x-sidebar-nav-link 
                     :href="route('carnets.index')" 
                     :active="request()->routeIs('carnets.*')"
-                    :theme="$theme"
                     :title="__('Carnets')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -303,7 +291,6 @@
                 <x-sidebar-nav-link 
                     :href="route('usuarios.index')" 
                     :active="request()->routeIs('usuarios.*')"
-                    :theme="$theme"
                     :title="__('Usuarios')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -319,7 +306,6 @@
                 <x-sidebar-nav-link 
                     :href="route('configuracion.index')" 
                     :active="request()->routeIs('configuracion.*')"
-                    :theme="$theme"
                     :title="__('Configuración')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -336,7 +322,7 @@
 
     <!-- PERFIL Y LOGOUT -->
     <div 
-        class="border-t {{ $borderColor }} transition-all duration-300"
+        class="border-t border-gray-200 dark:border-gray-700 transition-all duration-300"
         :class="{ 'p-2': $store.sidebar.collapsed && window.innerWidth >= 768, 'p-4': !$store.sidebar.collapsed || window.innerWidth < 768 }"
     >
         <div x-data="{ open: false }" class="relative">
@@ -344,18 +330,18 @@
             <button 
                 @click="open = !open"
                 x-show="!$store.sidebar.collapsed || window.innerWidth < 768"
-                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg {{ $hoverBg }} transition-colors duration-200 text-left"
+                class="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 text-left"
             >
-                <div class="w-8 h-8 {{ $avatarBg }} rounded-full flex items-center justify-center {{ $avatarText }} font-semibold text-sm flex-shrink-0">
+                <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-800 dark:text-white font-semibold text-sm flex-shrink-0">
                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
                 <div class="flex-1 min-w-0">
-                    <div class="{{ $textPrimary }} text-sm font-medium truncate">
+                    <div class="text-gray-900 dark:text-white text-sm font-medium truncate">
                         {{ Auth::user()->name }}
                     </div>
                 </div>
                 <svg 
-                    class="w-4 h-4 {{ $textSecondary }} flex-shrink-0"
+                    class="w-4 h-4 text-gray-600 dark:text-gray-400 flex-shrink-0"
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24" 
@@ -369,12 +355,10 @@
             <button 
                 @click="open = !open"
                 x-show="$store.sidebar.collapsed && window.innerWidth >= 768"
-                class="w-full flex items-center justify-center px-3 py-2 rounded-lg transition-colors duration-200"
-                style="display: none; background: transparent;"
-                @mouseenter="$el.style.background = '{{ $isDark ? 'rgba(55, 65, 81, 1)' : 'rgba(243, 244, 246, 1)' }}'"
-                @mouseleave="$el.style.background = 'transparent'"
+                class="w-full flex items-center justify-center px-3 py-2 rounded-lg transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                style="display: none;"
             >
-                <div class="w-8 h-8 {{ $avatarBg }} rounded-full flex items-center justify-center {{ $avatarText }} font-semibold text-sm flex-shrink-0">
+                <div class="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-800 dark:text-white font-semibold text-sm flex-shrink-0">
                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
             </button>
@@ -389,22 +373,22 @@
                 x-transition:leave="transition ease-in duration-75"
                 x-transition:leave-start="opacity-100 scale-100"
                 x-transition:leave-end="opacity-0 scale-95"
-                class="absolute bottom-full mb-2 {{ $dropdownBg }} rounded-lg shadow-lg overflow-hidden border {{ $dropdownBorder }} z-50"
+                class="absolute bottom-full mb-2 bg-white dark:bg-gray-700 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-600 z-50"
                 x-bind:class="$store.sidebar.collapsed && window.innerWidth >= 768 ? 'left-full ml-2' : 'left-0 right-0'"
                 style="display: none;"
             >
                 
                 <!-- Información del usuario -->
-                <div class="p-4 border-b {{ $dropdownBorder }}">
+                <div class="p-4 border-b border-gray-200 dark:border-gray-600">
                     <div class="flex items-center gap-3 mb-2">
-                        <div class="w-10 h-10 {{ $avatarBg }} rounded-full flex items-center justify-center {{ $avatarText }} font-semibold">
+                        <div class="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center text-gray-800 dark:text-white font-semibold">
                             {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                         </div>
                         <div class="flex-1 min-w-0">
-                            <div class="{{ $textPrimary }} font-semibold truncate">
+                            <div class="text-gray-900 dark:text-white font-semibold truncate">
                                 {{ Auth::user()->name }}
                             </div>
-                            <div class="{{ $textSecondary }} text-xs truncate">
+                            <div class="text-gray-600 dark:text-gray-400 text-xs truncate">
                                 {{ Auth::user()->email }}
                             </div>
                         </div>
@@ -415,7 +399,7 @@
                 <div class="py-2">
                     <a 
                         href="{{ route('profile.edit') }}"
-                        class="flex items-center gap-3 px-4 py-2 {{ $textPrimary }} {{ $hoverBg }} transition-colors duration-200">
+                        class="flex items-center gap-3 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -427,7 +411,7 @@
                         @csrf
                         <button 
                             type="submit"
-                            class="w-full flex items-center gap-3 px-4 py-2 {{ $textPrimary }} {{ $hoverBg }} transition-colors duration-200 text-left">
+                            class="w-full flex items-center gap-3 px-4 py-2 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200 text-left">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"></path>
                             </svg>

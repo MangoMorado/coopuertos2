@@ -11,6 +11,57 @@ Alpine.store('sidebar', {
     mobileOpen: window.__sidebarInitialState?.mobileOpen ?? false,
 });
 
+// Store global para el tema
+Alpine.store('theme', {
+    current: window.__currentTheme || 'light',
+    
+    toggle() {
+        const newTheme = this.current === 'light' ? 'dark' : 'light';
+        this.setTheme(newTheme);
+    },
+    
+    setTheme(theme) {
+        if (theme !== 'light' && theme !== 'dark') {
+            return;
+        }
+        
+        this.current = theme;
+        
+        // Aplicar tema al elemento html
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        
+        // Guardar en localStorage
+        localStorage.setItem('theme', theme);
+        
+        // Sincronizar con servidor mediante API
+        this.syncWithServer(theme);
+    },
+    
+    async syncWithServer(theme) {
+        try {
+            const response = await fetch('/api/theme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ theme }),
+            });
+            
+            if (!response.ok) {
+                console.warn('No se pudo sincronizar el tema con el servidor');
+            }
+        } catch (error) {
+            console.warn('Error al sincronizar tema:', error);
+        }
+    },
+});
+
 Alpine.start();
 
 // Importar CropperJS

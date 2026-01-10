@@ -35,9 +35,9 @@ class VehicleController extends Controller
             });
         }
 
-        $vehicles = $query->latest()->paginate(10)->withQueryString();
+        $vehiculos = $query->latest()->paginate(10)->withQueryString();
 
-        return view('vehiculos.index', compact('vehicles'));
+        return view('vehiculos.index', compact('vehiculos'));
     }
 
     public function create()

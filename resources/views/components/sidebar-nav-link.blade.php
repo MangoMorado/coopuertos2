@@ -1,16 +1,10 @@
-@props(['active', 'theme' => 'dark', 'title' => null])
+@props(['active', 'title' => null])
 
 @php
-    $isDark = $theme === 'dark';
-    
     if ($active ?? false) {
-        $classes = $isDark 
-            ? 'flex items-center gap-3 rounded-lg bg-gray-700 text-white font-medium transition-all duration-200'
-            : 'flex items-center gap-3 rounded-lg bg-gray-100 text-gray-900 font-medium transition-all duration-200';
+        $classes = 'flex items-center gap-3 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white font-medium transition-all duration-200';
     } else {
-        $classes = $isDark
-            ? 'flex items-center gap-3 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-all duration-200'
-            : 'flex items-center gap-3 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all duration-200';
+        $classes = 'flex items-center gap-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all duration-200';
     }
 @endphp
 

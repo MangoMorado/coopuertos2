@@ -36,11 +36,8 @@ class ConductorController extends Controller
         $conductores = $query->with(['asignacionActiva.vehicle'])->latest()->paginate(10)->withQueryString();
 
         if ($request->ajax() || $request->has('ajax')) {
-            $theme = Auth::user()->theme ?? 'light';
-            $isDark = $theme === 'dark';
-
             return response()->json([
-                'html' => view('conductores.partials.table', compact('conductores', 'theme', 'isDark'))->render(),
+                'html' => view('conductores.partials.table', compact('conductores'))->render(),
                 'pagination' => view('conductores.partials.pagination', compact('conductores'))->render(),
             ]);
         }

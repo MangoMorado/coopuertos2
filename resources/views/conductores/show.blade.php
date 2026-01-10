@@ -31,16 +31,16 @@
 
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
             Carnet del Conductor
         </h2>
     </x-slot>
 
-    <div class="min-h-screen bg-gray-100 flex items-center justify-center py-10 px-4">
+    <div class="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center py-10 px-4">
         <div class="max-w-4xl w-full">
             @if($template && $template->imagen_plantilla && $template->variables_config)
                 <!-- Carnet con diseño personalizado -->
-                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 p-6">
                     <div class="relative inline-block" style="max-width: 100%;">
                         @if($previewImageUrl)
                             <!-- Mostrar imagen generada por backend (igual al PDF) -->
@@ -75,7 +75,7 @@
                 </div>
             @else
                 <!-- Vista por defecto si no hay plantilla -->
-                <div class="max-w-md w-full bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
+                <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                     <div class="bg-gradient-to-r from-blue-600 to-blue-400 p-6 text-white text-center">
                         <img src="{{ $fotoUrl ?? $fallbackAvatar }}"
                              alt="Foto del conductor"
@@ -83,31 +83,31 @@
                         <h1 class="text-2xl font-semibold">{{ $conductor->nombres }} {{ $conductor->apellidos }}</h1>
                     </div>
 
-                    <div class="p-6 space-y-3">
+                    <div class="p-6 space-y-3 bg-white dark:bg-gray-800">
                         <div class="flex items-center justify-between">
-                            <span class="text-gray-500 text-sm">Cédula:</span>
-                            <span class="font-medium text-gray-800">{{ $conductor->cedula }}</span>
+                            <span class="text-gray-500 dark:text-gray-400 text-sm">Cédula:</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-100">{{ $conductor->cedula }}</span>
                         </div>
 
                         <div class="flex items-center justify-between">
-                            <span class="text-gray-500 text-sm">Estado:</span>
-                            <span class="font-medium text-gray-800">{{ ucfirst($conductor->estado) }}</span>
+                            <span class="text-gray-500 dark:text-gray-400 text-sm">Estado:</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-100">{{ ucfirst($conductor->estado) }}</span>
                         </div>
 
                         <div class="flex items-center justify-between">
-                            <span class="text-gray-500 text-sm">Vehículo Asignado:</span>
-                            <span class="font-medium text-gray-800">
+                            <span class="text-gray-500 dark:text-gray-400 text-sm">Vehículo Asignado:</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-100">
                                 @if($vehiculo)
                                     {{ $vehiculo->placa }} - {{ $vehiculo->marca }} {{ $vehiculo->modelo }}
                                 @else
-                                    <span class="text-gray-400">Sin asignar</span>
+                                    <span class="text-gray-500 dark:text-gray-400">Sin asignar</span>
                                 @endif
                             </span>
                         </div>
                     </div>
                     
                     <!-- Botones de acción -->
-                    <div class="mt-6 flex justify-center space-x-4">
+                    <div class="mt-6 flex justify-center space-x-4 pb-6">
                         <a href="{{ route('conductores.index') }}" 
                            class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg shadow-md transition flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">

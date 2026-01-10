@@ -1,27 +1,13 @@
-@php
-    $theme = Auth::user()->theme ?? 'light';
-    $isDark = $theme === 'dark';
-    $textTitle = $isDark ? 'text-gray-100' : 'text-gray-800';
-    $bgCard = $isDark ? 'bg-gray-800' : 'bg-white';
-    $bgInput = $isDark ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900';
-    $bgSuccess = $isDark ? 'bg-green-900 border-green-700 text-green-200' : 'bg-green-100 border-green-300 text-green-800';
-    $bgHeader = $isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-700';
-    $textBody = $isDark ? 'text-gray-300' : 'text-gray-700';
-    $borderRow = $isDark ? 'border-gray-700' : 'border-gray-200';
-    $hoverRow = $isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50';
-    $textEmpty = $isDark ? 'text-gray-400' : 'text-gray-500';
-@endphp
-
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
             PQRS - Peticiones, Quejas, Reclamos y Sugerencias
         </h2>
     </x-slot>
 
     <div class="max-w-7xl mx-auto py-8 px-6">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold {{ $textTitle }}">PQRS - Calificación del Servicio</h2>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">PQRS - Calificación del Servicio</h2>
             <div class="flex space-x-2 flex-wrap gap-2">
                 <a href="{{ route('pqrs.form.public') }}" target="_blank"
                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition flex items-center space-x-2">
@@ -56,7 +42,7 @@
         </div>
 
         @if (session('success'))
-            <div class="mb-4 {{ $bgSuccess }} border px-4 py-2 rounded">
+            <div class="mb-4 bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700 text-green-800 dark:text-green-200 px-4 py-2 rounded">
                 {{ session('success') }}
             </div>
         @endif
@@ -64,7 +50,7 @@
         <div class="mb-4">
             <form method="GET" action="{{ route('pqrs.index') }}" class="flex space-x-2">
                 <input type="text" name="search" placeholder="Buscar por nombre, correo, tiquete, placa, tipo, estado, usuario..." value="{{ request('search') }}"
-                       class="{{ $bgInput }} border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400">
+                       class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 dark:placeholder-gray-500">
                 @if(request('search'))
                     <a href="{{ route('pqrs.index') }}"
                        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md transition">
@@ -75,9 +61,9 @@
             </form>
         </div>
 
-        <div class="{{ $bgCard }} shadow-md rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
             <table class="w-full border-collapse text-sm">
-                <thead class="{{ $bgHeader }} uppercase text-sm">
+                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 uppercase text-sm">
                     <tr>
                         <th class="text-left px-4 py-3">Fecha</th>
                         <th class="text-left px-4 py-3">Nombre</th>
@@ -91,53 +77,53 @@
                 </thead>
                 <tbody class="text-sm">
                     @forelse($pqrs as $pqr)
-                        <tr class="border-t {{ $borderRow }} {{ $hoverRow }} transition">
-                            <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->fecha?->format('d/m/Y') ?? 'N/A' }}</td>
-                            <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->nombre }}</td>
-                            <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->vehiculo_placa ?? '-' }}</td>
+                        <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $pqr->fecha?->format('d/m/Y') ?? 'N/A' }}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $pqr->nombre }}</td>
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $pqr->vehiculo_placa ?? '-' }}</td>
                             <td class="px-4 py-3">
-                                <span class="px-2 py-1 text-xs rounded-full {{ $isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800' }}">
+                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                     {{ $pqr->tipo }}
                                 </span>
                             </td>
                             <td class="px-4 py-3">
                                 <span class="px-2 py-1 text-xs rounded-full
                                     @if($pqr->estado === 'Radicada')
-                                        {{ $isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800' }}
+                                        bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200
                                     @elseif($pqr->estado === 'En Trámite')
-                                        {{ $isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800' }}
+                                        bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
                                     @elseif($pqr->estado === 'En Espera de Información')
-                                        {{ $isDark ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800' }}
+                                        bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
                                     @elseif($pqr->estado === 'Resuelta')
-                                        {{ $isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800' }}
+                                        bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
                                     @else
-                                        {{ $isDark ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800' }}
+                                        bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
                                     @endif">
                                     {{ $pqr->estado ?? 'Radicada' }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3 {{ $textBody }}">
+                            <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
                                 @if($pqr->usuarioAsignado)
                                     {{ $pqr->usuarioAsignado->name }}
-                                    <span class="text-xs {{ $isDark ? 'text-gray-400' : 'text-gray-500' }}">
+                                    <span class="text-xs text-gray-500 dark:text-gray-400">
                                         ({{ $pqr->usuarioAsignado->email }})
                                     </span>
                                 @else
-                                    <span class="{{ $isDark ? 'text-gray-500' : 'text-gray-400' }}">Sin asignar</span>
+                                    <span class="text-gray-500 dark:text-gray-400">Sin asignar</span>
                                 @endif
                             </td>
                             <td class="px-4 py-3">
                                 @if($pqr->calificacion)
                                     <div class="flex items-center">
                                         @for($i = 1; $i <= 5; $i++)
-                                            <svg class="w-4 h-4 {{ $i <= $pqr->calificacion ? 'text-yellow-400 fill-current' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg class="w-4 h-4 {{ $i <= $pqr->calificacion ? 'text-yellow-400 fill-current dark:text-yellow-500' : 'text-gray-300 dark:text-gray-600' }}" fill="currentColor" viewBox="0 0 20 20">
                                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                             </svg>
                                         @endfor
-                                        <span class="ml-1 text-xs {{ $textBody }}">({{ $pqr->calificacion }})</span>
+                                        <span class="ml-1 text-xs text-gray-700 dark:text-gray-300">({{ $pqr->calificacion }})</span>
                                     </div>
                                 @else
-                                    <span class="{{ $textEmpty }}">-</span>
+                                    <span class="text-gray-500 dark:text-gray-400">-</span>
                                 @endif
                             </td>
                             <td class="text-center py-3">
@@ -150,7 +136,7 @@
                                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
                                         Editar
                                     </a>
-                                    <form method="POST" action="{{ route('pqrs.destroy', $pqr) }}" onsubmit="return confirm('¿Eliminar este PQRS?')">
+                                    <form method="POST" action="{{ route('pqrs.destroy', $pqr) }}" onsubmit="return confirm('¿Eliminar este PQRS?')" class="inline">
                                         @csrf @method('DELETE')
                                         <button class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm shadow-sm">
                                             Eliminar
@@ -161,7 +147,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="text-center py-6 {{ $textEmpty }}">No se encontraron PQRS.</td>
+                            <td colspan="8" class="text-center py-6 text-gray-500 dark:text-gray-400">No se encontraron PQRS.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -175,7 +161,7 @@
         <!-- Sección PQRS Taquilla -->
         <div class="mt-12">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold {{ $textTitle }}">PQRS - Taquilla</h2>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">PQRS - Taquilla</h2>
                 <div class="flex space-x-2 flex-wrap gap-2">
                     <a href="{{ route('pqrs.form.taquilla') }}" target="_blank"
                        class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition flex items-center space-x-2">
@@ -212,7 +198,7 @@
             <div class="mb-4">
                 <form method="GET" action="{{ route('pqrs.index') }}" class="flex space-x-2">
                     <input type="text" name="search_taquilla" placeholder="Buscar por nombre, correo, teléfono, sede, tipo, estado, usuario..." value="{{ request('search_taquilla') }}"
-                           class="{{ $bgInput }} border rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400">
+                           class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 rounded px-3 py-2 flex-1 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400 dark:placeholder-gray-500">
                     @if(request('search_taquilla'))
                         <a href="{{ route('pqrs.index') }}"
                            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg shadow-md transition">
@@ -223,9 +209,9 @@
                 </form>
             </div>
 
-            <div class="{{ $bgCard }} shadow-md rounded-lg overflow-hidden">
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
                 <table class="w-full border-collapse text-sm">
-                    <thead class="{{ $bgHeader }} uppercase text-sm">
+                    <thead class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 uppercase text-sm">
                         <tr>
                             <th class="text-left px-4 py-3">Fecha</th>
                             <th class="text-left px-4 py-3">Hora</th>
@@ -240,54 +226,54 @@
                     </thead>
                     <tbody class="text-sm">
                         @forelse($pqrsTaquilla ?? [] as $pqr)
-                            <tr class="border-t {{ $borderRow }} {{ $hoverRow }} transition">
-                                <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->fecha?->format('d/m/Y') ?? 'N/A' }}</td>
-                                <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->hora ? \Carbon\Carbon::parse($pqr->hora)->format('H:i') : 'N/A' }}</td>
-                                <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->nombre }}</td>
-                                <td class="px-4 py-3 {{ $textBody }}">{{ $pqr->sede ?? '-' }}</td>
+                            <tr class="border-t border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $pqr->fecha?->format('d/m/Y') ?? 'N/A' }}</td>
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $pqr->hora ? \Carbon\Carbon::parse($pqr->hora)->format('H:i') : 'N/A' }}</td>
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $pqr->nombre }}</td>
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ $pqr->sede ?? '-' }}</td>
                                 <td class="px-4 py-3">
-                                    <span class="px-2 py-1 text-xs rounded-full {{ $isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800' }}">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                                         {{ $pqr->tipo }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
                                     <span class="px-2 py-1 text-xs rounded-full
                                         @if($pqr->estado === 'Radicada')
-                                            {{ $isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800' }}
+                                            bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200
                                         @elseif($pqr->estado === 'En Trámite')
-                                            {{ $isDark ? 'bg-blue-900 text-blue-200' : 'bg-blue-100 text-blue-800' }}
+                                            bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200
                                         @elseif($pqr->estado === 'En Espera de Información')
-                                            {{ $isDark ? 'bg-yellow-900 text-yellow-200' : 'bg-yellow-100 text-yellow-800' }}
+                                            bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
                                         @elseif($pqr->estado === 'Resuelta')
-                                            {{ $isDark ? 'bg-green-900 text-green-200' : 'bg-green-100 text-green-800' }}
+                                            bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
                                         @else
-                                            {{ $isDark ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800' }}
+                                            bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
                                         @endif">
                                         {{ $pqr->estado ?? 'Radicada' }}
                                     </span>
                                 </td>
-                                <td class="px-4 py-3 {{ $textBody }}">
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">
                                     @if($pqr->usuarioAsignado)
                                         {{ $pqr->usuarioAsignado->name }}
-                                        <span class="text-xs {{ $isDark ? 'text-gray-400' : 'text-gray-500' }}">
+                                        <span class="text-xs text-gray-500 dark:text-gray-400">
                                             ({{ $pqr->usuarioAsignado->email }})
                                         </span>
                                     @else
-                                        <span class="{{ $isDark ? 'text-gray-500' : 'text-gray-400' }}">Sin asignar</span>
+                                        <span class="text-gray-500 dark:text-gray-400">Sin asignar</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3">
                                     @if($pqr->calificacion)
                                         <div class="flex items-center">
                                             @for($i = 1; $i <= 5; $i++)
-                                                <svg class="w-4 h-4 {{ $i <= $pqr->calificacion ? 'text-yellow-400 fill-current' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                <svg class="w-4 h-4 {{ $i <= $pqr->calificacion ? 'text-yellow-400 fill-current dark:text-yellow-500' : 'text-gray-300 dark:text-gray-600' }}" fill="currentColor" viewBox="0 0 20 20">
                                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
                                                 </svg>
                                             @endfor
-                                            <span class="ml-1 text-xs {{ $textBody }}">({{ $pqr->calificacion }})</span>
+                                            <span class="ml-1 text-xs text-gray-700 dark:text-gray-300">({{ $pqr->calificacion }})</span>
                                         </div>
                                     @else
-                                        <span class="{{ $textEmpty }}">-</span>
+                                        <span class="text-gray-500 dark:text-gray-400">-</span>
                                     @endif
                                 </td>
                                 <td class="text-center py-3">
@@ -311,7 +297,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center py-6 {{ $textEmpty }}">No se encontraron PQRS de Taquilla.</td>
+                                <td colspan="9" class="text-center py-6 text-gray-500 dark:text-gray-400">No se encontraron PQRS de Taquilla.</td>
                             </tr>
                         @endforelse
                     </tbody>

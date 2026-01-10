@@ -37,9 +37,12 @@ Route::get('/dashboard', function () {
 // Rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {
     // Perfil de usuario
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/perfil', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/perfil', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/perfil', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // API para cambiar tema sin recargar
+    Route::post('/api/theme', [ProfileController::class, 'updateTheme'])->name('api.theme.update');
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])
         ->middleware(['auth'])
