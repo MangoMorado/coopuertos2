@@ -1,0 +1,853 @@
+{
+	"info": {
+		"_postman_id": "coopuertos-api-v1",
+		"name": "API Coopuertos v1",
+		"description": "Colección de endpoints para la API REST de Coopuertos - Gestión de conductores, vehículos y propietarios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "coopuertos"
+	},
+	"item": [
+		{
+			"name": "Autenticación",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Guardar automáticamente el token después del login",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.data && jsonData.data.token) {",
+									"        pm.collectionVariables.set(\"auth_token\", jsonData.data.token);",
+									"        console.log(\"Token guardado: \" + jsonData.data.token.substring(0, 20) + \"...\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"usuario@ejemplo.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "login"]
+						},
+						"description": "Autentica un usuario con email y password, retorna un token de acceso"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/logout",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "logout"]
+						},
+						"description": "Revoca el token de acceso del usuario autenticado"
+					},
+					"response": []
+				},
+				{
+					"name": "Usuario Autenticado",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/user",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "user"]
+						},
+						"description": "Retorna la información del usuario autenticado"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticación con Laravel Sanctum"
+		},
+		{
+			"name": "Conductores",
+			"item": [
+				{
+					"name": "Listar Conductores",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conductores?search=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conductores"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Término de búsqueda opcional"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items por página"
+								}
+							]
+						},
+						"description": "Retorna una lista paginada de conductores con filtros opcionales"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Conductor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombres\": \"Juan\",\n    \"apellidos\": \"Pérez\",\n    \"cedula\": \"1234567890\",\n    \"conductor_tipo\": \"A\",\n    \"rh\": \"O+\",\n    \"numero_interno\": \"001\",\n    \"celular\": \"3001234567\",\n    \"correo\": \"juan@ejemplo.com\",\n    \"fecha_nacimiento\": \"1990-01-15\",\n    \"nivel_estudios\": \"Bachiller\",\n    \"relevo\": false,\n    \"estado\": \"activo\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/conductores",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conductores"]
+						},
+						"description": "Crea un nuevo conductor"
+					},
+					"response": []
+				},
+				{
+					"name": "Mostrar Conductor",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conductores/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conductores", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del conductor"
+								}
+							]
+						},
+						"description": "Retorna la información de un conductor específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Conductor",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombres\": \"Juan Carlos\",\n    \"apellidos\": \"Pérez García\",\n    \"celular\": \"3001234567\",\n    \"correo\": \"juan.carlos@ejemplo.com\",\n    \"estado\": \"activo\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/conductores/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conductores", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del conductor"
+								}
+							]
+						},
+						"description": "Actualiza la información de un conductor"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Conductor",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conductores/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conductores", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del conductor"
+								}
+							]
+						},
+						"description": "Elimina un conductor del sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Conductores",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conductores/search?q=123",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conductores", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "123",
+									"description": "Término de búsqueda (mínimo 2 caracteres)"
+								}
+							]
+						},
+						"description": "Busca conductores por cédula, nombres, apellidos o número interno"
+					},
+					"response": []
+				},
+				{
+					"name": "Mostrar Conductor Público (UUID)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/conductores/:uuid/public",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "conductores", ":uuid", "public"],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "550e8400-e29b-41d4-a716-446655440000",
+									"description": "UUID del conductor"
+								}
+							]
+						},
+						"description": "Retorna la información pública de un conductor por UUID (sin autenticación)"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de conductores"
+		},
+		{
+			"name": "Vehículos",
+			"item": [
+				{
+					"name": "Listar Vehículos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/vehiculos?search=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "vehiculos"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Término de búsqueda opcional"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items por página"
+								}
+							]
+						},
+						"description": "Retorna una lista paginada de vehículos con filtros opcionales"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Vehículo",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tipo\": \"Buseta\",\n    \"marca\": \"Toyota\",\n    \"modelo\": \"Hiace\",\n    \"anio_fabricacion\": 2020,\n    \"placa\": \"ABC123\",\n    \"chasis_vin\": \"5YJ3E1EB1KF123456\",\n    \"capacidad_pasajeros\": 16,\n    \"capacidad_carga_kg\": 1000,\n    \"combustible\": \"Diesel\",\n    \"ultima_revision_tecnica\": \"2024-01-15\",\n    \"estado\": \"activo\",\n    \"propietario_nombre\": \"Propietario S.A.S\",\n    \"conductor_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/vehiculos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "vehiculos"]
+						},
+						"description": "Crea un nuevo vehículo"
+					},
+					"response": []
+				},
+				{
+					"name": "Mostrar Vehículo",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/vehiculos/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "vehiculos", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del vehículo"
+								}
+							]
+						},
+						"description": "Retorna la información de un vehículo específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Vehículo",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"marca\": \"Nissan\",\n    \"modelo\": \"Urvan\",\n    \"estado\": \"activo\",\n    \"conductor_id\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/vehiculos/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "vehiculos", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del vehículo"
+								}
+							]
+						},
+						"description": "Actualiza la información de un vehículo"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Vehículo",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/vehiculos/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "vehiculos", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del vehículo"
+								}
+							]
+						},
+						"description": "Elimina un vehículo del sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Vehículos",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/vehiculos/search?q=ABC",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "vehiculos", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "ABC",
+									"description": "Término de búsqueda (mínimo 2 caracteres)"
+								}
+							]
+						},
+						"description": "Busca vehículos por placa, marca o modelo"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de vehículos"
+		},
+		{
+			"name": "Propietarios",
+			"item": [
+				{
+					"name": "Listar Propietarios",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/propietarios?search=&per_page=15",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "propietarios"],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Término de búsqueda opcional"
+								},
+								{
+									"key": "per_page",
+									"value": "15",
+									"description": "Items por página"
+								}
+							]
+						},
+						"description": "Retorna una lista paginada de propietarios con filtros opcionales"
+					},
+					"response": []
+				},
+				{
+					"name": "Crear Propietario",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tipo_identificacion\": \"NIT\",\n    \"numero_identificacion\": \"900123456-1\",\n    \"nombre_completo\": \"Propietario S.A.S\",\n    \"tipo_propietario\": \"Empresa\",\n    \"direccion_contacto\": \"Calle 123 #45-67\",\n    \"telefono_contacto\": \"6012345678\",\n    \"correo_electronico\": \"contacto@propietario.com\",\n    \"estado\": \"activo\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/propietarios",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "propietarios"]
+						},
+						"description": "Crea un nuevo propietario"
+					},
+					"response": []
+				},
+				{
+					"name": "Mostrar Propietario",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/propietarios/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "propietarios", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del propietario"
+								}
+							]
+						},
+						"description": "Retorna la información de un propietario específico"
+					},
+					"response": []
+				},
+				{
+					"name": "Actualizar Propietario",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre_completo\": \"Propietario Actualizado S.A.S\",\n    \"telefono_contacto\": \"6012345678\",\n    \"correo_electronico\": \"nuevo@propietario.com\",\n    \"estado\": \"activo\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/propietarios/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "propietarios", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del propietario"
+								}
+							]
+						},
+						"description": "Actualiza la información de un propietario"
+					},
+					"response": []
+				},
+				{
+					"name": "Eliminar Propietario",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/propietarios/:id",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "propietarios", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1",
+									"description": "ID del propietario"
+								}
+							]
+						},
+						"description": "Elimina un propietario del sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar Propietarios",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/propietarios/search?q=900",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "propietarios", "search"],
+							"query": [
+								{
+									"key": "q",
+									"value": "900",
+									"description": "Término de búsqueda (mínimo 2 caracteres)"
+								}
+							]
+						},
+						"description": "Busca propietarios por nombre completo o número de identificación"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de propietarios"
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Estadísticas",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v1/dashboard/stats",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "dashboard", "stats"]
+						},
+						"description": "Retorna estadísticas generales del sistema: conductores, vehículos, propietarios y usuarios"
+					},
+					"response": []
+				}
+			],
+			"description": "Estadísticas y métricas del sistema"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": []
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Script para guardar automáticamente el token después del login",
+					"if (pm.response.code === 200 && pm.request.url.toString().includes('/auth/login')) {",
+					"    var jsonData = pm.response.json();",
+					"    if (jsonData.data && jsonData.data.token) {",
+					"        pm.collectionVariables.set(\"auth_token\", jsonData.data.token);",
+					"        console.log(\"Token guardado exitosamente\");",
+					"    }",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost",
+			"type": "string",
+			"description": "URL base de la API. Cambiar según el entorno (local, desarrollo, producción)"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string",
+			"description": "Token de autenticación obtenido del endpoint de login"
+		}
+	]
+}

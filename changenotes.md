@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.1.3*
+- API REST completa: Sanctum auth, CRUD conductores/vehículos/propietarios, dashboard stats, Swagger docs, colección Postman (23 endpoints)
+
 ## *v. 0.1.2*
 - Sistema de exportación de datos (Excel y CSV) para conductores, vehículos y propietarios
 - Clases Export creadas (ConductoresExport, VehiculosExport, PropietariosExport) con encabezados en español y formateo de datos

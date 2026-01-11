@@ -8,10 +8,12 @@
     "require": {
         "php": "^8.2",
         "ext-imagick": "*",
+        "darkaonline/l5-swagger": "^10.0",
         "dompdf/dompdf": "^3.1",
         "enshrined/svg-sanitize": "^0.22.0",
         "laravel/framework": "^12.0",
         "laravel/mcp": "^0.5.2",
+        "laravel/sanctum": "*",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
         "simplesoftwareio/simple-qrcode": "^4.2",

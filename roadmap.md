@@ -40,6 +40,7 @@ Fase 5: API
     - Endpoints CRUD para todos los recursos
     - Rate limiting y throttling
     - Versionado de API
+    - Colección de postman
   - Integraciones externas
     - Integración con sistemas de terceros
     - Webhooks para eventos importantes

@@ -1,0 +1,55 @@
+<?php
+
+namespace App\Http\Requests\Api;
+
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+
+class UpdatePropietarioRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        $propietarioId = $this->route('propietario')?->id ?? $this->route('id');
+
+        return [
+            'tipo_identificacion' => ['required', 'in:Cédula de Ciudadanía,RUC/NIT,Pasaporte'],
+            'numero_identificacion' => ['required', 'string', Rule::unique('propietarios', 'numero_identificacion')->ignore($propietarioId), 'max:50'],
+            'nombre_completo' => ['required', 'string', 'max:255'],
+            'tipo_propietario' => ['required', 'in:Persona Natural,Persona Jurídica'],
+            'direccion_contacto' => ['nullable', 'string', 'max:500'],
+            'telefono_contacto' => ['nullable', 'string', 'max:20'],
+            'correo_electronico' => ['nullable', 'email', 'max:255'],
+            'estado' => ['required', 'in:Activo,Inactivo'],
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'tipo_identificacion.required' => 'El tipo de identificación es requerido',
+            'numero_identificacion.required' => 'El número de identificación es requerido',
+            'numero_identificacion.unique' => 'El número de identificación ya está registrado',
+            'nombre_completo.required' => 'El nombre completo es requerido',
+            'tipo_propietario.required' => 'El tipo de propietario es requerido',
+            'estado.required' => 'El estado es requerido',
+        ];
+    }
+}

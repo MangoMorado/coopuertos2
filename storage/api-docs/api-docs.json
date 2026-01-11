@@ -1,0 +1,871 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Coopuertos",
+        "description": "API REST para el sistema Coopuertos - Gestión de conductores, vehículos y propietarios",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api/v1",
+            "description": "Servidor API v1"
+        }
+    ],
+    "paths": {
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Autenticar usuario",
+                "description": "Autentica un usuario con email y password, retorna un token de acceso",
+                "operationId": "a7997e7c1e3bfed64d4e56de82415931",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "usuario@ejemplo.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Autenticación exitosa",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Autenticación exitosa"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/user": {
+            "get": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Obtener usuario autenticado",
+                "description": "Retorna la información del usuario autenticado",
+                "operationId": "8da19d20faaa3c751514549040698f0d",
+                "responses": {
+                    "200": {
+                        "description": "Usuario obtenido exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Cerrar sesión",
+                "description": "Revoca el token de acceso del usuario autenticado",
+                "operationId": "f6b8957b4c0b25636613a9f0512a8ba9",
+                "responses": {
+                    "200": {
+                        "description": "Sesión cerrada exitosamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/conductores": {
+            "get": {
+                "tags": [
+                    "Conductores"
+                ],
+                "summary": "Listar conductores",
+                "description": "Retorna una lista paginada de conductores con filtros opcionales",
+                "operationId": "ab2d8caf0998204767665b30d845b4ce",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de conductores"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Conductores"
+                ],
+                "summary": "Crear conductor",
+                "description": "Crea un nuevo conductor",
+                "operationId": "b6b362bccfe151f99d6aed388bd75b07",
+                "responses": {
+                    "201": {
+                        "description": "Conductor creado exitosamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/conductores/{id}": {
+            "get": {
+                "tags": [
+                    "Conductores"
+                ],
+                "summary": "Mostrar conductor",
+                "description": "Retorna la información de un conductor específico",
+                "operationId": "53df2e0ee0393e9cd732e4fc9e8b5870",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del conductor",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Información del conductor"
+                    },
+                    "404": {
+                        "description": "Conductor no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Conductores"
+                ],
+                "summary": "Actualizar conductor",
+                "description": "Actualiza la información de un conductor",
+                "operationId": "0ddbf2839fabe3406027a2ff2a09cb80",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del conductor",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conductor actualizado exitosamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    },
+                    "404": {
+                        "description": "Conductor no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Conductores"
+                ],
+                "summary": "Eliminar conductor",
+                "description": "Elimina un conductor del sistema",
+                "operationId": "922c1d4bebec1238ecb419f7edc43293",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del conductor",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conductor eliminado exitosamente"
+                    },
+                    "404": {
+                        "description": "Conductor no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/conductores/search": {
+            "get": {
+                "tags": [
+                    "Conductores"
+                ],
+                "summary": "Buscar conductores",
+                "description": "Busca conductores por cédula, nombres, apellidos o número interno",
+                "operationId": "9967584712f95aa621f90160bfb75fc7",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 2
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados de búsqueda"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/conductores/{uuid}/public": {
+            "get": {
+                "tags": [
+                    "Conductores"
+                ],
+                "summary": "Mostrar conductor público",
+                "description": "Retorna la información pública de un conductor por UUID (sin autenticación)",
+                "operationId": "50cd17c31a1841633cde8f01137b12bd",
+                "parameters": [
+                    {
+                        "name": "uuid",
+                        "in": "path",
+                        "description": "UUID del conductor",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Información del conductor"
+                    },
+                    "404": {
+                        "description": "Conductor no encontrado"
+                    }
+                }
+            }
+        },
+        "/api/v1/dashboard/stats": {
+            "get": {
+                "tags": [
+                    "Dashboard"
+                ],
+                "summary": "Obtener estadísticas",
+                "description": "Retorna estadísticas generales del sistema: conductores, vehículos, propietarios y usuarios",
+                "operationId": "00464eac0b2daa2b7dfd173ce52781f0",
+                "responses": {
+                    "200": {
+                        "description": "Estadísticas obtenidas exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Estadísticas obtenidas exitosamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/propietarios": {
+            "get": {
+                "tags": [
+                    "Propietarios"
+                ],
+                "summary": "Listar propietarios",
+                "description": "Retorna una lista paginada de propietarios con filtros opcionales",
+                "operationId": "b5dd90e2f7c19f8cfd22463f6a2cd514",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de propietarios"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Propietarios"
+                ],
+                "summary": "Crear propietario",
+                "description": "Crea un nuevo propietario",
+                "operationId": "101b99dc0b8bfb40c4820318f22c94d4",
+                "responses": {
+                    "201": {
+                        "description": "Propietario creado exitosamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/propietarios/{id}": {
+            "get": {
+                "tags": [
+                    "Propietarios"
+                ],
+                "summary": "Mostrar propietario",
+                "description": "Retorna la información de un propietario específico",
+                "operationId": "d32a49f20a2f1bb49dfb6a6c1334bf58",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del propietario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Información del propietario"
+                    },
+                    "404": {
+                        "description": "Propietario no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Propietarios"
+                ],
+                "summary": "Actualizar propietario",
+                "description": "Actualiza la información de un propietario",
+                "operationId": "cd7bc35f4eb262160f25359e1a301cbd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del propietario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Propietario actualizado exitosamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    },
+                    "404": {
+                        "description": "Propietario no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Propietarios"
+                ],
+                "summary": "Eliminar propietario",
+                "description": "Elimina un propietario del sistema",
+                "operationId": "f5dfca5d1e6b03dc306b30a5c3dd73ae",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del propietario",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Propietario eliminado exitosamente"
+                    },
+                    "404": {
+                        "description": "Propietario no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/propietarios/search": {
+            "get": {
+                "tags": [
+                    "Propietarios"
+                ],
+                "summary": "Buscar propietarios",
+                "description": "Busca propietarios por nombre completo o número de identificación",
+                "operationId": "e0082ee23785aa3a19ce97f1d7e020ce",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 2
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados de búsqueda"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/vehiculos": {
+            "get": {
+                "tags": [
+                    "Vehículos"
+                ],
+                "summary": "Listar vehículos",
+                "description": "Retorna una lista paginada de vehículos con filtros opcionales",
+                "operationId": "d0d6d5331f6af0db55a68379afe0671a",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de vehículos"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Vehículos"
+                ],
+                "summary": "Crear vehículo",
+                "description": "Crea un nuevo vehículo",
+                "operationId": "827c4ea51c30d822ae1f024a2ca87008",
+                "responses": {
+                    "201": {
+                        "description": "Vehículo creado exitosamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/vehiculos/{id}": {
+            "get": {
+                "tags": [
+                    "Vehículos"
+                ],
+                "summary": "Mostrar vehículo",
+                "description": "Retorna la información de un vehículo específico",
+                "operationId": "dbb0af856867b5ba2bb9e93761b01a6f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del vehículo",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Información del vehículo"
+                    },
+                    "404": {
+                        "description": "Vehículo no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Vehículos"
+                ],
+                "summary": "Actualizar vehículo",
+                "description": "Actualiza la información de un vehículo",
+                "operationId": "89b73b8702c61c09ede3b6ce416fa684",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del vehículo",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vehículo actualizado exitosamente"
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    },
+                    "404": {
+                        "description": "Vehículo no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Vehículos"
+                ],
+                "summary": "Eliminar vehículo",
+                "description": "Elimina un vehículo del sistema",
+                "operationId": "a29557df650c35d23c8cb6016545ab5e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del vehículo",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vehículo eliminado exitosamente"
+                    },
+                    "404": {
+                        "description": "Vehículo no encontrado"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/vehiculos/search": {
+            "get": {
+                "tags": [
+                    "Vehículos"
+                ],
+                "summary": "Buscar vehículos",
+                "description": "Busca vehículos por placa, marca o modelo",
+                "operationId": "cb767a3ba37a62f83b5daeac099fd179",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "minLength": 2
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados de búsqueda"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "description": "Token de autenticación de Laravel Sanctum",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            },
+            "0": []
+        }
+    },
+    "tags": [
+        {
+            "name": "Autenticación",
+            "description": "Endpoints de autenticación con Laravel Sanctum"
+        },
+        {
+            "name": "Conductores",
+            "description": "Gestión de conductores"
+        },
+        {
+            "name": "Dashboard",
+            "description": "Estadísticas y métricas del sistema"
+        },
+        {
+            "name": "Propietarios",
+            "description": "Gestión de propietarios"
+        },
+        {
+            "name": "Vehículos",
+            "description": "Gestión de vehículos"
+        }
+    ]
+}
