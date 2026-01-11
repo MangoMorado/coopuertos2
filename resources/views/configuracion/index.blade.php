@@ -15,13 +15,7 @@
 @endphp
 
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
-            Configuración de Permisos
-        </h2>
-    </x-slot>
-
-    <div class="max-w-7xl mx-auto py-8 px-6">
+    <div class="max-w-7xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
         <div class="{{ $bgCard }} rounded-lg shadow-md border {{ $borderCard }} p-6">
             <div class="mb-6">
                 <h3 class="text-2xl font-bold {{ $textTitle }} mb-2">Gestión de Módulos por Rol</h3>

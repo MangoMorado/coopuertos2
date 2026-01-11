@@ -21,13 +21,7 @@
 @endphp
 
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
-            Información del Conductor
-        </h2>
-    </x-slot>
-
-    <div class="max-w-6xl mx-auto py-8 px-6">
+    <div class="max-w-6xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
         <!-- Botón de regreso -->
         <div class="mb-6">
             <a href="{{ route('conductores.index') }}"

@@ -102,7 +102,7 @@ Fase 8: MCP y Herramientas de IA
   - ✅ Recursos MCP: DocumentacionProyecto, RoadmapProyecto
   - Autenticación OAuth para proteger el servidor MCP
   - Herramientas CRUD (crear, editar, eliminar) mediante MCP
-  - Herramientas para gestión de PQRS y carnets
+  - Herramientas para gestión de carnets
   - Prompts MCP para tareas comunes y automatizables
   - Integración con sistemas externos mediante herramientas MCP
   - Herramientas de monitoreo y salud del sistema

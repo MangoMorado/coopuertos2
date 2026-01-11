@@ -1,11 +1,6 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
-            Nuevo Vehículo
-        </h2>
-    </x-slot>
 
-    <div class="max-w-5xl mx-auto py-8 px-6">
+    <div class="max-w-5xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
         <div class="bg-white dark:bg-gray-800 shadow border border-gray-200 dark:border-gray-700 rounded-lg p-6">
             <form method="POST" action="{{ route('vehiculos.store') }}" enctype="multipart/form-data" class="space-y-4">
                 @csrf

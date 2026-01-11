@@ -21,13 +21,7 @@
 @endphp
 
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
-            {{ __('Importar Conductores') }}
-        </h2>
-    </x-slot>
-
-    <div class="max-w-6xl mx-auto py-8 px-6 space-y-6">
+    <div class="max-w-6xl mx-auto py-4 sm:py-8 px-4 sm:px-6 space-y-4 sm:space-y-6">
         <!-- Formulario de importación -->
         <div class="{{ $bgCard }} rounded-lg shadow-md border {{ $borderCard }} p-6">
             <div class="mb-6">

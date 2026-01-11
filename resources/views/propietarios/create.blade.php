@@ -1,11 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
-            Nuevo Propietario
-        </h2>
-    </x-slot>
-
-    <div class="max-w-5xl mx-auto py-8 px-6">
+    <div class="max-w-5xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
         <div class="bg-white dark:bg-gray-800 shadow border border-gray-200 dark:border-gray-700 rounded-lg p-6">
             @if ($errors->any())
                 <div class="mb-4 bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700 text-red-800 dark:text-red-200 px-4 py-3 rounded">

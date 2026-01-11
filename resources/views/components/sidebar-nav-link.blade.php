@@ -10,9 +10,12 @@
 
 <a 
     {{ $attributes->merge(['class' => $classes]) }}
+    x-data="{ isMobile: window.innerWidth < 768 }"
+    x-init="isMobile = window.innerWidth < 768; window.addEventListener('resize', () => { isMobile = window.innerWidth < 768; })"
     :class="{ 
-        'justify-center px-3 py-3': $store.sidebar.collapsed && window.innerWidth >= 768,
-        'px-4 py-3': !$store.sidebar.collapsed || window.innerWidth < 768
+        // Móvil: siempre solo iconos (justify-center), desktop: colapsado = solo iconos
+        'justify-center px-3 py-3': isMobile || (!isMobile && $store.sidebar.collapsed),
+        'px-4 py-3': !isMobile && !$store.sidebar.collapsed
     }"
 >
     @isset($icon)
@@ -22,10 +25,8 @@
     @endisset
     <span 
         class="truncate transition-opacity duration-300"
-        x-bind:class="{ 
-            'opacity-0 w-0 hidden': $store.sidebar.collapsed && window.innerWidth >= 768, 
-            'opacity-100': !$store.sidebar.collapsed || window.innerWidth < 768 
-        }"
+        x-show="!isMobile && !$store.sidebar.collapsed"
+        style="display: none;"
     >
         {{ $slot }}
     </span>

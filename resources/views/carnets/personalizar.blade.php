@@ -9,13 +9,7 @@
 @endphp
 
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
-            Personalizar Plantilla de Carnet
-        </h2>
-    </x-slot>
-
-    <div class="max-w-7xl mx-auto py-8 px-6" x-data="carnetEditor()">
+    <div class="max-w-7xl mx-auto py-4 sm:py-8 px-4 sm:px-6" x-data="carnetEditor()">
         <form method="POST" action="{{ route('carnets.guardar-plantilla') }}" enctype="multipart/form-data" id="carnet-form">
             @csrf
             

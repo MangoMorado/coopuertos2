@@ -1,6 +1,6 @@
 # Coopuertos - ERP
 
-Sistema web desarrollado con Laravel 12 para la gestión integral de conductores, vehículos, propietarios y PQRS (Peticiones, Quejas, Reclamos y Sugerencias) de una cooperativa de puertos.
+Sistema web desarrollado con Laravel 12 para la gestión integral de conductores, vehículos y propietarios de una cooperativa de transporte.
 
 ## 🚀 Características Principales
 
@@ -21,14 +21,6 @@ Sistema web desarrollado con Laravel 12 para la gestión integral de conductores
 - CRUD completo de propietarios
 - Búsqueda de propietarios
 - Asociación con vehículos
-
-### Sistema de PQRS
-- Formularios públicos para PQRS de servicio
-- Formularios de PQRS para taquilla
-- Editor visual de formularios
-- Gestión de estados de PQRS
-- Generación de códigos QR para formularios
-- Sistema de adjuntos
 
 ### Sistema de Carnets
 - Diseñador visual de plantillas de carnets

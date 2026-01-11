@@ -5,7 +5,6 @@ use App\Http\Controllers\ConductorController;
 use App\Http\Controllers\ConductorImportController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PqrController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\UserController;
@@ -21,10 +20,6 @@ Route::get('/', function () {
 
 // Rutas públicas (sin autenticación)
 Route::get('/api/vehiculos/search', [VehicleController::class, 'search'])->name('api.vehiculos.search');
-Route::get('/pqrs/servicio', [PqrController::class, 'publicForm'])->name('pqrs.form.public');
-Route::post('/pqrs/enviar', [PqrController::class, 'store'])->name('pqrs.store.public');
-Route::get('/pqrs/taquilla', [PqrController::class, 'publicFormTaquilla'])->name('pqrs.form.taquilla');
-Route::post('/pqrs/taquilla/enviar', [PqrController::class, 'storeTaquilla'])->name('pqrs.taquilla.store');
 
 // Ruta pública para mostrar un conductor específico por UUID
 Route::get('/conductor/{uuid}', [ConductorController::class, 'show'])->name('conductor.public');
@@ -69,21 +64,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('propietarios', PropietarioController::class);
     Route::get('/api/propietarios/search', [PropietarioController::class, 'search'])->name('api.propietarios.search');
     Route::get('/api/conductores/search', [ConductorController::class, 'search'])->name('api.conductores.search');
-
-    // PQRS (Rutas protegidas)
-    Route::get('/pqrs-qr', [PqrController::class, 'generateQR'])->name('pqrs.qr');
-    Route::get('/pqrs/formulario/editar', [PqrController::class, 'editFormTemplate'])->name('pqrs.edit-template');
-    Route::post('/pqrs/formulario/editar', [PqrController::class, 'updateFormTemplate'])->name('pqrs.update-template');
-    Route::get('/pqrs/taquilla/editar', [PqrController::class, 'editFormTemplateTaquilla'])->name('pqrs.edit-template-taquilla');
-    Route::post('/pqrs/taquilla/editar', [PqrController::class, 'updateFormTemplateTaquilla'])->name('pqrs.update-template-taquilla');
-    Route::get('/pqrs/taquilla/qr', [PqrController::class, 'generateQRTaquilla'])->name('pqrs.taquilla.qr');
-    Route::get('/pqrs-taquilla/create', [PqrController::class, 'createTaquilla'])->name('pqrs-taquilla.create');
-    Route::get('/pqrs-taquilla/{pqrTaquilla}', [PqrController::class, 'showTaquilla'])->name('pqrs-taquilla.show');
-    Route::get('/pqrs-taquilla/{pqrTaquilla}/edit', [PqrController::class, 'editTaquilla'])->name('pqrs-taquilla.edit');
-    Route::put('/pqrs-taquilla/{pqrTaquilla}', [PqrController::class, 'updateTaquilla'])->name('pqrs-taquilla.update');
-    Route::delete('/pqrs-taquilla/{pqrTaquilla}', [PqrController::class, 'destroyTaquilla'])->name('pqrs-taquilla.destroy');
-    Route::delete('/pqrs/{pqr}/adjunto/{index}', [PqrController::class, 'deleteAttachment'])->name('pqrs.adjunto.delete');
-    Route::resource('pqrs', PqrController::class);
 
     // Carnets
     Route::get('/carnets', [CarnetController::class, 'index'])->name('carnets.index');

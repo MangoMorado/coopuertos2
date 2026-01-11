@@ -1,14 +1,8 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
-            Usuarios
-        </h2>
-    </x-slot>
-
-    <div class="max-w-8xl mx-auto py-8 px-6">
-        <div class="flex items-center justify-between mb-6">
+    <div class="max-w-7xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
             <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-100">Usuarios</h2>
-            <div class="flex space-x-2">
+            <div class="flex flex-wrap gap-2">
                 @can('crear usuarios')
                 <a href="{{ route('usuarios.create') }}"
                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition">
@@ -39,7 +33,9 @@
 
         {{-- Contenedor para la tabla real --}}
         <div id="table-container" class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
-            @include('users.partials.table', ['users' => $users])
+            <div class="overflow-x-auto">
+                @include('users.partials.table', ['users' => $users])
+            </div>
         </div>
 
         <div id="pagination-container" class="mt-6">
@@ -84,7 +80,7 @@
                             tableContainer.classList.remove('hidden');
                             
                             tableContainer.className = 'bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden';
-                            tableContainer.innerHTML = data.html;
+                            tableContainer.innerHTML = '<div class="overflow-x-auto">' + data.html + '</div>';
                             paginationContainer.innerHTML = data.pagination;
                             
                             // Actualizar URL sin recargar

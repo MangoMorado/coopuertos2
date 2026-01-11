@@ -8,13 +8,7 @@
 @endphp
 
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl {{ $textTitle }} leading-tight">
-            Exportación Masiva de Carnets
-        </h2>
-    </x-slot>
-
-    <div class="max-w-7xl mx-auto py-8 px-6">
+    <div class="max-w-7xl mx-auto py-4 sm:py-8 px-4 sm:px-6">
         <!-- Botón de Generación -->
         <div class="mb-6 {{ $bgCard }} shadow border {{ $borderCard }} rounded-lg p-6">
             <div class="flex items-center justify-between">

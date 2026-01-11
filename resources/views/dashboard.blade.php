@@ -1,6 +1,6 @@
 <x-app-layout>
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-4 sm:py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {{-- BIENVENIDA --}}
             <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
@@ -8,7 +8,7 @@
             </h1>
 
             {{-- TARJETAS DEL DASHBOARD --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
                 {{-- TARJETA DE CONDUCTORES --}}
                 <a href="{{ route('conductores.index') }}" 
@@ -60,121 +60,16 @@
                     @endif
                 </a>
 
-                {{-- TARJETA DE PROPIETARIOS --}}
-                <a href="{{ route('propietarios.index') }}" 
-                   class="bg-white dark:bg-gray-800 p-6 shadow rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer block">
-                    <div class="flex items-center justify-between mb-3">
-                        <h2 class="text-gray-600 dark:text-gray-400 text-sm font-semibold">
-                            Propietarios registrados
-                        </h2>
-                        <svg class="w-5 h-5 text-gray-400 dark:text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"></path>
-                        </svg>
-                    </div>
-                    <p class="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-                        {{ $propietariosCount }}
-                    </p>
-                    @if(!empty($propietariosPorTipo))
-                        <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                            @foreach($propietariosPorTipo as $tipo => $total)
-                                <span class="text-xs px-2 py-1 rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                    {{ $tipo }}: {{ $total }}
-                                </span>
-                            @endforeach
-                        </div>
-                    @endif
-                </a>
-
             </div>
 
-            {{-- WIDGET: DISTRIBUCIÓN DE ESTADOS DE VEHÍCULOS --}}
-            @if(!empty($vehiculosEstadosConPorcentaje))
-            <div class="mt-8">
-                <div class="bg-white dark:bg-gray-800 p-6 shadow rounded-lg border border-gray-200 dark:border-gray-700">
+            {{-- WIDGETS: PRÓXIMOS CUMPLEAÑOS Y DISTRIBUCIÓN DE ESTADOS DE VEHÍCULOS EN LA MISMA FILA --}}
+            @if($proximosCumpleanos->count() > 0 || !empty($vehiculosEstadosConPorcentaje))
+            <div class="mt-6 sm:mt-8 flex flex-col lg:flex-row gap-4 sm:gap-6">
+                {{-- PRÓXIMOS CUMPLEAÑOS (80% en desktop, 100% en móvil) --}}
+                @if($proximosCumpleanos->count() > 0)
+                <div class="w-full lg:w-[80%] bg-white dark:bg-gray-800 p-4 sm:p-6 shadow rounded-lg border border-gray-200 dark:border-gray-700">
                     <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                        Distribución de Estados de Vehículos
-                    </h2>
-                    
-                    <div class="space-y-4">
-                        @php
-                            $estadosConfig = [
-                                'Activo' => [
-                                    'color' => 'bg-green-500',
-                                    'text' => 'text-green-700 dark:text-green-300',
-                                    'bg' => 'bg-green-100 dark:bg-green-900',
-                                ],
-                                'En Mantenimiento' => [
-                                    'color' => 'bg-yellow-500',
-                                    'text' => 'text-yellow-700 dark:text-yellow-300',
-                                    'bg' => 'bg-yellow-100 dark:bg-yellow-900',
-                                ],
-                                'Fuera de Servicio' => [
-                                    'color' => 'bg-red-500',
-                                    'text' => 'text-red-700 dark:text-red-300',
-                                    'bg' => 'bg-red-100 dark:bg-red-900',
-                                ],
-                            ];
-                        @endphp
-                        
-                        @foreach(['Activo', 'En Mantenimiento', 'Fuera de Servicio'] as $estado)
-                            @if(isset($vehiculosEstadosConPorcentaje[$estado]))
-                                @php
-                                    $data = $vehiculosEstadosConPorcentaje[$estado];
-                                    $config = $estadosConfig[$estado] ?? [
-                                        'color' => 'bg-gray-500',
-                                        'text' => 'text-gray-700 dark:text-gray-300',
-                                        'bg' => 'bg-gray-100 dark:bg-gray-700',
-                                    ];
-                                @endphp
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="font-medium text-gray-700 dark:text-gray-300">
-                                            {{ $estado }}
-                                        </span>
-                                        <span class="font-semibold {{ $config['text'] }}">
-                                            {{ $data['total'] }} ({{ $data['porcentaje'] }}%)
-                                        </span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden">
-                                        <div 
-                                            class="{{ $config['color'] }} h-6 rounded-full transition-all duration-500 flex items-center justify-end pr-2"
-                                            style="width: {{ $data['porcentaje'] }}%"
-                                        >
-                                            @if($data['porcentaje'] > 10)
-                                                <span class="text-xs font-semibold text-white">
-                                                    {{ $data['porcentaje'] }}%
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            @else
-                                <div class="space-y-1">
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="font-medium text-gray-700 dark:text-gray-300">
-                                            {{ $estado }}
-                                        </span>
-                                        <span class="font-semibold text-gray-500 dark:text-gray-400">
-                                            0 (0%)
-                                        </span>
-                                    </div>
-                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6">
-                                        <div class="bg-gray-300 dark:bg-gray-600 h-6 rounded-full" style="width: 0%"></div>
-                                    </div>
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            {{-- WIDGET: PRÓXIMOS CUMPLEAÑOS DE CONDUCTORES --}}
-            @if($proximosCumpleanos->count() > 0)
-            <div class="mt-8">
-                <div class="bg-white dark:bg-gray-800 p-6 shadow rounded-lg border border-gray-200 dark:border-gray-700">
-                    <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
-                        Próximos Cumpleaños de Conductores
+                        Próximos Cumpleaños
                     </h2>
                     
                     <div class="overflow-x-auto">
@@ -251,6 +146,168 @@
                         </table>
                     </div>
                 </div>
+                @endif
+
+                {{-- DISTRIBUCIÓN DE ESTADOS DE VEHÍCULOS (20% en desktop, 100% en móvil) - GRÁFICO DE PASTEL --}}
+                @if(!empty($vehiculosEstadosConPorcentaje))
+                <div class="w-full lg:w-[20%] bg-white dark:bg-gray-800 p-4 lg:p-6 shadow rounded-lg border border-gray-200 dark:border-gray-700">
+                    <h2 class="text-base lg:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 lg:mb-4">
+                        Estados de Vehículos
+                    </h2>
+                    
+                    <div class="relative">
+                        <canvas id="vehiculosEstadosChart" class="w-full" style="max-height: 250px;"></canvas>
+                    </div>
+                    
+                    {{-- Leyenda personalizada --}}
+                    <div class="mt-4 space-y-2">
+                        @php
+                            $estadosConfig = [
+                                'Activo' => [
+                                    'color' => '#10b981', // green-500
+                                    'text' => 'text-green-700 dark:text-green-300',
+                                ],
+                                'En Mantenimiento' => [
+                                    'color' => '#eab308', // yellow-500
+                                    'text' => 'text-yellow-700 dark:text-yellow-300',
+                                ],
+                                'Fuera de Servicio' => [
+                                    'color' => '#ef4444', // red-500
+                                    'text' => 'text-red-700 dark:text-red-300',
+                                ],
+                            ];
+                        @endphp
+                        
+                        @foreach(['Activo', 'En Mantenimiento', 'Fuera de Servicio'] as $estado)
+                            @if(isset($vehiculosEstadosConPorcentaje[$estado]))
+                                @php
+                                    $data = $vehiculosEstadosConPorcentaje[$estado];
+                                    $config = $estadosConfig[$estado] ?? [
+                                        'color' => '#6b7280',
+                                        'text' => 'text-gray-700 dark:text-gray-300',
+                                    ];
+                                @endphp
+                                <div class="flex items-center justify-between text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-3 h-3 rounded-full" style="background-color: {{ $config['color'] }};"></div>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">{{ $estado }}</span>
+                                    </div>
+                                    <span class="font-semibold {{ $config['text'] }}">
+                                        {{ $data['total'] }} ({{ $data['porcentaje'] }}%)
+                                    </span>
+                                </div>
+                            @else
+                                <div class="flex items-center justify-between text-xs">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-3 h-3 rounded-full bg-gray-400"></div>
+                                        <span class="font-medium text-gray-500 dark:text-gray-400">{{ $estado }}</span>
+                                    </div>
+                                    <span class="font-semibold text-gray-500 dark:text-gray-400">
+                                        0 (0%)
+                                    </span>
+                                </div>
+                            @endif
+                        @endforeach
+                    </div>
+                    
+                    {{-- Script para inicializar el gráfico --}}
+                    @php
+                        $labels = [];
+                        $data = [];
+                        $backgroundColors = [];
+                        $borderColors = [];
+                        
+                        $estadosOrdenados = ['Activo', 'En Mantenimiento', 'Fuera de Servicio'];
+                        $coloresChart = [
+                            'Activo' => ['bg' => '#10b981', 'border' => '#059669'],
+                            'En Mantenimiento' => ['bg' => '#eab308', 'border' => '#ca8a04'],
+                            'Fuera de Servicio' => ['bg' => '#ef4444', 'border' => '#dc2626'],
+                        ];
+                        
+                        foreach ($estadosOrdenados as $estado) {
+                            $labels[] = $estado;
+                            if (isset($vehiculosEstadosConPorcentaje[$estado])) {
+                                $data[] = $vehiculosEstadosConPorcentaje[$estado]['total'];
+                                $colores = $coloresChart[$estado] ?? ['bg' => '#6b7280', 'border' => '#4b5563'];
+                                $backgroundColors[] = $colores['bg'];
+                                $borderColors[] = $colores['border'];
+                            } else {
+                                $data[] = 0;
+                                $backgroundColors[] = '#9ca3af';
+                                $borderColors[] = '#6b7280';
+                            }
+                        }
+                    @endphp
+                    
+                    <script>
+                        (function() {
+                            function initChart() {
+                                if (typeof window.Chart === 'undefined') {
+                                    setTimeout(initChart, 100);
+                                    return;
+                                }
+                                
+                                const ctx = document.getElementById('vehiculosEstadosChart');
+                                if (!ctx) return;
+                                
+                                // Evitar múltiples inicializaciones
+                                if (ctx.chart) return;
+                                
+                                const isDarkMode = document.documentElement.classList.contains('dark');
+                                const textColor = isDarkMode ? '#e5e7eb' : '#374151';
+                                
+                                const chartData = {
+                                    labels: @json($labels),
+                                    datasets: [{
+                                        data: @json($data),
+                                        backgroundColor: @json($backgroundColors),
+                                        borderColor: @json($borderColors),
+                                        borderWidth: 2
+                                    }]
+                                };
+                                
+                                ctx.chart = new window.Chart(ctx, {
+                                    type: 'pie',
+                                    data: chartData,
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: true,
+                                        aspectRatio: 1.2,
+                                        plugins: {
+                                            legend: {
+                                                display: false
+                                            },
+                                            tooltip: {
+                                                backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                                                titleColor: textColor,
+                                                bodyColor: textColor,
+                                                borderColor: isDarkMode ? '#374151' : '#e5e7eb',
+                                                borderWidth: 1,
+                                                padding: 12,
+                                                callbacks: {
+                                                    label: function(context) {
+                                                        const label = context.label || '';
+                                                        const value = context.parsed || 0;
+                                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                                        const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                                        return label + ': ' + value + ' (' + percentage + '%)';
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                            
+                            if (document.readyState === 'loading') {
+                                document.addEventListener('DOMContentLoaded', initChart);
+                            } else {
+                                initChart();
+                            }
+                        })();
+                    </script>
+                </div>
+                @endif
             </div>
             @endif
             

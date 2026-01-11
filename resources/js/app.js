@@ -14,10 +14,8 @@ Alpine.data('toastContainer', toastContainer);
 Alpine.data('toastNotification', toastNotification);
 
 // Store global para el estado del sidebar
-// Usar estado inicial desde script inline si está disponible (para evitar flash)
 Alpine.store('sidebar', {
-    collapsed: window.__sidebarInitialState?.collapsed ?? (window.innerWidth < 768),
-    mobileOpen: window.__sidebarInitialState?.mobileOpen ?? false,
+    collapsed: false, // Por defecto expandido en desktop
 });
 
 // Store global para el tema
@@ -83,3 +81,18 @@ import 'cropperjs/dist/cropper.min.css';
 
 // Hacer disponible globalmente para usar en otros scripts
 window.Cropper = Cropper;
+
+// Importar Chart.js
+import {
+    Chart,
+    ArcElement,
+    PieController,
+    Tooltip,
+    Legend
+} from 'chart.js';
+
+// Registrar componentes necesarios para gráfico de pastel
+Chart.register(ArcElement, PieController, Tooltip, Legend);
+
+// Hacer Chart disponible globalmente
+window.Chart = Chart;

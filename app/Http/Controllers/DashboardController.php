@@ -26,7 +26,7 @@ class DashboardController extends Controller
             $conductoresPorTipoFormateado[$nombreTipo] = $total;
         }
 
-        // Próximos cumpleaños de conductores (próximos 15)
+        // Próximos cumpleaños de conductores (solo los que cumplen en 7 días o menos)
         $proximosCumpleanos = Conductor::whereNotNull('fecha_nacimiento')
             ->select('id', 'nombres', 'apellidos', 'cedula', 'fecha_nacimiento', 'conductor_tipo')
             ->get()
@@ -65,11 +65,10 @@ class DashboardController extends Controller
                 ];
             })
             ->filter(function ($conductor) {
-                // Solo incluir si el cumpleaños es en los próximos 365 días
-                return $conductor['dias_restantes'] <= 365;
+                // Solo incluir si el cumpleaños es en los próximos 7 días o menos
+                return $conductor['dias_restantes'] <= 7;
             })
             ->sortBy('dias_restantes')
-            ->take(15)
             ->values();
 
         // Vehículos

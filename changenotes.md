@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.1.1*
+- Ajustes visuales del navbar
+- Se elimino todo lo relacionado con PQRS
+
 ## *v. 0.1*
 - Sistema de notificaciones Toast con auto-cierre y barra de progreso visual
 - Skeleton loaders para tablas, tarjetas y formularios con animaciones optimizadas
