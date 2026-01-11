@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.1.1.1*
+- Mejoras al script de deploy start.sh
+
 ## *v. 0.1.1*
 - Ajustes visuales del navbar
 - Se elimino todo lo relacionado con PQRS

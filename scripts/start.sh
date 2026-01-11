@@ -58,7 +58,38 @@ if [ -n "${SUPERVISORD_CMD}" ] && [ -f "/etc/supervisor/supervisord.conf" ]; the
         fi
     fi
 else
-    echo "⚠️ Supervisor no disponible. Los workers no se iniciarán automáticamente."
+    echo "⚠️ Supervisor no disponible. Iniciando worker directamente..."
+    
+    # Iniciar worker directamente en background
+    echo "=== Iniciando Worker de Colas ==="
+    
+    # Asegurar que el directorio de logs existe
+    mkdir -p /app/storage/logs
+    
+    # Iniciar worker en background
+    # Usar nohup para asegurar que el proceso continúe si la shell termina
+    nohup php /app/artisan queue:work \
+        --queue=importaciones,carnets \
+        --tries=3 \
+        --timeout=600 \
+        --max-time=3600 \
+        --sleep=3 \
+        --max-jobs=1000 \
+        > /app/storage/logs/worker.log 2>&1 &
+    
+    WORKER_PID=$!
+    echo "✓ Worker iniciado (PID: ${WORKER_PID})"
+    echo "  Logs: /app/storage/logs/worker.log"
+    
+    # Dar un momento para que el worker inicie
+    sleep 2
+    
+    # Verificar que el proceso sigue ejecutándose
+    if ps -p ${WORKER_PID} > /dev/null 2>&1; then
+        echo "✓ Worker verificado: proceso activo"
+    else
+        echo "⚠️  Advertencia: El worker pudo haber fallado al iniciar. Revisa los logs."
+    fi
 fi
 
 # Iniciar nginx y php-fpm
@@ -70,7 +101,11 @@ nginx -c /nginx.conf &
 
 echo ""
 echo "=== Todos los servicios iniciados ==="
-echo "   - Supervisor: ${SUPERVISORD_CMD:-No disponible}"
+if [ -n "${SUPERVISORD_CMD}" ]; then
+    echo "   - Supervisor: Ejecutándose (PID: ${SUPERVISORD_PID})"
+else
+    echo "   - Worker de Colas: Ejecutándose (PID: ${WORKER_PID})"
+fi
 echo "   - PHP-FPM: Ejecutándose"
 echo "   - Nginx: Ejecutándose"
 
