@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
     description: 'API REST para el sistema Coopuertos - Gestión de conductores, vehículos y propietarios'
 )]
 #[OA\Server(
-    url: '/api/v1',
+    url: '/',
     description: 'Servidor API v1'
 )]
 #[OA\SecurityScheme(

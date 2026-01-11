@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.1.4*
+- Fix path duplicado en cURL generado por sawgger
+
 ## *v. 0.1.3*
 - API REST completa: Sanctum auth, CRUD conductores/vehículos/propietarios, dashboard stats, Swagger docs, colección Postman (23 endpoints)
 

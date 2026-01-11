@@ -36,6 +36,16 @@ Sistema web desarrollado con Laravel 12 para la gestión integral de conductores
 - UI completamente en español
 - Diseño responsive
 
+### API REST
+- API REST completa con 23 endpoints
+- Autenticación con Laravel Sanctum (tokens Bearer)
+- Documentación interactiva con Swagger/OpenAPI
+- Colección Postman completa disponible
+- Versionado de API (`/api/v1/`)
+- Integración con permisos Spatie
+- Rate limiting configurado
+- Endpoints: autenticación, conductores, vehículos, propietarios, dashboard
+
 ## 📋 Requisitos
 
 - PHP >= 8.2
@@ -130,7 +140,15 @@ coopuertos2/
 │   └── js/                  # JavaScript
 ├── routes/
 │   ├── web.php              # Rutas web
+│   ├── api.php              # Rutas API REST
 │   └── auth.php             # Rutas de autenticación
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/Api/ # Controladores API
+│   │   └── Resources/Api/   # API Resources
+│   └── Api/                 # Configuración OpenAPI
+├── docs/
+│   └── postman_collection.json  # Colección Postman
 └── public/                  # Archivos públicos
 ```
 
@@ -312,7 +330,7 @@ Cada módulo tiene 4 permisos base que controlan las acciones:
 - Los permisos se pueden gestionar desde la vista de Configuración (solo Mango)
 - Los permisos se aplican tanto en rutas como en vistas mediante directivas `@can` y middleware
 
-## 📝 Notas de Versión
+##  Notas de Versión
 
 Para ver el historial completo de cambios y mejoras, consulta el archivo [changenotes.md](changenotes.md).
 
@@ -324,6 +342,3 @@ Para ver el progreso de la App y su bitacora de cambios, consulta el archivo [ro
 
 Este proyecto es software propietario. Todos los derechos reservados.
 
-## 👥 Soporte
-
-Para soporte técnico o consultas, contactar al equipo de desarrollo.
