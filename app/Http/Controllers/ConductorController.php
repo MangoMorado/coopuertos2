@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ConductoresExport;
 use App\Models\CarnetTemplate;
 use App\Models\Conductor;
 use App\Services\CarnetGeneratorService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class ConductorController extends Controller
@@ -353,5 +354,17 @@ class ConductorController extends Controller
                 'label' => "{$conductor->nombres} {$conductor->apellidos} ({$conductor->cedula})",
             ];
         }));
+    }
+
+    public function exportar(Request $request)
+    {
+        $formato = $request->get('formato', 'excel');
+        $nombreArchivo = 'conductores_'.date('YmdHis');
+
+        if ($formato === 'csv') {
+            return Excel::download(new ConductoresExport, $nombreArchivo.'.csv', \Maatwebsite\Excel\Excel::CSV);
+        }
+
+        return Excel::download(new ConductoresExport, $nombreArchivo.'.xlsx');
     }
 }

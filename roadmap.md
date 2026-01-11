@@ -31,14 +31,7 @@ Fase 3: UI/UX
 Fase 4: Dashboard
   - ✅ Nuevos Widgets / Estadisticas de los CRUDs (numero de vehiculos, conductores) - Parcialmente implementado (solo conductores)
   - ✅ Acciones rapidas (Descargar Carnets)
-  - Sugerencias del sistema (X usuario falta por x dato)
-  - Exportación de datos
-    - Exportar conductores a Excel/CSV
-    - Exportar vehículos a Excel/CSV
-    - Exportar reportes personalizados
-  - Notificaciones por email
-    - Recordatorios y alertas automáticas
-    - Plantillas de email personalizables
+  - ✅ Exportación de datos
 
 Fase 5: API
   - API REST completa

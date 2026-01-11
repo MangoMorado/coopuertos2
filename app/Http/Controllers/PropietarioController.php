@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PropietariosExport;
 use App\Models\Propietario;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PropietarioController extends Controller
 {
@@ -13,12 +15,12 @@ class PropietarioController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('numero_identificacion', 'like', '%' . $search . '%')
-                  ->orWhere('nombre_completo', 'like', '%' . $search . '%')
-                  ->orWhere('telefono_contacto', 'like', '%' . $search . '%')
-                  ->orWhere('correo_electronico', 'like', '%' . $search . '%')
-                  ->orWhere('direccion_contacto', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('numero_identificacion', 'like', '%'.$search.'%')
+                    ->orWhere('nombre_completo', 'like', '%'.$search.'%')
+                    ->orWhere('telefono_contacto', 'like', '%'.$search.'%')
+                    ->orWhere('correo_electronico', 'like', '%'.$search.'%')
+                    ->orWhere('direccion_contacto', 'like', '%'.$search.'%');
             });
         }
 
@@ -55,7 +57,7 @@ class PropietarioController extends Controller
         Propietario::create($validated);
 
         return redirect()->route('propietarios.index')
-                         ->with('success', 'Propietario creado correctamente.');
+            ->with('success', 'Propietario creado correctamente.');
     }
 
     public function show(Propietario $propietario)
@@ -72,7 +74,7 @@ class PropietarioController extends Controller
     {
         $validated = $request->validate([
             'tipo_identificacion' => 'required|in:Cédula de Ciudadanía,RUC/NIT,Pasaporte',
-            'numero_identificacion' => 'required|string|unique:propietarios,numero_identificacion,' . $propietario->id . ',id|max:50',
+            'numero_identificacion' => 'required|string|unique:propietarios,numero_identificacion,'.$propietario->id.',id|max:50',
             'nombre_completo' => 'required|string|max:255',
             'tipo_propietario' => 'required|in:Persona Natural,Persona Jurídica',
             'direccion_contacto' => 'nullable|string|max:500',
@@ -84,12 +86,13 @@ class PropietarioController extends Controller
         $propietario->update($validated);
 
         return redirect()->route('propietarios.index')
-                         ->with('success', 'Propietario actualizado correctamente.');
+            ->with('success', 'Propietario actualizado correctamente.');
     }
 
     public function destroy(Propietario $propietario)
     {
         $propietario->delete();
+
         return back()->with('success', 'Propietario eliminado correctamente.');
     }
 
@@ -97,14 +100,14 @@ class PropietarioController extends Controller
     {
         $query = $request->get('q', '');
         $columns = $request->get('columns', []); // Columnas específicas a buscar
-        
+
         if (strlen($query) < 2) {
             return response()->json([]);
         }
 
         // Si se especifican columnas, usar solo esas. Si no, buscar en todas las columnas comunes
-        if (!empty($columns) && is_array($columns)) {
-            $propietarios = Propietario::where(function($q) use ($query, $columns) {
+        if (! empty($columns) && is_array($columns)) {
+            $propietarios = Propietario::where(function ($q) use ($query, $columns) {
                 foreach ($columns as $column) {
                     if (in_array($column, ['numero_identificacion', 'nombre_completo', 'telefono_contacto', 'correo_electronico', 'direccion_contacto'])) {
                         $q->orWhere($column, 'like', "%{$query}%");
@@ -113,12 +116,12 @@ class PropietarioController extends Controller
             })->limit(10)->get();
         } else {
             // Búsqueda por defecto en todas las columnas comunes
-            $propietarios = Propietario::where(function($q) use ($query) {
+            $propietarios = Propietario::where(function ($q) use ($query) {
                 $q->where('nombre_completo', 'like', "%{$query}%")
-                  ->orWhere('numero_identificacion', 'like', "%{$query}%")
-                  ->orWhere('telefono_contacto', 'like', "%{$query}%")
-                  ->orWhere('correo_electronico', 'like', "%{$query}%")
-                  ->orWhere('direccion_contacto', 'like', "%{$query}%");
+                    ->orWhere('numero_identificacion', 'like', "%{$query}%")
+                    ->orWhere('telefono_contacto', 'like', "%{$query}%")
+                    ->orWhere('correo_electronico', 'like', "%{$query}%")
+                    ->orWhere('direccion_contacto', 'like', "%{$query}%");
             })->limit(10)->get();
         }
 
@@ -134,5 +137,17 @@ class PropietarioController extends Controller
                 'label' => "{$propietario->nombre_completo} ({$propietario->numero_identificacion})",
             ];
         }));
+    }
+
+    public function exportar(Request $request)
+    {
+        $formato = $request->get('formato', 'excel');
+        $nombreArchivo = 'propietarios_'.date('YmdHis');
+
+        if ($formato === 'csv') {
+            return Excel::download(new PropietariosExport, $nombreArchivo.'.csv', \Maatwebsite\Excel\Excel::CSV);
+        }
+
+        return Excel::download(new PropietariosExport, $nombreArchivo.'.xlsx');
     }
 }

@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:ver conductores')->group(function () {
         Route::get('/conductores/{conductor}/info', [ConductorController::class, 'info'])->name('conductores.info');
         Route::get('/conductores/{uuid}/carnet/descargar', [ConductorController::class, 'descargarCarnet'])->name('conductores.carnet.descargar');
+        Route::get('/conductores/exportar', [ConductorController::class, 'exportar'])->name('conductores.exportar');
         Route::resource('conductores', ConductorController::class)->except('show');
     });
 
@@ -58,9 +59,11 @@ Route::middleware('auth')->group(function () {
     });
 
     // Vehículos
+    Route::get('/vehiculos/exportar', [VehicleController::class, 'exportar'])->name('vehiculos.exportar');
     Route::resource('vehiculos', VehicleController::class);
 
     // Propietarios
+    Route::get('/propietarios/exportar', [PropietarioController::class, 'exportar'])->name('propietarios.exportar');
     Route::resource('propietarios', PropietarioController::class);
     Route::get('/api/propietarios/search', [PropietarioController::class, 'search'])->name('api.propietarios.search');
     Route::get('/api/conductores/search', [ConductorController::class, 'search'])->name('api.conductores.search');

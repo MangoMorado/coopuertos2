@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\VehiculosExport;
 use App\Models\Conductor;
 use App\Models\ConductorVehicle;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class VehicleController extends Controller
 {
@@ -245,5 +247,17 @@ class VehicleController extends Controller
                 'label' => "{$vehicle->placa} - {$vehicle->marca} {$vehicle->modelo}",
             ];
         }));
+    }
+
+    public function exportar(Request $request)
+    {
+        $formato = $request->get('formato', 'excel');
+        $nombreArchivo = 'vehiculos_'.date('YmdHis');
+
+        if ($formato === 'csv') {
+            return Excel::download(new VehiculosExport, $nombreArchivo.'.csv', \Maatwebsite\Excel\Excel::CSV);
+        }
+
+        return Excel::download(new VehiculosExport, $nombreArchivo.'.xlsx');
     }
 }

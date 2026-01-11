@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.1.2*
+- Sistema de exportación de datos (Excel y CSV) para conductores, vehículos y propietarios
+- Clases Export creadas (ConductoresExport, VehiculosExport, PropietariosExport) con encabezados en español y formateo de datos
+
 ## *v. 0.1.1.1*
 - Mejoras al script de deploy start.sh
 
