@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.1.6*
+- Suite de tests PHPUnit (296 test): tests web y API para Conductores, Vehículos, Propietarios y Carnets. Tests unitarios para servicios y jobs de generación de carnets. Corrección de cast de fecha en modelo Vehicle.
+- Eliminada la card Resultados de los Tests de /configuracion
+
 ## *v. 0.1.5*
 - Paneles de salud de la app en /configuracion: estado de BD, colas, almacenamiento, extensiones PHP y versiones
 - Resultados de tests en /configuracion: estadísticas de tests (total, feature, unit)

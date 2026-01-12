@@ -239,51 +239,5 @@
                 </div>
             @endif
         </div>
-
-        <!-- Resultados de los Test -->
-        <div class="{{ $bgCard }} rounded-lg shadow-md border {{ $borderCard }} p-6 mt-6">
-            <div class="mb-6">
-                <h3 class="text-2xl font-bold {{ $textTitle }} mb-2">Resultados de los Test</h3>
-                <p class="{{ $textSubtitle }}">Información sobre la suite de tests de la aplicación.</p>
-            </div>
-
-            @if(isset($testInfo['error']))
-                <div class="{{ $bgError }} border {{ $borderCard }} rounded-lg p-4">
-                    <p class="{{ $textError }}">Error al obtener información de tests: {{ $testInfo['error'] }}</p>
-                </div>
-            @else
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Total de Tests -->
-                    <div class="{{ $isDark ? 'bg-gray-700' : 'bg-gray-50' }} rounded-lg p-4 border {{ $borderCard }} text-center">
-                        <div class="text-3xl font-bold {{ $textTitle }} mb-2">{{ $testInfo['total'] ?? 0 }}</div>
-                        <p class="text-sm {{ $textSubtitle }}">Tests Totales</p>
-                    </div>
-
-                    <!-- Tests de Feature -->
-                    <div class="{{ $isDark ? 'bg-gray-700' : 'bg-gray-50' }} rounded-lg p-4 border {{ $borderCard }} text-center">
-                        <div class="text-3xl font-bold {{ $textTitle }} mb-2">{{ $testInfo['feature'] ?? 0 }}</div>
-                        <p class="text-sm {{ $textSubtitle }}">Tests de Feature</p>
-                    </div>
-
-                    <!-- Tests Unitarios -->
-                    <div class="{{ $isDark ? 'bg-gray-700' : 'bg-gray-50' }} rounded-lg p-4 border {{ $borderCard }} text-center">
-                        <div class="text-3xl font-bold {{ $textTitle }} mb-2">{{ $testInfo['unit'] ?? 0 }}</div>
-                        <p class="text-sm {{ $textSubtitle }}">Tests Unitarios</p>
-                    </div>
-                </div>
-
-                <div class="mt-6 pt-4 border-t {{ $borderCard }}">
-                    <p class="text-sm {{ $textSubtitle }} mb-4">Para ejecutar los tests, utiliza el siguiente comando:</p>
-                    <div class="{{ $isDark ? 'bg-gray-900' : 'bg-gray-100' }} rounded-lg p-4 border {{ $borderCard }}">
-                        <code class="text-sm {{ $textBody }} font-mono">
-                            php artisan test
-                        </code>
-                    </div>
-                    <p class="text-xs {{ $textSubtitle }} mt-2">
-                        Para ejecutar tests específicos: <code class="{{ $textBody }}">php artisan test --filter=NombreTest</code>
-                    </p>
-                </div>
-            @endif
-        </div>
     </div>
 </x-app-layout>

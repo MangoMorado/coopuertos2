@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Services\HealthCheckService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -41,10 +40,7 @@ class ConfiguracionController extends Controller
         $healthCheckService = new HealthCheckService;
         $healthStatus = $healthCheckService->getHealthStatus();
 
-        // Obtener información de tests
-        $testInfo = $this->getTestInfo();
-
-        return view('configuracion.index', compact('roles', 'modulos', 'modulosPorRol', 'healthStatus', 'testInfo'));
+        return view('configuracion.index', compact('roles', 'modulos', 'modulosPorRol', 'healthStatus'));
     }
 
     public function update(Request $request)
@@ -100,39 +96,5 @@ class ConfiguracionController extends Controller
             return redirect()->route('configuracion.index')
                 ->with('error', 'Error al actualizar permisos: '.$e->getMessage());
         }
-    }
-
-    private function getTestInfo(): array
-    {
-        $info = [
-            'total' => 0,
-            'feature' => 0,
-            'unit' => 0,
-        ];
-
-        try {
-            $featurePath = base_path('tests/Feature');
-            $unitPath = base_path('tests/Unit');
-
-            if (File::exists($featurePath)) {
-                $featureFiles = File::allFiles($featurePath);
-                $info['feature'] = collect($featureFiles)
-                    ->filter(fn ($file) => $file->getExtension() === 'php' && $file->getFilename() !== 'TestCase.php')
-                    ->count();
-            }
-
-            if (File::exists($unitPath)) {
-                $unitFiles = File::allFiles($unitPath);
-                $info['unit'] = collect($unitFiles)
-                    ->filter(fn ($file) => $file->getExtension() === 'php' && $file->getFilename() !== 'TestCase.php')
-                    ->count();
-            }
-
-            $info['total'] = $info['feature'] + $info['unit'];
-        } catch (\Exception $e) {
-            $info['error'] = $e->getMessage();
-        }
-
-        return $info;
     }
 }

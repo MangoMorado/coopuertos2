@@ -48,7 +48,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/conductores/{conductor}/info', [ConductorController::class, 'info'])->name('conductores.info');
         Route::get('/conductores/{uuid}/carnet/descargar', [ConductorController::class, 'descargarCarnet'])->name('conductores.carnet.descargar');
         Route::get('/conductores/exportar', [ConductorController::class, 'exportar'])->name('conductores.exportar');
-        Route::resource('conductores', ConductorController::class)->except('show');
+        Route::resource('conductores', ConductorController::class)->except(['show', 'destroy']);
+    });
+
+    // Eliminar conductores (requiere permiso específico)
+    Route::middleware('permission:eliminar conductores')->group(function () {
+        Route::delete('/conductores/{conductor}', [ConductorController::class, 'destroy'])->name('conductores.destroy');
     });
 
     // Importación de conductores (requiere permiso de crear)

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Vehicle extends Model
 {
@@ -26,6 +26,10 @@ class Vehicle extends Model
         'foto',
     ];
 
+    protected $casts = [
+        'ultima_revision_tecnica' => 'date',
+    ];
+
     // Relación antigua (mantener por compatibilidad, pero usar asignaciones)
     public function conductor()
     {
@@ -36,16 +40,16 @@ class Vehicle extends Model
     public function conductores()
     {
         return $this->belongsToMany(Conductor::class, 'conductor_vehicle')
-                    ->withPivot('estado', 'fecha_asignacion', 'fecha_desasignacion', 'observaciones')
-                    ->withTimestamps();
+            ->withPivot('estado', 'fecha_asignacion', 'fecha_desasignacion', 'observaciones')
+            ->withTimestamps();
     }
 
     // Obtener todos los conductores activos del vehículo
     public function conductoresActivos()
     {
         return $this->conductores()
-                    ->wherePivot('estado', 'activo')
-                    ->get();
+            ->wherePivot('estado', 'activo')
+            ->get();
     }
 
     // Obtener todas las asignaciones del vehículo
