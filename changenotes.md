@@ -1,5 +1,11 @@
 # Coopuertos App
 
+## *v. 0.1.5*
+- Paneles de salud de la app en /configuracion: estado de BD, colas, almacenamiento, extensiones PHP y versiones
+- Resultados de tests en /configuracion: estadísticas de tests (total, feature, unit)
+- Nuevo endpoint API `/api/v1/health`: retorna información completa de salud del sistema (público, sin autenticación)
+- Servicio HealthCheckService: centraliza verificaciones de salud del sistema
+
 ## *v. 0.1.4*
 - Fix path duplicado en cURL generado por sawgger
 

@@ -3,11 +3,14 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ConductorController;
 use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\PropietarioController;
 use App\Http\Controllers\Api\V1\VehicleController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
+    // Endpoint público de salud (sin autenticación)
+    Route::get('/health', [HealthController::class, 'index'])->middleware('throttle:60,1');
     // Rutas de autenticación
     Route::prefix('auth')->group(function () {
         Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');

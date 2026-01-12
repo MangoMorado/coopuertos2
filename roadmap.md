@@ -44,21 +44,8 @@ Fase 5: API
 
 Fase 6: SuperAdmin / Mango
   - ✅ Paneles de confgiuración global de permisos
-  - Paneles de salud de la App
-  - Resultados de los test
-  - Historial de auditoría y logs
-    - Registrar cambios en registros importantes
-    - Logs de acciones de usuarios
-    - Historial de modificaciones en conductores y vehículos
-    - Vista de auditoría en interfaz
-  - Monitoreo y logging
-    - Sistema de logging centralizado
-    - Monitoreo de performance
-    - Alertas automáticas de errores
-  - CI/CD Pipeline
-    - Automatización de tests
-    - Despliegue automático
-    - Code quality checks
+  - ✅ Paneles de salud de la App
+  - ✅ Resultados de los test
 
 Fase 7: Tests y Performance
   - Optimizar consultas a base de datos

@@ -408,6 +408,133 @@
                 ]
             }
         },
+        "/api/v1/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Obtener estado de salud del sistema",
+                "description": "Retorna información detallada sobre el estado de salud del sistema: base de datos, colas, almacenamiento, extensiones PHP y versiones. Este endpoint es público y no requiere autenticación.",
+                "operationId": "75aa2f24b75e1cb18ac69fb7ff10bc7b",
+                "responses": {
+                    "200": {
+                        "description": "Estado de salud obtenido exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "database": {
+                                                    "properties": {
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "healthy"
+                                                        },
+                                                        "message": {
+                                                            "type": "string",
+                                                            "example": "Conexión establecida"
+                                                        },
+                                                        "connection": {
+                                                            "type": "string",
+                                                            "example": "mysql"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "queue": {
+                                                    "properties": {
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "healthy"
+                                                        },
+                                                        "pending": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
+                                                        "failed": {
+                                                            "type": "integer",
+                                                            "example": 0
+                                                        },
+                                                        "connection": {
+                                                            "type": "string",
+                                                            "example": "database"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "storage": {
+                                                    "properties": {
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "healthy"
+                                                        },
+                                                        "total": {
+                                                            "type": "string",
+                                                            "example": "500.00 GB"
+                                                        },
+                                                        "used": {
+                                                            "type": "string",
+                                                            "example": "250.50 GB"
+                                                        },
+                                                        "free": {
+                                                            "type": "string",
+                                                            "example": "249.50 GB"
+                                                        },
+                                                        "percentage": {
+                                                            "type": "number",
+                                                            "format": "float",
+                                                            "example": 50.1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "versions": {
+                                                    "properties": {
+                                                        "php": {
+                                                            "type": "string",
+                                                            "example": "8.2.12"
+                                                        },
+                                                        "laravel": {
+                                                            "type": "string",
+                                                            "example": "12.0.0"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "php_extensions": {
+                                                    "properties": {
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "healthy"
+                                                        },
+                                                        "extensions": {
+                                                            "description": "Estado de cada extensión PHP requerida",
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Estado de salud obtenido exitosamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/propietarios": {
             "get": {
                 "tags": [
@@ -858,6 +985,10 @@
         {
             "name": "Dashboard",
             "description": "Estadísticas y métricas del sistema"
+        },
+        {
+            "name": "Health",
+            "description": "Estado de salud del sistema"
         },
         {
             "name": "Propietarios",
