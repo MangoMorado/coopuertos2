@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  tests:
+    name: Tests y Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, bcmath, pdo, pdo_sqlite, imagick, gd, zip, curl
+          coverage: none
+
+      - name: Configurar .env
+        run: |
+          if [ -f .env.example ]; then
+            cp .env.example .env
+          else
+            touch .env
+          fi
+          echo "APP_KEY=" >> .env
+          echo "APP_ENV=testing" >> .env
+
+      - name: Instalar dependencias Composer
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Generar key de aplicación
+        run: php artisan key:generate
+
+      - name: Ejecutar Laravel Pint (Lint)
+        run: |
+          vendor/bin/pint --test || (echo "❌ Laravel Pint encontró errores de formato. Ejecuta: vendor/bin/pint" && exit 1)
+
+      - name: Ejecutar tests PHPUnit
+        run: php artisan test

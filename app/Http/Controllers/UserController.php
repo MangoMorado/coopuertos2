@@ -152,7 +152,7 @@ class UserController extends Controller
         $user->update($updateData);
 
         // Actualizar contraseña si se proporciona
-        if ($validated['password']) {
+        if (isset($validated['password']) && $validated['password']) {
             $user->update([
                 'password' => Hash::make($validated['password']),
             ]);
