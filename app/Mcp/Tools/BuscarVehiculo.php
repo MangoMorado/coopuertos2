@@ -6,6 +6,7 @@ use App\Models\Vehicle;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
+use Laravel\Mcp\ResponseFactory;
 use Laravel\Mcp\Server\Tool;
 
 class BuscarVehiculo extends Tool
@@ -18,7 +19,7 @@ class BuscarVehiculo extends Tool
     /**
      * Handle the tool request.
      */
-    public function handle(Request $request): Response
+    public function handle(Request $request): Response|ResponseFactory
     {
         $query = $request->get('query');
         $limit = $request->get('limit', 10);
@@ -27,12 +28,11 @@ class BuscarVehiculo extends Tool
             ->orWhere('marca', 'like', "%{$query}%")
             ->orWhere('modelo', 'like', "%{$query}%")
             ->orWhere('propietario_nombre', 'like', "%{$query}%")
-            ->with(['conductoresActivos'])
             ->limit($limit)
             ->get();
 
         $resultados = $vehiculos->map(function ($vehiculo) {
-            $conductoresActivos = $vehiculo->conductoresActivos;
+            $conductoresActivos = $vehiculo->conductoresActivos();
 
             return [
                 'id' => $vehiculo->id,
@@ -51,7 +51,7 @@ class BuscarVehiculo extends Tool
                         'cedula' => $conductor->cedula,
                         'numero_interno' => $conductor->numero_interno,
                     ];
-                }),
+                })->toArray(),
             ];
         });
 

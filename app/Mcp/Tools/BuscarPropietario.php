@@ -6,6 +6,7 @@ use App\Models\Propietario;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
+use Laravel\Mcp\ResponseFactory;
 use Laravel\Mcp\Server\Tool;
 
 class BuscarPropietario extends Tool
@@ -18,7 +19,7 @@ class BuscarPropietario extends Tool
     /**
      * Handle the tool request.
      */
-    public function handle(Request $request): Response
+    public function handle(Request $request): Response|ResponseFactory
     {
         $query = $request->get('query');
         $limit = $request->get('limit', 10);

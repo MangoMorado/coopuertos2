@@ -6,6 +6,7 @@ use App\Models\Conductor;
 use Illuminate\Contracts\JsonSchema\JsonSchema;
 use Laravel\Mcp\Request;
 use Laravel\Mcp\Response;
+use Laravel\Mcp\ResponseFactory;
 use Laravel\Mcp\Server\Tool;
 
 class BuscarConductor extends Tool
@@ -18,7 +19,7 @@ class BuscarConductor extends Tool
     /**
      * Handle the tool request.
      */
-    public function handle(Request $request): Response
+    public function handle(Request $request): Response|ResponseFactory
     {
         $query = $request->get('query');
         $limit = $request->get('limit', 10);
@@ -27,12 +28,12 @@ class BuscarConductor extends Tool
             ->orWhere('nombres', 'like', "%{$query}%")
             ->orWhere('apellidos', 'like', "%{$query}%")
             ->orWhere('numero_interno', 'like', "%{$query}%")
-            ->with(['vehiculoActivo', 'asignacionActiva'])
+            ->with(['asignacionActiva.vehicle'])
             ->limit($limit)
             ->get();
 
         $resultados = $conductores->map(function ($conductor) {
-            $vehiculoActivo = $conductor->vehiculoActivo;
+            $vehiculoActivo = $conductor->asignacionActiva?->vehicle;
 
             return [
                 'id' => $conductor->id,

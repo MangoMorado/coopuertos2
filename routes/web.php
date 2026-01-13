@@ -117,5 +117,6 @@ Route::middleware('auth')->group(function () {
 // Rutas de autenticación generadas por Laravel Breeze/Jetstream
 require __DIR__.'/auth.php';
 
-// Servidor MCP para Coopuertos
-Mcp::web('/mcp/coopuertos', CoopuertosServer::class);
+// Servidor MCP para Coopuertos (protegido con autenticación personalizada)
+Mcp::web('/mcp/coopuertos', CoopuertosServer::class)
+    ->middleware(\App\Http\Middleware\McpAuthenticate::class);

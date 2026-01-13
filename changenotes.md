@@ -1,5 +1,10 @@
 # Coopuertos App
 
+## *v. 0.2.3*
+- Implementación completa MCP: Servidor MCP configurado con autenticación Sanctum, 28 herramientas (búsqueda, CRUD, carnets, monitoreo, super poderes), 5 prompts interactivos, 5 recursos de documentación. Total: 37 capacidades MCP.
+- Suite de pruebas MCP: Suite completa de tests: 55 tests (92 assertions) cubriendo todas las funcionalidades 
+MCP (servidor, middleware, herramientas, prompts, recursos) 
+
 ## *v. 0.2.2*
 - Exportación de QRs: Cambiado el nombre de los archivos SVG exportados para usar el nombre del conductor en formato slug en lugar de usar cédula y UUID. Actualizado método exportarQRs() en CarnetController para generar nombres más legibles usando Str::slug() con nombres y apellidos del conductor
 
