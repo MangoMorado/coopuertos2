@@ -116,8 +116,6 @@ class ObtenerLogsImportacion extends Tool
                 ->enum(['pendiente', 'procesando', 'completado', 'error'])
                 ->description('Filtrar por estado de importación'),
             'limit' => $schema->integer()
-                ->minimum(1)
-                ->maximum(100)
                 ->default(20)
                 ->description('Número máximo de registros a retornar (máximo 100)'),
             'include_logs' => $schema->boolean()

@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.2.3.4*
+- Corrección JsonSchema: Eliminados métodos `minimum()` y `maximum()` de schemas en `ObtenerLogsImportacion`, `ObtenerLogsLaravel` y `ObtenerLogsGeneracionCarnets` ya que no existen en la API de JsonSchema de Laravel. La validación de límites se mantiene en las reglas de validación del método `handle()`. Corrección autenticación Sanctum: Actualizado middleware `McpAuthenticate` para autenticar correctamente tokens Bearer usando `PersonalAccessToken::findToken()` en lugar de verificación manual
+
 ## *v. 0.2.3.3*
 - Corrección CSRF para pruebas MCP: Excluida ruta `/mcp/coopuertos` del middleware CSRF en `bootstrap/app.php` usando `validateCsrfTokens(except: ['mcp/coopuertos'])` para permitir peticiones internas desde el controlador de prueba. La ruta MCP mantiene su seguridad mediante el middleware `McpAuthenticate` que requiere autenticación Sanctum para herramientas protegidas 
 

@@ -141,8 +141,6 @@ class ObtenerLogsLaravel extends Tool
                 ->maxLength(200)
                 ->description('Buscar texto en los logs'),
             'limit' => $schema->integer()
-                ->minimum(1)
-                ->maximum(500)
                 ->default(100)
                 ->description('Número máximo de líneas a retornar (máximo 500)'),
             'file' => $schema->string()

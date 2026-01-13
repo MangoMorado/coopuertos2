@@ -126,8 +126,6 @@ class ObtenerLogsGeneracionCarnets extends Tool
                 ->enum(['masivo', 'individual', 'plantilla'])
                 ->description('Filtrar por tipo de generación'),
             'limit' => $schema->integer()
-                ->minimum(1)
-                ->maximum(100)
                 ->default(20)
                 ->description('Número máximo de registros a retornar (máximo 100)'),
             'include_logs' => $schema->boolean()

@@ -56,7 +56,24 @@ class McpAuthenticate
         }
 
         // Para todas las demás requests MCP, requerir autenticación con Sanctum
-        if (! $request->bearerToken() && ! Auth::guard('sanctum')->check()) {
+        // Intentar autenticar con Sanctum usando el token Bearer
+        if ($token = $request->bearerToken()) {
+            // Autenticar usando Sanctum
+            $user = \Laravel\Sanctum\PersonalAccessToken::findToken($token)?->tokenable;
+
+            if ($user) {
+                Auth::guard('sanctum')->setUser($user);
+            } else {
+                return response()->json([
+                    'error' => [
+                        'code' => 'INVALID_TOKEN',
+                        'message' => 'El token proporcionado no es válido o ha expirado.',
+                        'hint' => 'Usa la herramienta iniciar_sesion para obtener un nuevo token.',
+                    ],
+                ], 401);
+            }
+        } else {
+            // No hay token Bearer
             return response()->json([
                 'error' => [
                     'code' => 'UNAUTHORIZED',
@@ -64,24 +81,6 @@ class McpAuthenticate
                     'hint' => 'Usa la herramienta iniciar_sesion con email y password para obtener un token de acceso.',
                 ],
             ], 401);
-        }
-
-        // Intentar autenticar con Sanctum
-        if (! Auth::guard('sanctum')->check()) {
-            // Si hay un token Bearer, intentar autenticar
-            if ($token = $request->bearerToken()) {
-                // Sanctum manejará la autenticación automáticamente
-                // Si falla, retornar error
-                if (! Auth::guard('sanctum')->check()) {
-                    return response()->json([
-                        'error' => [
-                            'code' => 'INVALID_TOKEN',
-                            'message' => 'El token proporcionado no es válido o ha expirado.',
-                            'hint' => 'Usa la herramienta iniciar_sesion para obtener un nuevo token.',
-                        ],
-                    ], 401);
-                }
-            }
         }
 
         return $next($request);
