@@ -51,8 +51,9 @@ class HealthCheckService
             $usedSpace = $totalSpace - $freeSpace;
             $usedPercentage = $totalSpace > 0 ? round(($usedSpace / $totalSpace) * 100, 2) : 0;
 
+            $storageStatus = $usedPercentage > 90 ? 'error' : ($usedPercentage > 75 ? 'warning' : 'healthy');
             $status['storage'] = [
-                'status' => $usedPercentage > 90 ? 'error' : ($usedPercentage > 75 ? 'warning' : 'healthy'),
+                'status' => $storageStatus,
                 'total' => $this->formatBytes($totalSpace),
                 'used' => $this->formatBytes($usedSpace),
                 'free' => $this->formatBytes($freeSpace),
@@ -61,6 +62,12 @@ class HealthCheckService
                 'used_bytes' => $usedSpace,
                 'free_bytes' => $freeSpace,
             ];
+
+            if ($storageStatus === 'error') {
+                $status['storage']['message'] = 'Espacio en disco crítico: '.$usedPercentage.'% utilizado';
+            } elseif ($storageStatus === 'warning') {
+                $status['storage']['message'] = 'Espacio en disco bajo: '.$usedPercentage.'% utilizado';
+            }
         } catch (\Exception $e) {
             $status['storage'] = [
                 'status' => 'error',

@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.1.7.2*
+- Correción de permisos en producción del log
+- Correción de version de php para github
+
 ## *v. 0.1.7.1*
 - Comando php artisan new-mango ahora registra usuarios
 

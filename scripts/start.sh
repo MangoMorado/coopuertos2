@@ -10,10 +10,31 @@ mkdir -p /app/public/uploads/carnets
 mkdir -p /app/public/storage/carnet_previews /app/public/storage/carnets
 mkdir -p /app/storage/app/carnets /app/storage/app/temp /app/storage/app/temp_imports /app/storage/app/public
 
-# Configurar permisos
-chmod -R 775 /app/storage /app/bootstrap/cache
-chmod -R 777 /app/public/uploads
+# Detectar usuario que ejecutará PHP (típicamente nobody o www-data en contenedores)
+PHP_USER="nobody"
+if id "www-data" &>/dev/null; then
+    PHP_USER="www-data"
+elif [ -n "$USER" ] && [ "$USER" != "root" ]; then
+    PHP_USER="$USER"
+fi
+
+# Intentar cambiar propietario de storage si tenemos permisos (fallback silencioso si falla)
+if [ "$(id -u)" = "0" ]; then
+    chown -R ${PHP_USER}:${PHP_USER} /app/storage /app/bootstrap/cache 2>/dev/null || true
+    chown -R ${PHP_USER}:${PHP_USER} /app/public/uploads /app/public/storage 2>/dev/null || true
+fi
+
+# Configurar permisos - storage/logs necesita permisos más permisivos para escritura
+chmod -R 777 /app/storage/logs 2>/dev/null || true
+chmod -R 775 /app/storage /app/bootstrap/cache 2>/dev/null || true
+chmod -R 777 /app/public/uploads 2>/dev/null || true
 chmod -R 777 /app/public/storage 2>/dev/null || true
+
+# Asegurar que el directorio de logs tenga permisos correctos
+# Si existe un archivo laravel.log con permisos incorrectos, intentar removerlo
+if [ -f /app/storage/logs/laravel.log ] && [ ! -w /app/storage/logs/laravel.log ]; then
+    rm -f /app/storage/logs/laravel.log 2>/dev/null || true
+fi
 
 # Configurar directorios de almacenamiento
 php /app/artisan storage:setup-directories 2>/dev/null || true

@@ -52,7 +52,7 @@ Fase 7: Tests y Performance
     - Implementar Eager Loading en relaciones para evitar N+1 queries
     - Revisar y optimizar consultas en controladores principales
     - Agregar índices en campos de búsqueda frecuentes
-  - Ampliar suite de tests
+  - ✅ Ampliar suite de tests
     - Tests funcionales para controladores principales
     - Tests de integración para generación de carnets
   - Documentación de código
@@ -77,3 +77,5 @@ Fase 8: MCP y Herramientas de IA
   - UX: Tutorial y documentación de uso de la App
 
 ---
+
+* Corregir exportación de excel de relevos
