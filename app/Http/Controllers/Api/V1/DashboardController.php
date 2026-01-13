@@ -11,9 +11,25 @@ use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 use Spatie\Permission\Models\Role;
 
+/**
+ * Controlador API para estadísticas y métricas del dashboard
+ *
+ * Proporciona endpoints para obtener estadísticas generales del sistema
+ * incluyendo conteos, distribuciones por tipo/estado/rol y próximos cumpleaños.
+ * Requiere autenticación mediante Laravel Sanctum.
+ */
 #[OA\Tag(name: 'Dashboard', description: 'Estadísticas y métricas del sistema')]
 class DashboardController extends Controller
 {
+    /**
+     * Obtiene estadísticas generales del sistema
+     *
+     * Retorna estadísticas agregadas de conductores (total, por tipo, próximos cumpleaños),
+     * vehículos (total, por tipo, por estado con porcentajes), propietarios (total, por tipo)
+     * y usuarios (total, por rol).
+     *
+     * @return JsonResponse Respuesta JSON con todas las estadísticas del sistema
+     */
     #[OA\Get(
         path: '/api/v1/dashboard/stats',
         summary: 'Obtener estadísticas',

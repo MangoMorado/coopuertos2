@@ -14,12 +14,30 @@ use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use ZipArchive;
 
+/**
+ * Controlador web para gestión de carnets
+ *
+ * Gestiona la generación masiva de carnets, personalización de plantillas,
+ * descarga de carnets generados y exportación de QRs. Utiliza jobs en cola
+ * para procesar generaciones grandes en segundo plano.
+ */
 class CarnetController extends Controller
 {
+    /**
+     * @param  CarnetTemplateService  $templateService  Servicio de gestión de plantillas de carnets
+     */
     public function __construct(
         protected CarnetTemplateService $templateService
     ) {}
 
+    /**
+     * Muestra la lista de carnets y plantilla activa
+     *
+     * Obtiene la plantilla activa y todos los conductores con sus asignaciones
+     * de vehículos para mostrar en la vista principal de carnets.
+     *
+     * @return \Illuminate\Contracts\View\View Vista de lista de carnets
+     */
     public function index()
     {
         $template = CarnetTemplate::where('activo', true)->first();
@@ -28,6 +46,15 @@ class CarnetController extends Controller
         return view('carnets.index', compact('template', 'conductores'));
     }
 
+    /**
+     * Muestra la página de exportación de carnets
+     *
+     * Si se proporciona un session_id, muestra el estado de esa generación.
+     * Si no, busca el último proceso de generación completado para mostrar.
+     *
+     * @param  Request  $request  Request HTTP con parámetro opcional 'session_id'
+     * @return \Illuminate\Contracts\View\View Vista de exportación de carnets
+     */
     public function exportar(Request $request)
     {
         $sessionId = $request->get('session_id');
@@ -49,7 +76,14 @@ class CarnetController extends Controller
     }
 
     /**
-     * Iniciar generación manual de carnets
+     * Inicia la generación manual masiva de carnets
+     *
+     * Verifica que haya una plantilla activa, obtiene los conductores a procesar
+     * (todos o los seleccionados), crea un CarnetGenerationLog y encola un job
+     * supervisor (ProcesarGeneracionCarnets) para procesar la generación en segundo plano.
+     *
+     * @param  Request  $request  Request HTTP con parámetro opcional 'conductor_ids' (array)
+     * @return \Illuminate\Http\RedirectResponse Redirección a la página de exportación
      */
     public function generar(Request $request)
     {
@@ -117,6 +151,14 @@ class CarnetController extends Controller
             ->with('success', 'Generación de carnets iniciada. El proceso se ejecutará en segundo plano.');
     }
 
+    /**
+     * Muestra la página de personalización de plantillas
+     *
+     * Obtiene la plantilla activa y las variables disponibles junto con su
+     * configuración para mostrar en el editor de plantillas.
+     *
+     * @return \Illuminate\Contracts\View\View Vista de personalización de plantillas
+     */
     public function personalizar()
     {
         $template = CarnetTemplate::where('activo', true)->first();
@@ -129,6 +171,16 @@ class CarnetController extends Controller
         return view('carnets.personalizar', compact('template', 'variables', 'variablesConfig'));
     }
 
+    /**
+     * Guarda una nueva plantilla de carnet
+     *
+     * Valida los datos, desactiva todas las plantillas anteriores, maneja
+     * la imagen de plantilla (nueva o mantiene la anterior), y crea una
+     * nueva plantilla activa con la configuración de variables.
+     *
+     * @param  Request  $request  Request HTTP con datos de la plantilla (nombre, imagen, variables_config)
+     * @return \Illuminate\Http\RedirectResponse Redirección a la lista de carnets
+     */
     public function guardarPlantilla(Request $request)
     {
         $validated = $request->validate([
@@ -200,6 +252,17 @@ class CarnetController extends Controller
         ]);
     }
 
+    /**
+     * Descarga el archivo ZIP de carnets generados
+     *
+     * Busca el archivo ZIP asociado a la sesión de generación, intentando
+     * primero la ruta del log y luego la ruta esperada. Actualiza el log
+     * si encuentra el archivo pero el log no tenía la ruta. El archivo no
+     * se elimina después de la descarga ya que los carnets se guardan permanentemente.
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de generación
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse Archivo ZIP o redirección con error
+     */
     public function descargarZip(string $sessionId)
     {
         $log = CarnetGenerationLog::where('session_id', $sessionId)->first();
@@ -271,7 +334,13 @@ class CarnetController extends Controller
     }
 
     /**
-     * Exportar todos los QRs de conductores en un ZIP
+     * Exporta todos los QRs de conductores en un archivo ZIP
+     *
+     * Genera códigos QR para todos los conductores (URL pública de cada conductor),
+     * los guarda como archivos SVG en un directorio temporal, crea un ZIP con todos
+     * los QRs y lo descarga. El directorio temporal se limpia después de la descarga.
+     *
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse Archivo ZIP o redirección con error
      */
     public function exportarQRs()
     {

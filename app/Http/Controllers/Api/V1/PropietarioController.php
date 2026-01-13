@@ -11,9 +11,24 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
+/**
+ * Controlador API para gestión de propietarios
+ *
+ * Proporciona endpoints RESTful para CRUD de propietarios y búsqueda.
+ * Todos los endpoints requieren autenticación mediante Laravel Sanctum.
+ */
 #[OA\Tag(name: 'Propietarios', description: 'Gestión de propietarios')]
 class PropietarioController extends Controller
 {
+    /**
+     * Lista propietarios con paginación y filtros opcionales
+     *
+     * Retorna una lista paginada de propietarios con búsqueda opcional por
+     * nombre completo, número de identificación, teléfono de contacto o correo electrónico.
+     *
+     * @param  Request  $request  Request HTTP con parámetros de búsqueda y paginación
+     * @return JsonResponse Respuesta JSON con lista paginada de propietarios
+     */
     #[OA\Get(
         path: '/api/v1/propietarios',
         summary: 'Listar propietarios',
@@ -76,6 +91,14 @@ class PropietarioController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Crea un nuevo propietario
+     *
+     * Crea un propietario con los datos validados.
+     *
+     * @param  StorePropietarioRequest  $request  Request con datos validados del propietario
+     * @return JsonResponse Respuesta JSON con el propietario creado (HTTP 201)
+     */
     public function store(StorePropietarioRequest $request): JsonResponse
     {
         $propietario = Propietario::create($request->validated());
@@ -102,6 +125,14 @@ class PropietarioController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Muestra la información de un propietario específico
+     *
+     * Retorna los datos completos de un propietario.
+     *
+     * @param  Propietario  $propietario  Propietario obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON con los datos del propietario
+     */
     public function show(Propietario $propietario): JsonResponse
     {
         return response()->json([
@@ -126,6 +157,15 @@ class PropietarioController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Actualiza la información de un propietario
+     *
+     * Actualiza los datos del propietario con los datos validados.
+     *
+     * @param  UpdatePropietarioRequest  $request  Request con datos validados del propietario
+     * @param  Propietario  $propietario  Propietario a actualizar obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON con el propietario actualizado
+     */
     public function update(UpdatePropietarioRequest $request, Propietario $propietario): JsonResponse
     {
         $propietario->update($request->validated());
@@ -152,6 +192,14 @@ class PropietarioController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Elimina un propietario del sistema
+     *
+     * Elimina permanentemente el propietario y todas sus relaciones asociadas.
+     *
+     * @param  Propietario  $propietario  Propietario a eliminar obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON confirmando la eliminación
+     */
     public function destroy(Propietario $propietario): JsonResponse
     {
         $propietario->delete();
@@ -176,6 +224,16 @@ class PropietarioController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Busca propietarios por término de búsqueda
+     *
+     * Realiza una búsqueda rápida de propietarios por nombre completo o
+     * número de identificación. Retorna máximo 10 resultados.
+     * Requiere mínimo 2 caracteres en el término de búsqueda.
+     *
+     * @param  Request  $request  Request HTTP con parámetro 'q' (término de búsqueda)
+     * @return JsonResponse Respuesta JSON con lista de propietarios encontrados (máximo 10)
+     */
     public function search(Request $request): JsonResponse
     {
         $query = $request->get('q', '');

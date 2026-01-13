@@ -10,20 +10,52 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Job para procesar importación de conductores en segundo plano
+ *
+ * Procesa archivos CSV/Excel de importación de conductores de manera asíncrona.
+ * Utiliza ImportLog para el seguimiento de progreso en lugar de sesión PHP.
+ * Aumenta límites de tiempo y memoria para manejar archivos grandes.
+ */
 class ProcesarImportacionConductores implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Identificador único de la sesión de importación
+     *
+     * @var string
+     */
     protected $sessionId;
 
+    /**
+     * Ruta relativa al archivo de importación en storage/app
+     *
+     * @var string
+     */
     protected $filePath;
 
+    /**
+     * Extensión del archivo ('csv' o 'xlsx')
+     *
+     * @var string
+     */
     protected $extension;
 
+    /**
+     * ID del usuario que inició la importación
+     *
+     * @var int
+     */
     protected $userId;
 
     /**
-     * Create a new job instance.
+     * Crea una nueva instancia del job
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @param  string  $filePath  Ruta relativa al archivo en storage/app
+     * @param  string  $extension  Extensión del archivo: 'csv' o 'xlsx'
+     * @param  int  $userId  ID del usuario que inició la importación
      */
     public function __construct(string $sessionId, string $filePath, string $extension, int $userId)
     {
@@ -37,7 +69,15 @@ class ProcesarImportacionConductores implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Ejecuta el job de importación
+     *
+     * Busca el ImportLog asociado, procesa el archivo usando ConductorImportService
+     * con useSession=false (para usar ImportLog), actualiza el estado del log
+     * y elimina el archivo temporal después de procesarlo.
+     *
+     * @param  ConductorImportService  $importService  Servicio de importación de conductores
+     *
+     * @throws \Exception Si no se encuentra el ImportLog, el archivo no existe o hay errores en el procesamiento
      */
     public function handle(ConductorImportService $importService): void
     {

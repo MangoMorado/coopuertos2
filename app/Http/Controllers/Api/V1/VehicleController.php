@@ -14,9 +14,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use OpenApi\Attributes as OA;
 
+/**
+ * Controlador API para gestión de vehículos
+ *
+ * Proporciona endpoints RESTful para CRUD de vehículos y búsqueda.
+ * Maneja la asignación/desasignación de conductores a vehículos.
+ * Todos los endpoints requieren autenticación mediante Laravel Sanctum.
+ */
 #[OA\Tag(name: 'Vehículos', description: 'Gestión de vehículos')]
 class VehicleController extends Controller
 {
+    /**
+     * Lista vehículos con paginación y filtros opcionales
+     *
+     * Retorna una lista paginada de vehículos con búsqueda opcional por
+     * placa, marca, modelo o nombre del propietario.
+     *
+     * @param  Request  $request  Request HTTP con parámetros de búsqueda y paginación
+     * @return JsonResponse Respuesta JSON con lista paginada de vehículos
+     */
     #[OA\Get(
         path: '/api/v1/vehiculos',
         summary: 'Listar vehículos',
@@ -79,6 +95,15 @@ class VehicleController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Crea un nuevo vehículo
+     *
+     * Crea un vehículo con los datos validados. La placa se convierte a mayúsculas.
+     * Si se proporciona conductor_id, se asigna automáticamente al vehículo.
+     *
+     * @param  StoreVehicleRequest  $request  Request con datos validados del vehículo
+     * @return JsonResponse Respuesta JSON con el vehículo creado (HTTP 201)
+     */
     public function store(StoreVehicleRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -119,6 +144,14 @@ class VehicleController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Muestra la información de un vehículo específico
+     *
+     * Retorna los datos completos de un vehículo incluyendo su conductor asignado.
+     *
+     * @param  Vehicle  $vehicle  Vehículo obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON con los datos del vehículo
+     */
     public function show(Vehicle $vehicle): JsonResponse
     {
         $vehicle->load('conductor');
@@ -145,6 +178,18 @@ class VehicleController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Actualiza la información de un vehículo
+     *
+     * Actualiza los datos del vehículo. Si se cambia el conductor_id,
+     * desactiva la asignación anterior y crea/actualiza la nueva asignación
+     * en ConductorVehicle, asegurando que un conductor solo tenga un vehículo activo.
+     * La placa se convierte a mayúsculas.
+     *
+     * @param  UpdateVehicleRequest  $request  Request con datos validados del vehículo
+     * @param  Vehicle  $vehicle  Vehículo a actualizar obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON con el vehículo actualizado
+     */
     public function update(UpdateVehicleRequest $request, Vehicle $vehicle): JsonResponse
     {
         $data = $request->validated();
@@ -217,6 +262,14 @@ class VehicleController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Elimina un vehículo del sistema
+     *
+     * Elimina permanentemente el vehículo y todas sus relaciones asociadas.
+     *
+     * @param  Vehicle  $vehicle  Vehículo a eliminar obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON confirmando la eliminación
+     */
     public function destroy(Vehicle $vehicle): JsonResponse
     {
         $vehicle->delete();
@@ -241,6 +294,15 @@ class VehicleController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Busca vehículos por término de búsqueda
+     *
+     * Realiza una búsqueda rápida de vehículos por placa, marca o modelo.
+     * Retorna máximo 10 resultados. Requiere mínimo 2 caracteres en el término de búsqueda.
+     *
+     * @param  Request  $request  Request HTTP con parámetro 'q' (término de búsqueda)
+     * @return JsonResponse Respuesta JSON con lista de vehículos encontrados (máximo 10)
+     */
     public function search(Request $request): JsonResponse
     {
         $query = $request->get('q', '');

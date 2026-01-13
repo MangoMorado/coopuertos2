@@ -5,10 +5,26 @@ namespace App\Services\ConductorImport;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Validator;
 
+/**
+ * Validador de archivos para importación de conductores
+ *
+ * Valida que los archivos subidos cumplan con los requisitos de formato (CSV, XLS, XLSX),
+ * tamaño máximo y tipos MIME permitidos antes de procesarlos.
+ */
 class ConductorImportFileValidator
 {
     /**
-     * Validar archivo de importación
+     * Valida un archivo subido para importación de conductores
+     *
+     * Verifica el formato (CSV, XLS, XLSX), tamaño máximo (10MB) y tipo MIME del archivo.
+     * Para archivos CSV es más flexible con los tipos MIME debido a las variaciones entre sistemas.
+     *
+     * @param  UploadedFile  $file  Archivo subido a validar
+     * @return array{
+     *     valid: bool,
+     *     extension?: string,
+     *     errors?: \Illuminate\Support\MessageBag
+     * }
      */
     public function validate(UploadedFile $file): array
     {

@@ -7,9 +7,29 @@ use App\Services\HealthCheckService;
 use Illuminate\Http\JsonResponse;
 use OpenApi\Attributes as OA;
 
+/**
+ * Controlador API para estado de salud del sistema
+ *
+ * Proporciona endpoints públicos para verificar el estado de salud del sistema
+ * incluyendo base de datos, colas, almacenamiento, extensiones PHP y versiones.
+ * Este endpoint es público y no requiere autenticación.
+ */
 #[OA\Tag(name: 'Health', description: 'Estado de salud del sistema')]
 class HealthController extends Controller
 {
+    /**
+     * Obtiene el estado de salud completo del sistema
+     *
+     * Retorna información detallada sobre el estado de salud del sistema:
+     * - Base de datos: estado de conexión
+     * - Colas: trabajos pendientes y fallidos
+     * - Almacenamiento: espacio total, usado, libre y porcentaje
+     * - Extensiones PHP: estado de cada extensión requerida
+     * - Versiones: PHP y Laravel
+     *
+     * @param  HealthCheckService  $healthCheckService  Servicio de verificación de salud
+     * @return JsonResponse Respuesta JSON con el estado de salud completo
+     */
     #[OA\Get(
         path: '/api/v1/health',
         summary: 'Obtener estado de salud del sistema',

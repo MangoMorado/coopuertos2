@@ -7,8 +7,20 @@ use App\Models\Conductor;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Servicio de generación de carnets para conductores
+ *
+ * Genera carnets en formato PNG (previsualización) y PDF (final) para conductores.
+ * Renderiza variables personalizables sobre plantillas de imagen, incluyendo texto,
+ * fotos y códigos QR. Maneja la conversión de formatos de imagen y PDF.
+ */
 class CarnetGeneratorService
 {
+    /**
+     * @param  ImageProcessorService  $imageProcessor  Procesador de imágenes
+     * @param  FontManager  $fontManager  Gestor de fuentes
+     * @param  CarnetPdfConverter  $pdfConverter  Convertidor PNG a PDF
+     */
     public function __construct(
         protected ImageProcessorService $imageProcessor,
         protected FontManager $fontManager,
@@ -17,6 +29,17 @@ class CarnetGeneratorService
 
     /**
      * Genera una imagen PNG del carnet (sin convertir a PDF) para previsualización
+     *
+     * Crea una imagen PNG del carnet renderizando todas las variables configuradas
+     * sobre la plantilla. Incluye texto, foto del conductor y código QR. Crea y
+     * limpia automáticamente directorios temporales para recursos del QR.
+     *
+     * @param  Conductor  $conductor  Conductor para el cual generar el carnet
+     * @param  CarnetTemplate  $template  Plantilla de carnet a utilizar
+     * @param  string  $outputPath  Ruta completa donde guardar la imagen PNG generada
+     * @return string Ruta completa del archivo PNG generado (igual a $outputPath)
+     *
+     * @throws \Exception Si no se puede cargar la plantilla o renderizar las variables
      */
     public function generarCarnetImagen(Conductor $conductor, CarnetTemplate $template, string $outputPath): string
     {
@@ -64,6 +87,17 @@ class CarnetGeneratorService
 
     /**
      * Genera un PDF de carnet para un conductor
+     *
+     * Crea una imagen PNG del carnet, la convierte a PDF y la guarda en el directorio
+     * temporal. Si la conversión a PDF falla, retorna el PNG como fallback. Elimina
+     * automáticamente el PNG intermedio después de la conversión exitosa.
+     *
+     * @param  Conductor  $conductor  Conductor para el cual generar el carnet
+     * @param  CarnetTemplate  $template  Plantilla de carnet a utilizar
+     * @param  string  $tempDir  Directorio temporal donde guardar el PDF generado
+     * @return string Ruta completa del archivo PDF generado
+     *
+     * @throws \Exception Si no se puede generar la imagen PNG o cargar la plantilla
      */
     public function generarCarnetPDF(Conductor $conductor, CarnetTemplate $template, string $tempDir): string
     {
@@ -104,7 +138,14 @@ class CarnetGeneratorService
     }
 
     /**
-     * Prepara los datos del conductor para el carnet
+     * Prepara los datos del conductor en formato para renderizar en el carnet
+     *
+     * Transforma los datos del conductor y su vehículo asignado en un array
+     * estructurado con todos los campos disponibles para renderizar en la plantilla.
+     * Incluye información del vehículo activo, foto en base64, y URL del código QR.
+     *
+     * @param  Conductor  $conductor  Conductor del cual extraer los datos
+     * @return array<string, mixed> Array con todos los datos disponibles para el carnet (nombres, cedula, vehiculo, qr_code, etc.)
      */
     protected function prepararDatosConductor(Conductor $conductor): array
     {
@@ -139,7 +180,16 @@ class CarnetGeneratorService
     }
 
     /**
-     * Carga la imagen de plantilla
+     * Carga la imagen de plantilla como recurso GD
+     *
+     * Carga la imagen de plantilla desde el directorio público y la convierte
+     * a un recurso GD (GdImage). Soporta múltiples formatos: JPEG, PNG, GIF y SVG.
+     * Los SVG se procesan mediante ImageProcessorService.
+     *
+     * @param  CarnetTemplate  $template  Plantilla de carnet con la ruta de la imagen
+     * @return \GdImage Recurso GD de la imagen de plantilla
+     *
+     * @throws \Exception Si no se encuentra la imagen, no se puede leer o el formato no es soportado
      */
     protected function cargarImagenPlantilla(CarnetTemplate $template)
     {
@@ -175,7 +225,19 @@ class CarnetGeneratorService
     }
 
     /**
-     * Renderiza las variables sobre la imagen del carnet
+     * Renderiza todas las variables configuradas sobre la imagen del carnet
+     *
+     * Itera sobre la configuración de variables y renderiza cada una según su tipo:
+     * - Foto: Renderiza la foto del conductor desde base64
+     * - QR Code: Genera y renderiza el código QR
+     * - Texto: Renderiza campos de texto con formato personalizado
+     *
+     * @param  \GdImage  $templateImage  Recurso GD de la imagen de plantilla
+     * @param  array<string, array<string, mixed>>  $variablesConfig  Configuración de variables desde la plantilla (x, y, activo, size, etc.)
+     * @param  array<string, mixed>  $datosConductor  Datos del conductor (retornado por prepararDatosConductor)
+     * @param  Conductor  $conductor  Conductor para generar QR y logs
+     * @param  string  $tempDir  Directorio temporal para recursos del QR
+     * @param  int  $width  Ancho de la imagen de plantilla (para centrado de texto)
      */
     protected function renderizarVariables($templateImage, array $variablesConfig, array $datosConductor, Conductor $conductor, string $tempDir, int $width): void
     {

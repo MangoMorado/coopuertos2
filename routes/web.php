@@ -5,6 +5,7 @@ use App\Http\Controllers\ConductorController;
 use App\Http\Controllers\ConductorImportController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DocumentacionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\UserController;
@@ -105,6 +106,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/configuracion', [ConfiguracionController::class, 'index'])->name('configuracion.index');
         Route::put('/configuracion', [ConfiguracionController::class, 'update'])->name('configuracion.update');
     });
+
+    // Documentación (solo para rol Mango - verificación en controlador)
+    Route::get('/documentacion', [DocumentacionController::class, 'index'])->name('documentacion.index');
+    Route::get('/documentacion/asset/{path?}', [DocumentacionController::class, 'asset'])
+        ->where('path', '.*')
+        ->name('documentacion.asset');
 });
 
 // Rutas de autenticación generadas por Laravel Breeze/Jetstream

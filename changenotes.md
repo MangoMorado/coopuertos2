@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.2*
+- Implementación de documentación PHPDoc: Documentación PHPDoc completa en servicios de importación, servicios de carnets, jobs en cola, controladores API, controladores web, modelos y relaciones, helpers y utilidades, y sistema de generación de documentación HTML. Instalado phpDocumentor/shim, comando Artisan `docs:generate`, controlador DocumentacionController, item "Documentación" en navbar (solo rol Mango), integración en start.sh con generación automática y configuración de permisos
+
 ## *v. 0.1.9.1*
 - Corrección de error en GitHub Actions workflow lint.yml: Agregado script "format" faltante en package.json
 - Configuración de formateo frontend: Instalado Prettier (^3.7.4) como dependencia de desarrollo, agregados scripts "format" (formatear) y "lint" (verificar formato) en package.json, creado archivo de configuración .prettierrc.json con reglas de formato estándar

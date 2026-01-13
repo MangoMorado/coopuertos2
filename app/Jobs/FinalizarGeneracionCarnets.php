@@ -12,14 +12,26 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use ZipArchive;
 
+/**
+ * Job para finalizar generación masiva de carnets y crear archivo ZIP
+ *
+ * Crea un archivo ZIP con todos los carnets PDF generados, lo guarda en
+ * public/storage/carnets, actualiza el CarnetGenerationLog como completado
+ * y limpia ZIPs antiguos manteniendo solo los 2 más recientes.
+ */
 class FinalizarGeneracionCarnets implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Identificador único de la sesión de generación
+     */
     protected string $sessionId;
 
     /**
-     * Create a new job instance.
+     * Crea una nueva instancia del job de finalización
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de generación
      */
     public function __construct(string $sessionId)
     {
@@ -28,7 +40,15 @@ class FinalizarGeneracionCarnets implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Ejecuta el job de finalización y empaquetado
+     *
+     * Busca el CarnetGenerationLog, obtiene todos los conductores con carnets
+     * generados, crea un archivo ZIP con todos los PDFs, lo guarda en
+     * public/storage/carnets, actualiza el log como completado y limpia
+     * ZIPs antiguos. Aumenta límites de memoria y tiempo para procesar
+     * muchos archivos.
+     *
+     * @throws \Exception Si no se encuentra el log, no hay carnets para comprimir o hay errores al crear el ZIP
      */
     public function handle(): void
     {
@@ -124,7 +144,11 @@ class FinalizarGeneracionCarnets implements ShouldQueue
     }
 
     /**
-     * Limpiar ZIPs viejos, manteniendo solo los 2 más recientes
+     * Limpia ZIPs antiguos, manteniendo solo los 2 más recientes
+     *
+     * Obtiene todos los archivos ZIP del directorio de carnets, los ordena
+     * por fecha de modificación (más recientes primero) y elimina todos
+     * excepto los 2 más nuevos para evitar acumulación excesiva de archivos.
      */
     protected function limpiarZipsViejos(): void
     {

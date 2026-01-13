@@ -1,4 +1,4 @@
-# Configuración completa de Nixpacks para Coopuertos
+# Configuración completa de Nixpacks para Coopuertos App
 
 [phases.setup]
 nixPkgs = [

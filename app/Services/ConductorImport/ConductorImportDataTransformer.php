@@ -4,14 +4,31 @@ namespace App\Services\ConductorImport;
 
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
+/**
+ * Transformador de datos para importación de conductores
+ *
+ * Transforma filas de datos CSV/Excel en arrays estructurados para crear conductores.
+ * Maneja normalización de campos, validación de tipos, conversión de fechas y descarga de imágenes.
+ */
 class ConductorImportDataTransformer
 {
+    /**
+     * @param  GoogleDriveImageDownloader  $imageDownloader  Descargador de imágenes desde Google Drive
+     */
     public function __construct(
         private GoogleDriveImageDownloader $imageDownloader
     ) {}
 
     /**
-     * Transformar fila de datos a array de datos de conductor
+     * Transforma una fila de datos en un array estructurado para crear un conductor
+     *
+     * Normaliza y transforma los datos según el tipo de campo: nombres/apellidos (capitalización),
+     * tipos de conductor (A/B), grupos sanguíneos (RH), fechas (múltiples formatos), emails (validación),
+     * y maneja la lógica de relevo (conductor sin vehículo asignado).
+     *
+     * @param  array<int, mixed>  $row  Fila de datos del archivo (array indexado)
+     * @param  array<string, int>  $indexMap  Mapeo de campos a índices de columna (ej: ['nombres' => 0, 'cedula' => 1])
+     * @return array<string, mixed> Array de datos del conductor listo para crear (ej: ['nombres' => 'Juan', 'cedula' => '123456'])
      */
     public function transformRow(array $row, array $indexMap): array
     {
@@ -143,7 +160,12 @@ class ConductorImportDataTransformer
     }
 
     /**
-     * Obtener mapeo de columnas estándar
+     * Obtiene el mapeo estándar de nombres de columnas a campos de conductor
+     *
+     * Retorna un array asociativo que mapea diferentes variantes de nombres de columnas
+     * (con/sin acentos, mayúsculas/minúsculas) a los nombres de campos internos del modelo Conductor.
+     *
+     * @return array<string, string> Mapeo de nombres de columnas a campos (ej: ['NOMBRES' => 'nombres', 'CEDULA' => 'cedula'])
      */
     public function getColumnMapping(): array
     {
@@ -185,7 +207,14 @@ class ConductorImportDataTransformer
     }
 
     /**
-     * Crear mapeo de índices desde headers
+     * Crea un mapeo de campos a índices de columnas basado en los headers del archivo
+     *
+     * Compara los headers del archivo con el mapeo de columnas estándar y crea un índice
+     * que relaciona cada campo con su posición en el array de datos de la fila.
+     *
+     * @param  array<int, string>  $headers  Headers del archivo (array indexado)
+     * @param  array<string, string>  $columnMapping  Mapeo de columnas estándar (retornado por getColumnMapping)
+     * @return array<string, int> Mapeo de campos a índices (ej: ['nombres' => 0, 'cedula' => 2])
      */
     public function createIndexMap(array $headers, array $columnMapping): array
     {
@@ -203,7 +232,18 @@ class ConductorImportDataTransformer
     }
 
     /**
-     * Validar columnas requeridas
+     * Valida que las columnas requeridas estén presentes en el archivo
+     *
+     * Verifica que las columnas esenciales (nombres, apellidos, cedula) estén presentes
+     * en el archivo. Retorna información detallada sobre las columnas faltantes si las hay.
+     *
+     * @param  array<string, int>  $indexMap  Mapeo de campos a índices (retornado por createIndexMap)
+     * @param  array<int, string>  $headers  Headers del archivo (opcional, solo para mensajes de error)
+     * @return array{
+     *     valid: bool,
+     *     missing?: array<int, string>,
+     *     found?: string
+     * }
      */
     public function validateRequiredFields(array $indexMap, array $headers = []): array
     {

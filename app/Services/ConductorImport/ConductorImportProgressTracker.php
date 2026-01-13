@@ -5,10 +5,23 @@ namespace App\Services\ConductorImport;
 use App\Models\ImportLog;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Seguimiento de progreso para importación de conductores
+ *
+ * Maneja la actualización de progreso usando sesión PHP (para controladores web)
+ * o ImportLog en base de datos (para jobs en cola). Mantiene logs limitados para
+ * evitar consumo excesivo de memoria/almacenamiento.
+ */
 class ConductorImportProgressTracker
 {
     /**
-     * Actualizar progreso usando sesión (para controlador)
+     * Actualiza el progreso usando sesión PHP (para controladores web)
+     *
+     * Actualiza el progreso de la importación en la sesión PHP. Mantiene un máximo
+     * de 50 logs para evitar consumo excesivo de memoria en sesiones.
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @param  array<string, mixed>  $datos  Datos del progreso a actualizar (estado, progreso, mensaje, log, etc.)
      */
     public function updateSessionProgress(string $sessionId, array $datos): void
     {
@@ -41,7 +54,13 @@ class ConductorImportProgressTracker
     }
 
     /**
-     * Actualizar progreso usando ImportLog (para Job)
+     * Actualiza el progreso usando ImportLog en base de datos (para jobs en cola)
+     *
+     * Actualiza el progreso de la importación en el modelo ImportLog. Mantiene un máximo
+     * de 200 logs para permitir más información de debug en procesos asíncronos.
+     *
+     * @param  ImportLog  $importLog  Modelo ImportLog a actualizar
+     * @param  array<string, mixed>  $datos  Datos del progreso a actualizar (estado, progreso, mensaje, logs, etc.)
      */
     public function updateImportLog(ImportLog $importLog, array $datos): void
     {
@@ -60,7 +79,14 @@ class ConductorImportProgressTracker
     }
 
     /**
-     * Agregar log al ImportLog
+     * Agrega un log individual al ImportLog
+     *
+     * Añade un nuevo log al registro de importación con timestamp. Mantiene un máximo
+     * de 200 logs eliminando los más antiguos si se excede el límite.
+     *
+     * @param  ImportLog  $importLog  Modelo ImportLog al que agregar el log
+     * @param  string  $mensaje  Mensaje del log
+     * @param  string  $tipo  Tipo de log: 'info', 'success', 'warning', 'error' (default: 'info')
      */
     public function addLog(ImportLog $importLog, string $mensaje, string $tipo = 'info'): void
     {

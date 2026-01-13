@@ -5,15 +5,43 @@ namespace App\Services\ConductorImport;
 use App\Models\ImportLog;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Servicio principal para procesar importación de conductores desde archivos CSV o Excel
+ *
+ * Coordina el flujo de importación, delegando el procesamiento específico de archivos
+ * a ConductorImportFileProcessor y el seguimiento de progreso a ConductorImportProgressTracker.
+ */
 class ConductorImportService
 {
+    /**
+     * @param  ConductorImportFileProcessor  $fileProcessor  Procesador de archivos CSV/Excel
+     * @param  ConductorImportProgressTracker  $progressTracker  Seguimiento de progreso
+     */
     public function __construct(
         private ConductorImportFileProcessor $fileProcessor,
         private ConductorImportProgressTracker $progressTracker
     ) {}
 
     /**
-     * Procesar archivo de importación
+     * Procesa un archivo de importación de conductores (CSV o Excel)
+     *
+     * Este método es el punto de entrada principal para la importación. Maneja la validación
+     * del archivo, determina la estrategia de procesamiento según el tipo y tamaño del archivo,
+     * y coordina el flujo de importación. Aumenta automáticamente los límites de tiempo y memoria
+     * para manejar archivos grandes.
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @param  string  $filePath  Ruta relativa o absoluta al archivo a procesar
+     * @param  string  $extension  Extensión del archivo: 'csv' o 'xlsx'
+     * @param  bool  $useSession  Si es true, usa sesión PHP para el progreso; si es false, usa ImportLog en BD
+     * @return array{
+     *     importados: int,
+     *     duplicados: int,
+     *     errores: array<int, string>,
+     *     total: int
+     * }
+     *
+     * @throws \Exception Si el archivo no existe o no se puede procesar
      */
     public function processFile(
         string $sessionId,
@@ -69,7 +97,20 @@ class ConductorImportService
     }
 
     /**
-     * Procesar archivo CSV
+     * Procesa un archivo CSV de conductores
+     *
+     * Delega el procesamiento al ConductorImportFileProcessor usando el método optimizado
+     * que procesa línea por línea para manejar archivos grandes eficientemente.
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @param  string  $fullPath  Ruta completa al archivo CSV
+     * @param  bool  $useSession  Si es true, usa sesión PHP; si es false, usa ImportLog
+     * @return array{
+     *     importados: int,
+     *     duplicados: int,
+     *     errores: array<int, string>,
+     *     total: int
+     * }
      */
     private function processCsvFile(string $sessionId, string $fullPath, bool $useSession): array
     {
@@ -87,7 +128,22 @@ class ConductorImportService
     }
 
     /**
-     * Procesar archivo Excel
+     * Procesa un archivo Excel de conductores
+     *
+     * Delega el procesamiento al ConductorImportFileProcessor. El parámetro $optimized
+     * se usa solo para mostrar advertencias al usuario, pero el procesamiento real
+     * siempre usa el método estándar de Excel (carga todo en memoria).
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @param  string  $fullPath  Ruta completa al archivo Excel
+     * @param  bool  $useSession  Si es true, usa sesión PHP; si es false, usa ImportLog
+     * @param  bool  $optimized  Indica si el archivo es grande (>10MB), solo para mostrar advertencias
+     * @return array{
+     *     importados: int,
+     *     duplicados: int,
+     *     errores: array<int, string>,
+     *     total: int
+     * }
      */
     private function processExcelFile(string $sessionId, string $fullPath, bool $useSession, bool $optimized): array
     {
@@ -113,7 +169,13 @@ class ConductorImportService
     }
 
     /**
-     * Resolver ruta completa del archivo
+     * Resuelve la ruta completa del archivo
+     *
+     * Convierte rutas relativas a rutas absolutas dentro del directorio storage/app.
+     * Si la ruta ya es absoluta o ya incluye storage/app, la retorna sin modificar.
+     *
+     * @param  string  $filePath  Ruta relativa o absoluta del archivo
+     * @return string Ruta absoluta completa del archivo
      */
     private function resolveFullPath(string $filePath): string
     {
@@ -134,7 +196,15 @@ class ConductorImportService
     }
 
     /**
-     * Actualizar progreso usando sesión o ImportLog
+     * Actualiza el progreso de la importación
+     *
+     * Actualiza el progreso usando sesión PHP o ImportLog en base de datos según
+     * el parámetro $useSession. Convierte automáticamente la clave 'log' a 'logs'
+     * cuando se usa ImportLog para mantener compatibilidad con el modelo.
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @param  bool  $useSession  Si es true, usa sesión PHP; si es false, usa ImportLog
+     * @param  array<string, mixed>  $data  Datos del progreso a actualizar (estado, progreso, mensaje, log, etc.)
      */
     private function updateProgress(string $sessionId, bool $useSession, array $data): void
     {

@@ -6,12 +6,31 @@ use App\Models\CarnetTemplate;
 use App\Models\Conductor;
 use Illuminate\Support\Facades\File;
 
+/**
+ * Servicio de verificación de carnets de conductores
+ *
+ * Verifica el estado de los carnets generados, identifica conductores sin carnet,
+ * archivos faltantes y carnets que necesitan regeneración por cambios en la plantilla.
+ */
 class CarnetVerificationService
 {
     /**
      * Verifica qué conductores necesitan regenerar su carnet
      *
-     * @return array Array con información de qué regenerar
+     * Analiza todos los conductores y determina cuáles no tienen carnet, cuáles
+     * tienen archivos faltantes o necesitan regeneración por cambios en la plantilla.
+     * Compara fechas de modificación de archivos con fechas de actualización de plantilla.
+     *
+     * @return array{
+     *     hay_plantilla: bool,
+     *     template_id?: int,
+     *     template_hash?: string,
+     *     conductores_sin_carnet: array<int, Conductor>,
+     *     conductores_con_archivo_faltante: array<int, Conductor>,
+     *     total_necesitan_generacion: int,
+     *     total_conductores: int,
+     *     total_con_carnet_valido: int
+     * }
      */
     public function verificarCarnetsFaltantes(): array
     {
@@ -109,6 +128,13 @@ class CarnetVerificationService
 
     /**
      * Verifica si un archivo de carnet existe y es válido
+     *
+     * Verifica que el conductor tenga una ruta de carnet configurada, que el archivo
+     * exista físicamente, que no esté vacío, que tenga extensión PDF y que el
+     * archivo empiece con el header PDF válido (%PDF).
+     *
+     * @param  Conductor  $conductor  Conductor a verificar
+     * @return bool True si el carnet existe y es válido, false en caso contrario
      */
     public function carnetExisteYEsValido(Conductor $conductor): bool
     {
@@ -144,7 +170,10 @@ class CarnetVerificationService
     /**
      * Obtiene todos los conductores que necesitan regenerar su carnet
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * Utiliza verificarCarnetsFaltantes() para obtener los conductores sin carnet
+     * y con archivos faltantes, luego retorna una colección Eloquent con esos conductores.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Conductor> Colección de conductores que necesitan regeneración
      */
     public function obtenerConductoresQueNecesitanRegeneracion()
     {

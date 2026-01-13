@@ -11,9 +11,25 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes as OA;
 
+/**
+ * Controlador API para gestión de conductores
+ *
+ * Proporciona endpoints RESTful para CRUD de conductores, búsqueda avanzada
+ * y visualización pública mediante UUID. Todos los endpoints (excepto publicShow)
+ * requieren autenticación mediante Laravel Sanctum.
+ */
 #[OA\Tag(name: 'Conductores', description: 'Gestión de conductores')]
 class ConductorController extends Controller
 {
+    /**
+     * Lista conductores con paginación y filtros opcionales
+     *
+     * Retorna una lista paginada de conductores con búsqueda opcional por
+     * cédula, nombres, apellidos, número interno, celular o correo.
+     *
+     * @param  Request  $request  Request HTTP con parámetros de búsqueda y paginación
+     * @return JsonResponse Respuesta JSON con lista paginada de conductores
+     */
     #[OA\Get(
         path: '/api/v1/conductores',
         summary: 'Listar conductores',
@@ -78,6 +94,15 @@ class ConductorController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Crea un nuevo conductor
+     *
+     * Crea un conductor con los datos validados. Si el correo está vacío,
+     * se establece como 'No tiene'.
+     *
+     * @param  StoreConductorRequest  $request  Request con datos validados del conductor
+     * @return JsonResponse Respuesta JSON con el conductor creado (HTTP 201)
+     */
     public function store(StoreConductorRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -110,6 +135,15 @@ class ConductorController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Muestra la información de un conductor específico
+     *
+     * Retorna los datos completos de un conductor incluyendo su asignación
+     * activa de vehículo.
+     *
+     * @param  Conductor  $conductor  Conductor obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON con los datos del conductor
+     */
     public function show(Conductor $conductor): JsonResponse
     {
         $conductor->load('asignacionActiva.vehicle');
@@ -136,6 +170,16 @@ class ConductorController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Actualiza la información de un conductor
+     *
+     * Actualiza los datos del conductor con los datos validados. Si el correo
+     * está vacío, se establece como 'No tiene'.
+     *
+     * @param  UpdateConductorRequest  $request  Request con datos validados del conductor
+     * @param  Conductor  $conductor  Conductor a actualizar obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON con el conductor actualizado
+     */
     public function update(UpdateConductorRequest $request, Conductor $conductor): JsonResponse
     {
         $data = $request->validated();
@@ -169,6 +213,14 @@ class ConductorController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Elimina un conductor del sistema
+     *
+     * Elimina permanentemente el conductor y todas sus relaciones asociadas.
+     *
+     * @param  Conductor  $conductor  Conductor a eliminar obtenido mediante route model binding
+     * @return JsonResponse Respuesta JSON confirmando la eliminación
+     */
     public function destroy(Conductor $conductor): JsonResponse
     {
         $conductor->delete();
@@ -193,6 +245,16 @@ class ConductorController extends Controller
             new OA\Response(response: 401, description: 'No autenticado'),
         ]
     )]
+    /**
+     * Busca conductores por término de búsqueda
+     *
+     * Realiza una búsqueda rápida de conductores por cédula, nombres,
+     * apellidos o número interno. Retorna máximo 10 resultados.
+     * Requiere mínimo 2 caracteres en el término de búsqueda.
+     *
+     * @param  Request  $request  Request HTTP con parámetro 'q' (término de búsqueda)
+     * @return JsonResponse Respuesta JSON con lista de conductores encontrados (máximo 10)
+     */
     public function search(Request $request): JsonResponse
     {
         $query = $request->get('q', '');
@@ -233,6 +295,18 @@ class ConductorController extends Controller
             new OA\Response(response: 404, description: 'Conductor no encontrado'),
         ]
     )]
+    /**
+     * Muestra información pública de un conductor por UUID
+     *
+     * Endpoint público (sin autenticación) que permite acceder a la información
+     * de un conductor mediante su UUID. Útil para compartir información de forma
+     * pública sin exponer IDs internos.
+     *
+     * @param  string  $uuid  UUID del conductor
+     * @return JsonResponse Respuesta JSON con los datos públicos del conductor
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si el conductor no existe
+     */
     public function publicShow(string $uuid): JsonResponse
     {
         $conductor = Conductor::where('uuid', $uuid)

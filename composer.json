@@ -16,6 +16,7 @@
         "laravel/sanctum": "*",
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
+        "phpdocumentor/shim": "^3.9",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^6.24"
     },
@@ -64,6 +65,9 @@
         "dev:queue": [
             "php artisan queue:work --queue=importaciones,carnets --tries=3"
         ],
+        "docs:generate": [
+            "@php artisan docs:generate"
+        ],
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
@@ -103,7 +107,8 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "phpdocumentor/shim": true
         }
     },
     "minimum-stability": "stable",

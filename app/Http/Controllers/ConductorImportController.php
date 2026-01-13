@@ -11,13 +11,32 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+/**
+ * Controlador web para importación de conductores
+ *
+ * Gestiona la importación de conductores desde archivos CSV/Excel mediante
+ * formularios web y seguimiento de progreso mediante ImportLog. Utiliza
+ * jobs en cola para procesar importaciones grandes en segundo plano.
+ */
 class ConductorImportController extends Controller
 {
+    /**
+     * @param  ConductorImportFileValidator  $fileValidator  Validador de archivos de importación
+     * @param  ConductorImportProgressTracker  $progressTracker  Seguimiento de progreso de importaciones
+     */
     public function __construct(
         private ConductorImportFileValidator $fileValidator,
         private ConductorImportProgressTracker $progressTracker
     ) {}
 
+    /**
+     * Muestra el formulario de importación de conductores
+     *
+     * Si hay una sesión de importación activa, carga el ImportLog asociado
+     * para mostrar el estado de la última importación.
+     *
+     * @return \Illuminate\Contracts\View\View Vista del formulario de importación
+     */
     public function showImportForm()
     {
         $importSessionId = session('import_session_id');
@@ -35,6 +54,20 @@ class ConductorImportController extends Controller
         ]);
     }
 
+    /**
+     * Inicia el proceso de importación de conductores
+     *
+     * Valida el archivo CSV/Excel, lo guarda temporalmente, crea un ImportLog
+     * en base de datos y encola un job (ProcesarImportacionConductores) para
+     * procesar la importación en segundo plano. Aumenta el tiempo de ejecución
+     * para archivos grandes. Retorna respuesta JSON si es petición AJAX o
+     * redirige si es petición HTTP tradicional.
+     *
+     * @param  Request  $request  Request HTTP con el archivo a importar
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse Respuesta JSON o redirección
+     *
+     * @throws \Exception Si hay errores al guardar el archivo o crear el registro
+     */
     public function import(Request $request)
     {
         // Aumentar tiempo de ejecución para importaciones grandes
@@ -141,6 +174,15 @@ class ConductorImportController extends Controller
         }
     }
 
+    /**
+     * Obtiene el progreso de una importación en curso
+     *
+     * Retorna el estado actual de la importación incluyendo progreso, totales,
+     * errores, logs, tiempo transcurrido y tiempo estimado restante.
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el estado de la importación
+     */
     public function obtenerProgreso($sessionId)
     {
         try {

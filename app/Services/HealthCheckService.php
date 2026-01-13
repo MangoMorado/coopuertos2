@@ -4,8 +4,27 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Servicio para verificar el estado de salud del sistema
+ *
+ * Proporciona métodos para verificar el estado de diversos componentes
+ * del sistema: base de datos, colas, almacenamiento, extensiones PHP
+ * y versiones. Utilizado por endpoints de health check y configuración.
+ */
 class HealthCheckService
 {
+    /**
+     * Obtiene el estado completo de salud del sistema
+     *
+     * Verifica y retorna el estado de:
+     * - Base de datos: conexión y estado
+     * - Colas: trabajos pendientes y fallidos
+     * - Almacenamiento: espacio total, usado, libre y porcentaje
+     * - Versiones: PHP y Laravel
+     * - Extensiones PHP: estado de cada extensión requerida
+     *
+     * @return array<string, mixed> Array con el estado de salud completo del sistema
+     */
     public function getHealthStatus(): array
     {
         $status = [];
@@ -125,6 +144,16 @@ class HealthCheckService
         ];
     }
 
+    /**
+     * Formatea bytes en unidades legibles (B, KB, MB, GB, TB)
+     *
+     * Convierte un número de bytes en una cadena formateada con la unidad
+     * apropiada según el tamaño.
+     *
+     * @param  int  $bytes  Número de bytes a formatear
+     * @param  int  $precision  Número de decimales (por defecto 2)
+     * @return string Bytes formateados con unidad (ej: "1.5 GB")
+     */
     private function formatBytes(int $bytes, int $precision = 2): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];

@@ -11,22 +11,52 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Job supervisor para procesar generación masiva de carnets
+ *
+ * Coordina la generación masiva de carnets encolando trabajos individuales
+ * (GenerarCarnetJob) para cada conductor. No genera los carnets directamente,
+ * solo encola los trabajos. El seguimiento se hace mediante CarnetGenerationLog.
+ */
 class ProcesarGeneracionCarnets implements ShouldQueue
 {
     use InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Identificador único de la sesión de generación
+     */
     protected string $sessionId;
 
+    /**
+     * ID del usuario que inició la generación (opcional)
+     */
     protected ?int $userId;
 
+    /**
+     * Tipo de generación ('masivo' por defecto)
+     */
     protected string $tipo;
 
+    /**
+     * ID de la plantilla a usar (opcional, usa activa si no se especifica)
+     */
     protected ?int $templateId;
 
+    /**
+     * IDs de conductores específicos a procesar (opcional, todos si es null)
+     *
+     * @var array<int>|null
+     */
     protected ?array $conductorIds;
 
     /**
-     * Create a new job instance.
+     * Crea una nueva instancia del job supervisor
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de generación
+     * @param  string  $tipo  Tipo de generación (default: 'masivo')
+     * @param  int|null  $userId  ID del usuario que inició la generación
+     * @param  int|null  $templateId  ID de la plantilla a usar (opcional)
+     * @param  array<int>|null  $conductorIds  IDs de conductores específicos (opcional)
      */
     public function __construct(
         string $sessionId,
@@ -44,7 +74,14 @@ class ProcesarGeneracionCarnets implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Ejecuta el job supervisor de generación de carnets
+     *
+     * Busca el CarnetGenerationLog, obtiene la plantilla activa (o la especificada),
+     * obtiene los conductores a procesar (específicos o todos), y encola trabajos
+     * individuales GenerarCarnetJob para cada conductor. No marca como completado
+     * aquí, eso lo hace FinalizarGeneracionCarnets cuando todos los jobs terminan.
+     *
+     * @throws \Exception Si no se encuentra el log, no hay plantilla configurada o no hay conductores
      */
     public function handle(): void
     {

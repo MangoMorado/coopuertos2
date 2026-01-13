@@ -5,10 +5,24 @@ namespace App\Services;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Servicio de procesamiento de imágenes
+ *
+ * Proporciona funcionalidades para cargar imágenes desde diferentes fuentes
+ * (rutas de archivo, base64, SVG), convertirlas a recursos GD y renderizar
+ * SVG a imágenes GD para códigos QR.
+ */
 class ImageProcessorService
 {
     /**
-     * Carga una imagen desde una ruta o base64 (soporta JPG, PNG, GIF, SVG)
+     * Carga una imagen desde una ruta de archivo o data URI base64
+     *
+     * Detecta automáticamente si el parámetro es una ruta de archivo o un
+     * data URI base64. Soporta formatos JPEG, PNG, GIF y SVG. Para SVG
+     * utiliza métodos especializados de renderizado.
+     *
+     * @param  string  $path  Ruta de archivo o data URI base64 (data:image/mime;base64,...)
+     * @return \GdImage|false|null Recurso GD de la imagen, false si es SVG sin renderizar, o null si falla
      */
     public function loadImage(string $path)
     {
@@ -48,6 +62,13 @@ class ImageProcessorService
 
     /**
      * Carga una imagen desde un string base64 (data URI)
+     *
+     * Extrae y decodifica el contenido base64 de un data URI, luego crea
+     * un recurso GD desde los datos de imagen. Soporta data URIs con prefijo
+     * (data:image/mime;base64,...) o strings base64 puros.
+     *
+     * @param  string  $base64String  Data URI base64 o string base64 puro
+     * @return \GdImage|null Recurso GD de la imagen o null si falla la decodificación
      */
     public function loadImageFromBase64(string $base64String)
     {
@@ -88,6 +109,16 @@ class ImageProcessorService
 
     /**
      * Convierte un archivo SVG a una imagen GD
+     *
+     * Carga un archivo SVG, lo sanitiza y lo convierte a un recurso GD.
+     * Intenta usar Imagick primero (mejor calidad), y si no está disponible
+     * usa un método alternativo creando una imagen básica con dimensiones
+     * extraídas del SVG.
+     *
+     * @param  string  $svgPath  Ruta completa al archivo SVG
+     * @param  int|null  $width  Ancho deseado de la imagen (opcional)
+     * @param  int|null  $height  Alto deseado de la imagen (opcional)
+     * @return \GdImage|false Recurso GD de la imagen o false si falla
      */
     public function loadSvgAsImage(string $svgPath, ?int $width = null, ?int $height = null)
     {
@@ -161,7 +192,15 @@ class ImageProcessorService
     }
 
     /**
-     * Renderiza contenido SVG a imagen GD (específico para QR codes)
+     * Renderiza contenido SVG a imagen GD (específico para códigos QR)
+     *
+     * Renderiza un SVG en formato string a un recurso GD. Extrae el viewBox
+     * del SVG, calcula factores de escala y renderiza rectángulos y paths.
+     * Especializado para renderizar códigos QR generados como SVG.
+     *
+     * @param  string  $svgContent  Contenido SVG como string
+     * @param  int  $size  Tamaño deseado de la imagen cuadrada resultante
+     * @return \GdImage|null Recurso GD de la imagen renderizada o null si no se puede renderizar
      */
     public function renderSvgToGd(string $svgContent, int $size)
     {

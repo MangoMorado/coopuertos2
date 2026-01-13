@@ -7,10 +7,28 @@ use Dompdf\Options;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Convertidor de imágenes PNG a PDF para carnets
+ *
+ * Convierte imágenes PNG de carnets a formato PDF usando DomPDF. Calcula
+ * las dimensiones en milímetros basándose en 300 DPI y genera un PDF
+ * con el tamaño exacto de la imagen.
+ */
 class CarnetPdfConverter
 {
     /**
      * Convierte una imagen PNG a PDF usando DomPDF
+     *
+     * Lee una imagen PNG, la convierte a base64, genera HTML con la imagen
+     * y usa DomPDF para crear un PDF con las dimensiones exactas. Asume
+     * 300 DPI para el cálculo de dimensiones en milímetros.
+     *
+     * @param  string  $imagePath  Ruta completa al archivo PNG de entrada
+     * @param  string  $pdfPath  Ruta completa donde guardar el PDF generado
+     * @param  int  $width  Ancho de la imagen en píxeles
+     * @param  int  $height  Alto de la imagen en píxeles
+     *
+     * @throws \Exception Si no se puede leer la imagen o convertir a PDF
      */
     public function convertirImagenAPDF(string $imagePath, string $pdfPath, int $width, int $height): void
     {

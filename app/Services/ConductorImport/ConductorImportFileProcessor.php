@@ -7,15 +7,43 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx as XlsxReader;
 
+/**
+ * Procesador de archivos CSV y Excel para importación de conductores
+ *
+ * Maneja el procesamiento optimizado de archivos CSV (línea por línea) y Excel (en memoria).
+ * Implementa detección automática de delimitadores, validación de estructura, procesamiento
+ * en lotes y manejo de transacciones de base de datos.
+ */
 class ConductorImportFileProcessor
 {
+    /**
+     * @param  ConductorImportDataTransformer  $transformer  Transformador de datos de filas
+     * @param  ConductorImportProgressTracker  $progressTracker  Seguimiento de progreso
+     */
     public function __construct(
         private ConductorImportDataTransformer $transformer,
         private ConductorImportProgressTracker $progressTracker
     ) {}
 
     /**
-     * Procesar archivo CSV optimizado (línea por línea)
+     * Procesa un archivo CSV optimizado línea por línea
+     *
+     * Este método procesa archivos CSV de manera eficiente, leyendo línea por línea
+     * sin cargar todo el archivo en memoria. Detecta automáticamente el delimitador
+     * (coma o punto y coma), valida la estructura, procesa en lotes y mantiene
+     * transacciones de base de datos para consistencia.
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @param  string  $fullPath  Ruta completa al archivo CSV
+     * @param  callable  $progressCallback  Función callback para actualizar progreso: callable(array<string, mixed>): void
+     * @return array{
+     *     importados: int,
+     *     duplicados: int,
+     *     errores: array<int, string>,
+     *     total: int
+     * }
+     *
+     * @throws \Exception Si no se puede abrir el archivo, leer encabezados o faltan columnas requeridas
      */
     public function processCsv(
         string $sessionId,
@@ -288,7 +316,23 @@ class ConductorImportFileProcessor
     }
 
     /**
-     * Procesar Excel normal
+     * Procesa un archivo Excel (.xlsx) cargándolo completamente en memoria
+     *
+     * Este método procesa archivos Excel usando PhpSpreadsheet, cargando todo el archivo
+     * en memoria. Valida la estructura, procesa registros en lotes y mantiene transacciones
+     * de base de datos. Adecuado para archivos pequeños/medianos (<10MB recomendado).
+     *
+     * @param  string  $sessionId  Identificador único de la sesión de importación
+     * @param  string  $fullPath  Ruta completa al archivo Excel (.xlsx)
+     * @param  callable  $progressCallback  Función callback para actualizar progreso: callable(array<string, mixed>): void
+     * @return array{
+     *     importados: int,
+     *     duplicados: int,
+     *     errores: array<int, string>,
+     *     total: int
+     * }
+     *
+     * @throws \Exception Si no se puede cargar el archivo, faltan columnas requeridas o hay errores de procesamiento
      */
     public function processExcel(
         string $sessionId,

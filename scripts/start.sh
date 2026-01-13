@@ -9,6 +9,7 @@ mkdir -p /app/bootstrap/cache
 mkdir -p /app/public/uploads/carnets
 mkdir -p /app/public/storage/carnet_previews /app/public/storage/carnets
 mkdir -p /app/storage/app/carnets /app/storage/app/temp /app/storage/app/temp_imports /app/storage/app/public
+mkdir -p /app/docs/api
 
 # Detectar usuario que ejecutará PHP (típicamente nobody o www-data en contenedores)
 PHP_USER="nobody"
@@ -22,6 +23,7 @@ fi
 if [ "$(id -u)" = "0" ]; then
     chown -R ${PHP_USER}:${PHP_USER} /app/storage /app/bootstrap/cache 2>/dev/null || true
     chown -R ${PHP_USER}:${PHP_USER} /app/public/uploads /app/public/storage 2>/dev/null || true
+    chown -R ${PHP_USER}:${PHP_USER} /app/docs 2>/dev/null || true
 fi
 
 # Configurar permisos - storage/logs necesita permisos más permisivos para escritura
@@ -29,6 +31,7 @@ chmod -R 777 /app/storage/logs 2>/dev/null || true
 chmod -R 775 /app/storage /app/bootstrap/cache 2>/dev/null || true
 chmod -R 777 /app/public/uploads 2>/dev/null || true
 chmod -R 777 /app/public/storage 2>/dev/null || true
+chmod -R 775 /app/docs 2>/dev/null || true
 
 # Asegurar que app/temp existe y tiene permisos correctos
 TEMP_DIR="/app/storage/app/temp"
@@ -51,6 +54,16 @@ php /app/artisan storage:setup-directories 2>/dev/null || true
 
 # Crear enlace simbólico de storage
 php /app/artisan storage:link 2>/dev/null || true
+
+# Generar documentación PHPDoc si no existe
+echo ""
+echo "=== Generando documentación PHPDoc ==="
+if [ ! -f /app/docs/api/index.html ]; then
+    echo "Generando documentación desde bloques PHPDoc..."
+    php /app/artisan docs:generate 2>/dev/null || echo "⚠️  No se pudo generar la documentación (phpDocumentor puede no estar instalado)"
+else
+    echo "✓ Documentación ya existe, omitiendo generación"
+fi
 
 # Configurar supervisor
 echo ""

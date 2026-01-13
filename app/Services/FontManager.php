@@ -4,10 +4,25 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\File;
 
+/**
+ * Gestor de fuentes para renderizado de texto en imágenes
+ *
+ * Proporciona acceso a archivos de fuentes TTF para renderizar texto en carnets.
+ * Busca fuentes en public/fonts y en el directorio de fuentes de Windows.
+ * Incluye conversión de colores hexadecimales a RGB.
+ */
 class FontManager
 {
     /**
      * Obtiene la ruta del archivo de fuente según la familia y estilo
+     *
+     * Busca archivos de fuente TTF en múltiples ubicaciones: primero en public/fonts,
+     * luego en C:/Windows/Fonts. Normaliza el estilo de fuente y mapea familias
+     * comunes a nombres de archivos. Retorna Arial como fallback si no se encuentra la fuente.
+     *
+     * @param  string  $fontFamily  Familia de fuente (Arial, Times New Roman, Century Gothic, etc.)
+     * @param  string  $fontStyle  Estilo de fuente: 'normal', 'bold', 'italic', 'bold italic' (default: 'normal')
+     * @return string|null Ruta completa al archivo de fuente TTF o null si no se encuentra ninguna
      */
     public function getFontPath(string $fontFamily, string $fontStyle = 'normal'): ?string
     {
@@ -63,6 +78,12 @@ class FontManager
 
     /**
      * Convierte un color hexadecimal a RGB
+     *
+     * Convierte un color en formato hexadecimal (#RRGGBB) a un array asociativo
+     * con los componentes RGB (red, green, blue) para usar en funciones de GD.
+     *
+     * @param  string  $hex  Color hexadecimal con o sin prefijo # (ej: '#000000' o 'FF00FF')
+     * @return array{r: int, g: int, b: int} Array con componentes RGB (valores de 0 a 255)
      */
     public function hexToRgb(string $hex): array
     {

@@ -7,8 +7,23 @@ use App\Models\Propietario;
 use App\Models\User;
 use App\Models\Vehicle;
 
+/**
+ * Controlador web para el dashboard principal
+ *
+ * Proporciona estadísticas y métricas generales del sistema incluyendo
+ * conteos, distribuciones por tipo/estado/rol, y próximos cumpleaños de
+ * conductores. Utiliza consultas optimizadas para mejor rendimiento.
+ */
 class DashboardController extends Controller
 {
+    /**
+     * Muestra la página principal del dashboard
+     *
+     * Obtiene estadísticas optimizadas del sistema, calcula próximos cumpleaños
+     * de conductores (próximos 7 días), y prepara todos los datos para la vista.
+     *
+     * @return \Illuminate\Contracts\View\View Vista del dashboard principal
+     */
     public function index()
     {
         // Obtener estadísticas optimizadas
@@ -91,8 +106,13 @@ class DashboardController extends Controller
     }
 
     /**
-     * Obtener estadísticas del dashboard optimizadas
-     * Combina múltiples consultas en menos queries
+     * Obtiene estadísticas del dashboard optimizadas
+     *
+     * Combina múltiples consultas en menos queries para mejor rendimiento.
+     * Retorna conteos y distribuciones de conductores, vehículos, propietarios
+     * y usuarios agrupados por tipo, estado o rol.
+     *
+     * @return array<string, array<string, mixed>> Array con estadísticas organizadas por entidad
      */
     protected function getDashboardStats(): array
     {

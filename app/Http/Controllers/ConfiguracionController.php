@@ -8,8 +8,24 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
+/**
+ * Controlador web para configuración del sistema
+ *
+ * Gestiona la configuración de permisos por rol y módulo, mostrando el estado
+ * actual de permisos y permitiendo su actualización. Mango siempre tiene todos
+ * los permisos, mientras que Admin y User tienen permisos basados en módulos activos.
+ */
 class ConfiguracionController extends Controller
 {
+    /**
+     * Muestra la página de configuración de permisos
+     *
+     * Obtiene los roles del sistema (Mango, Admin, User), los módulos disponibles
+     * y el estado actual de permisos por rol y módulo. También obtiene el estado
+     * de salud del sistema para mostrar en la vista.
+     *
+     * @return \Illuminate\Contracts\View\View Vista de configuración de permisos
+     */
     public function index()
     {
         $roles = Role::whereIn('name', ['Mango', 'Admin', 'User'])->where('guard_name', 'web')->get();
@@ -43,6 +59,19 @@ class ConfiguracionController extends Controller
         return view('configuracion.index', compact('roles', 'modulos', 'modulosPorRol', 'healthStatus'));
     }
 
+    /**
+     * Actualiza los permisos del sistema por rol y módulo
+     *
+     * Actualiza los permisos de cada rol basándose en los módulos activos.
+     * Mango siempre recibe todos los permisos. Admin y User reciben permisos
+     * básicos (ver, crear, editar, eliminar) solo para los módulos activos.
+     * Usa transacciones de base de datos para garantizar consistencia.
+     *
+     * @param  Request  $request  Request HTTP con array 'modulos' indexado por nombre de rol
+     * @return \Illuminate\Http\RedirectResponse Redirección a la página de configuración
+     *
+     * @throws \Exception Si hay errores al actualizar los permisos
+     */
     public function update(Request $request)
     {
         $request->validate([

@@ -5,6 +5,13 @@ namespace App\Helpers;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Helper para operaciones de almacenamiento de archivos
+ *
+ * Proporciona métodos estáticos para gestionar directorios y validar
+ * datos de archivos (como fotos en base64). Maneja creación de directorios
+ * con manejo robusto de errores y permisos.
+ */
 class StorageHelper
 {
     /**
@@ -57,10 +64,13 @@ class StorageHelper
     }
 
     /**
-     * Obtiene la URL de la foto desde base64
+     * Valida y retorna una foto en formato base64
      *
-     * @param  string|null  $foto  Base64 de la foto
-     * @return string|null Base64 de la foto o null si no existe
+     * Verifica que la foto proporcionada esté en formato base64 válido
+     * (debe empezar con "data:"). Si no es válida o es null, retorna null.
+     *
+     * @param  string|null  $foto  String con datos de foto en base64
+     * @return string|null Base64 de la foto si es válida, null en caso contrario
      */
     public static function getFotoUrl(?string $foto): ?string
     {
