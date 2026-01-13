@@ -50,15 +50,14 @@ Fase 6: SuperAdmin / Mango
 Fase 7: Tests y Performance
   - ✅ Optimizar consultas a base de datos
   - ✅ Suite de tests
-  - Documentación de código
-    - Agregar PHPDoc a métodos complejos
-    - Documentar endpoints API existentes
-    - Crear documentación técnica del sistema
+  - ✅ Refactorizar archivos muy grandes (mas de mil lineas)
   - Caché y optimización
     - Implementar caché para consultas frecuentes
     - Caché de vistas y queries pesadas
     - Optimización de assets (CSS/JS)
-  - Refactorizar archivos muy grandes (mas de mil lineas)
+  - Documentación de código
+    - Agregar PHPDoc a métodos complejos
+    - Crear documentación técnica del sistema
 
 Fase 8: MCP y Herramientas de IA
   - ✅ Servidor MCP configurado (CoopuertosServer) con rutas en `/mcp/coopuertos`

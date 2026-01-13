@@ -4,7 +4,9 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "format": "prettier --write \"resources/**/*.{js,css}\" \"public/js/**/*.js\"",
+        "lint": "prettier --check \"resources/**/*.{js,css}\" \"public/js/**/*.js\""
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.11",
@@ -16,6 +18,7 @@
         "concurrently": "^9.2.1",
         "laravel-vite-plugin": "^2.0.1",
         "postcss": "^8.5.6",
+        "prettier": "^3.7.4",
         "tailwindcss": "^4.1.18",
         "vite": "^7.3.1"
     },

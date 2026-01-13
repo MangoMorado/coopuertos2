@@ -1,5 +1,10 @@
 # Coopuertos App
 
+## *v. 0.1.9.1*
+- Corrección de error en GitHub Actions workflow lint.yml: Agregado script "format" faltante en package.json
+- Configuración de formateo frontend: Instalado Prettier (^3.7.4) como dependencia de desarrollo, agregados scripts "format" (formatear) y "lint" (verificar formato) en package.json, creado archivo de configuración .prettierrc.json con reglas de formato estándar
+- Refactorización mayor de ConductorImportController: Separado en 6 servicios especializados siguiendo principios SOLID (ConductorImportFileValidator, ConductorImportProgressTracker, GoogleDriveImageDownloader, ConductorImportDataTransformer, ConductorImportFileProcessor, ConductorImportService). Controlador reducido de 1,521 a 161 líneas. Job ProcesarImportacionConductores refactorizado para usar los mismos servicios compartidos. Todos los tests actualizados y pasando (23/23 tests: 11 ConductorImportTest + 12 ProcesarImportacionConductoresTest)
+
 ## *v. 0.1.9*
 - Agregado a github actions test de calidad lint
 - Optimización de consultas a base de datos (Fase 1, 2 y 3):
@@ -203,12 +208,12 @@
 # Mejoras Pendientes:
 
 - 📝 Reportes y estadísticas
-- 📝 Exportación de datos (Excel, CSV)
+- ✅ Exportación de datos (Excel, CSV)
 - 📝 Notificaciones por email
-- 📝 Dashboard con más métricas
-- 📝 API REST para integraciones
+- ✅ Dashboard con más métricas
+- ✅ API REST para integraciones
 - ✅ Sistema de roles y permisos de usuario
 - 📝 Historial de auditoría y logs de cambios
 - ✅ Importación masiva de datos desde Excel/CSV
-- 📝 Sistema de notificaciones push en tiempo real
+- ✅ Sistema de notificaciones push en tiempo real
 - 📝 App móvil para consulta de información
