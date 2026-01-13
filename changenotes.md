@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.2.3.2*
+- Herramienta de prueba MCP: Creada ruta `/test` con controlador `McpTestController` y vista `mcp-test.blade.php` para probar el servidor MCP desde el frontend. Permite probar los métodos de descubrimiento (`initialize`, `tools/list`, `prompts/list`, `resources/list`) y verificar el estado del servidor MCP en producción.
+
 ## *v. 0.2.3.1*
 - Corrección middleware MCP: Actualizado `McpAuthenticate` para permitir peticiones de descubrimiento inicial sin autenticación (`initialize`, `tools/list`, `prompts/list`, `resources/list`). Esto permite que clientes MCP como n8n puedan conectarse y descubrir las capacidades del servidor antes de autenticarse.
 

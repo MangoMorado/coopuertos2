@@ -6,6 +6,7 @@ use App\Http\Controllers\ConductorImportController;
 use App\Http\Controllers\ConfiguracionController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DocumentacionController;
+use App\Http\Controllers\McpTestController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropietarioController;
 use App\Http\Controllers\UserController;
@@ -18,6 +19,10 @@ use Laravel\Mcp\Facades\Mcp;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Ruta de prueba MCP
+Route::get('/test', [McpTestController::class, 'index'])->name('mcp.test');
+Route::post('/test', [McpTestController::class, 'test'])->name('mcp.test.run');
 
 // Rutas públicas (sin autenticación)
 Route::get('/api/vehiculos/search', [VehicleController::class, 'search'])->name('api.vehiculos.search');
