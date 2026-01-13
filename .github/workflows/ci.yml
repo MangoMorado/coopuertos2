@@ -38,6 +38,18 @@ jobs:
       - name: Generar key de aplicación
         run: php artisan key:generate
 
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependencias NPM
+        run: npm ci
+
+      - name: Compilar assets de Vite
+        run: npm run build
+
       - name: Ejecutar Laravel Pint (Lint)
         run: |
           vendor/bin/pint --test || (echo "❌ Laravel Pint encontró errores de formato. Ejecuta: vendor/bin/pint" && exit 1)

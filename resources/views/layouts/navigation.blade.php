@@ -237,6 +237,7 @@
         </div>
 
         <!-- Perfil y logout -->
+        @if(auth()->check())
         <div 
             class="border-t border-gray-200 dark:border-gray-700"
             :class="{
@@ -345,5 +346,6 @@
                 </div>
             </div>
         </div>
+        @endif
     </nav>
 </div>

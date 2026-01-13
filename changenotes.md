@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.1.8.2*
+- Corregida la configuración de node y compilación para pruebas en github actions
+- Corrección de error en navigation.blade.php: Envuelta toda la sección del perfil y logout en verificación de autenticación (@if(auth()->check())) para prevenir errores "Attempt to read property on null" en rutas públicas donde Auth::user() puede ser null
+
 ## *v. 0.1.8.1*
 - Corrección de error en navigation.blade.php: Agregada verificación de autenticación antes de llamar a hasRole() para prevenir errores en rutas públicas donde auth()->user() puede ser null
 
