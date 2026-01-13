@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
+
+        // Excluir ruta MCP del CSRF para permitir peticiones desde el controlador de prueba
+        $middleware->validateCsrfTokens(except: [
+            'mcp/coopuertos',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

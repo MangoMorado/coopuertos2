@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.2.3.3*
+- Corrección CSRF para pruebas MCP: Excluida ruta `/mcp/coopuertos` del middleware CSRF en `bootstrap/app.php` usando `validateCsrfTokens(except: ['mcp/coopuertos'])` para permitir peticiones internas desde el controlador de prueba. La ruta MCP mantiene su seguridad mediante el middleware `McpAuthenticate` que requiere autenticación Sanctum para herramientas protegidas 
+
 ## *v. 0.2.3.2*
 - Herramienta de prueba MCP: Creada ruta `/test` con controlador `McpTestController` y vista `mcp-test.blade.php` para probar el servidor MCP desde el frontend. Permite probar los métodos de descubrimiento (`initialize`, `tools/list`, `prompts/list`, `resources/list`) y verificar el estado del servidor MCP en producción.
 
@@ -224,16 +227,3 @@ MCP (servidor, middleware, herramientas, prompts, recursos)
 - UI en español (auth, dashboard, navegación, perfil, conductores).
 - Logo e imágenes sirven desde assets/ uploads.
 - CRUD de conductores con edición, carnet, QR y fotos públicas.
-
-# Mejoras Pendientes:
-
-- 📝 Reportes y estadísticas
-- ✅ Exportación de datos (Excel, CSV)
-- 📝 Notificaciones por email
-- ✅ Dashboard con más métricas
-- ✅ API REST para integraciones
-- ✅ Sistema de roles y permisos de usuario
-- 📝 Historial de auditoría y logs de cambios
-- ✅ Importación masiva de datos desde Excel/CSV
-- ✅ Sistema de notificaciones push en tiempo real
-- 📝 App móvil para consulta de información
