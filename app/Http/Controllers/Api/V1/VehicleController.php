@@ -252,11 +252,14 @@ class VehicleController extends Controller
             ]);
         }
 
-        $vehiculos = Vehicle::where(function ($q) use ($query) {
-            $q->where('placa', 'like', "%{$query}%")
-                ->orWhere('marca', 'like', "%{$query}%")
-                ->orWhere('modelo', 'like', "%{$query}%");
-        })->limit(10)->get();
+        $vehiculos = Vehicle::with(['conductor'])
+            ->where(function ($q) use ($query) {
+                $q->where('placa', 'like', "%{$query}%")
+                    ->orWhere('marca', 'like', "%{$query}%")
+                    ->orWhere('modelo', 'like', "%{$query}%");
+            })
+            ->limit(10)
+            ->get();
 
         return response()->json([
             'success' => true,

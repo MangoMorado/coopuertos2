@@ -6,25 +6,17 @@ use App\Models\Conductor;
 use App\Models\Propietario;
 use App\Models\User;
 use App\Models\Vehicle;
-use Spatie\Permission\Models\Role;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Conductores
-        $conductoresCount = Conductor::count();
-        $conductoresPorTipo = Conductor::selectRaw('conductor_tipo, COUNT(*) as total')
-            ->groupBy('conductor_tipo')
-            ->pluck('total', 'conductor_tipo')
-            ->toArray();
+        // Obtener estadísticas optimizadas
+        $stats = $this->getDashboardStats();
 
-        // Mapear tipos de conductores para mostrar
-        $conductoresPorTipoFormateado = [];
-        foreach ($conductoresPorTipo as $tipo => $total) {
-            $nombreTipo = $tipo === 'A' ? 'Camionetas' : 'Busetas';
-            $conductoresPorTipoFormateado[$nombreTipo] = $total;
-        }
+        // Conductores
+        $conductoresCount = $stats['conductores']['count'];
+        $conductoresPorTipoFormateado = $stats['conductores']['por_tipo'];
 
         // Próximos cumpleaños de conductores (solo los que cumplen en 7 días o menos)
         $proximosCumpleanos = Conductor::whereNotNull('fecha_nacimiento')
@@ -72,19 +64,65 @@ class DashboardController extends Controller
             ->values();
 
         // Vehículos
+        $vehiculosCount = $stats['vehiculos']['count'];
+        $vehiculosPorTipo = $stats['vehiculos']['por_tipo'];
+        $vehiculosEstadosConPorcentaje = $stats['vehiculos']['por_estado'];
+
+        // Propietarios
+        $propietariosCount = $stats['propietarios']['count'];
+        $propietariosPorTipo = $stats['propietarios']['por_tipo'];
+
+        // Usuarios
+        $usuariosCount = $stats['usuarios']['count'];
+        $usuariosPorRol = $stats['usuarios']['por_rol'];
+
+        return view('dashboard', compact(
+            'conductoresCount',
+            'conductoresPorTipoFormateado',
+            'proximosCumpleanos',
+            'vehiculosCount',
+            'vehiculosPorTipo',
+            'vehiculosEstadosConPorcentaje',
+            'propietariosCount',
+            'propietariosPorTipo',
+            'usuariosCount',
+            'usuariosPorRol'
+        ));
+    }
+
+    /**
+     * Obtener estadísticas del dashboard optimizadas
+     * Combina múltiples consultas en menos queries
+     */
+    protected function getDashboardStats(): array
+    {
+        // Conductores - Obtener count y agrupación en consultas separadas pero optimizadas
+        $conductoresCount = Conductor::count();
+        $conductoresPorTipo = Conductor::selectRaw('conductor_tipo, COUNT(*) as total')
+            ->groupBy('conductor_tipo')
+            ->pluck('total', 'conductor_tipo')
+            ->toArray();
+
+        // Mapear tipos de conductores para mostrar
+        $conductoresPorTipoFormateado = [];
+        foreach ($conductoresPorTipo as $tipo => $total) {
+            $nombreTipo = $tipo === 'A' ? 'Camionetas' : 'Busetas';
+            $conductoresPorTipoFormateado[$nombreTipo] = $total;
+        }
+
+        // Vehículos - Combinar count, tipo y estado en consultas optimizadas
         $vehiculosCount = Vehicle::count();
         $vehiculosPorTipo = Vehicle::selectRaw('tipo, COUNT(*) as total')
             ->groupBy('tipo')
             ->pluck('total', 'tipo')
             ->toArray();
 
-        // Distribución de estados de vehículos
         $vehiculosPorEstado = Vehicle::selectRaw('estado, COUNT(*) as total')
             ->groupBy('estado')
             ->pluck('total', 'estado')
             ->toArray();
 
-        // Calcular porcentajes
+        // Calcular porcentajes de estados
         $vehiculosEstadosConPorcentaje = [];
         foreach ($vehiculosPorEstado as $estado => $total) {
             $porcentaje = $vehiculosCount > 0 ? round(($total / $vehiculosCount) * 100, 1) : 0;
@@ -101,25 +139,40 @@ class DashboardController extends Controller
             ->pluck('total', 'tipo_propietario')
             ->toArray();
 
-        // Usuarios
+        // Usuarios - Ya optimizado en Fase 1
         $usuariosCount = User::count();
-        $roles = Role::whereIn('name', ['Mango', 'Admin', 'User'])->get();
-        $usuariosPorRol = [];
-        foreach ($roles as $rol) {
-            $usuariosPorRol[$rol->name] = User::role($rol->name)->count();
-        }
+        $usuariosPorRolData = \Illuminate\Support\Facades\DB::table('model_has_roles')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->whereIn('roles.name', ['Mango', 'Admin', 'User'])
+            ->select('roles.name', \Illuminate\Support\Facades\DB::raw('COUNT(*) as total'))
+            ->groupBy('roles.name')
+            ->pluck('total', 'name')
+            ->toArray();
 
-        return view('dashboard', compact(
-            'conductoresCount',
-            'conductoresPorTipoFormateado',
-            'proximosCumpleanos',
-            'vehiculosCount',
-            'vehiculosPorTipo',
-            'vehiculosEstadosConPorcentaje',
-            'propietariosCount',
-            'propietariosPorTipo',
-            'usuariosCount',
-            'usuariosPorRol'
-        ));
+        $usuariosPorRol = [
+            'Mango' => $usuariosPorRolData['Mango'] ?? 0,
+            'Admin' => $usuariosPorRolData['Admin'] ?? 0,
+            'User' => $usuariosPorRolData['User'] ?? 0,
+        ];
+
+        return [
+            'conductores' => [
+                'count' => $conductoresCount,
+                'por_tipo' => $conductoresPorTipoFormateado,
+            ],
+            'vehiculos' => [
+                'count' => $vehiculosCount,
+                'por_tipo' => $vehiculosPorTipo,
+                'por_estado' => $vehiculosEstadosConPorcentaje,
+            ],
+            'propietarios' => [
+                'count' => $propietariosCount,
+                'por_tipo' => $propietariosPorTipo,
+            ],
+            'usuarios' => [
+                'count' => $usuariosCount,
+                'por_rol' => $usuariosPorRol,
+            ],
+        ];
     }
 }

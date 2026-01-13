@@ -56,7 +56,7 @@ class ImportLog extends Model
 
         $endTime = $this->completed_at ?? now();
 
-        return $endTime->diffInSeconds($this->started_at);
+        return max(0, $endTime->diffInSeconds($this->started_at));
     }
 
     /**

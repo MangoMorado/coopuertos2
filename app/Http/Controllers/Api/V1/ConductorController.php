@@ -204,12 +204,15 @@ class ConductorController extends Controller
             ]);
         }
 
-        $conductores = Conductor::where(function ($q) use ($query) {
-            $q->where('cedula', 'like', "%{$query}%")
-                ->orWhere('nombres', 'like', "%{$query}%")
-                ->orWhere('apellidos', 'like', "%{$query}%")
-                ->orWhere('numero_interno', 'like', "%{$query}%");
-        })->limit(10)->get();
+        $conductores = Conductor::with(['asignacionActiva.vehicle'])
+            ->where(function ($q) use ($query) {
+                $q->where('cedula', 'like', "%{$query}%")
+                    ->orWhere('nombres', 'like', "%{$query}%")
+                    ->orWhere('apellidos', 'like', "%{$query}%")
+                    ->orWhere('numero_interno', 'like', "%{$query}%");
+            })
+            ->limit(10)
+            ->get();
 
         return response()->json([
             'success' => true,

@@ -48,13 +48,8 @@ Fase 6: SuperAdmin / Mango
   - ✅ Resultados de los test
 
 Fase 7: Tests y Performance
-  - Optimizar consultas a base de datos
-    - Implementar Eager Loading en relaciones para evitar N+1 queries
-    - Revisar y optimizar consultas en controladores principales
-    - Agregar índices en campos de búsqueda frecuentes
-  - ✅ Ampliar suite de tests
-    - Tests funcionales para controladores principales
-    - Tests de integración para generación de carnets
+  - ✅ Optimizar consultas a base de datos
+  - ✅ Suite de tests
   - Documentación de código
     - Agregar PHPDoc a métodos complejos
     - Documentar endpoints API existentes
@@ -63,6 +58,7 @@ Fase 7: Tests y Performance
     - Implementar caché para consultas frecuentes
     - Caché de vistas y queries pesadas
     - Optimización de assets (CSS/JS)
+  - Refactorizar archivos muy grandes (mas de mil lineas)
 
 Fase 8: MCP y Herramientas de IA
   - ✅ Servidor MCP configurado (CoopuertosServer) con rutas en `/mcp/coopuertos`
@@ -79,4 +75,3 @@ Fase 8: MCP y Herramientas de IA
 ---
 
 Cambios Pendientes:
-- ✅ Reivsar la vista publica

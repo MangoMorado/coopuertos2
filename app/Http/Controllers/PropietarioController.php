@@ -105,24 +105,33 @@ class PropietarioController extends Controller
             return response()->json([]);
         }
 
+        // Seleccionar solo los campos necesarios para optimizar la consulta
+        $selectFields = ['id', 'numero_identificacion', 'nombre_completo', 'telefono_contacto', 'correo_electronico', 'direccion_contacto', 'tipo_identificacion'];
+
         // Si se especifican columnas, usar solo esas. Si no, buscar en todas las columnas comunes
         if (! empty($columns) && is_array($columns)) {
-            $propietarios = Propietario::where(function ($q) use ($query, $columns) {
-                foreach ($columns as $column) {
-                    if (in_array($column, ['numero_identificacion', 'nombre_completo', 'telefono_contacto', 'correo_electronico', 'direccion_contacto'])) {
-                        $q->orWhere($column, 'like', "%{$query}%");
+            $propietarios = Propietario::select($selectFields)
+                ->where(function ($q) use ($query, $columns) {
+                    foreach ($columns as $column) {
+                        if (in_array($column, ['numero_identificacion', 'nombre_completo', 'telefono_contacto', 'correo_electronico', 'direccion_contacto'])) {
+                            $q->orWhere($column, 'like', "%{$query}%");
+                        }
                     }
-                }
-            })->limit(10)->get();
+                })
+                ->limit(10)
+                ->get();
         } else {
             // Búsqueda por defecto en todas las columnas comunes
-            $propietarios = Propietario::where(function ($q) use ($query) {
-                $q->where('nombre_completo', 'like', "%{$query}%")
-                    ->orWhere('numero_identificacion', 'like', "%{$query}%")
-                    ->orWhere('telefono_contacto', 'like', "%{$query}%")
-                    ->orWhere('correo_electronico', 'like', "%{$query}%")
-                    ->orWhere('direccion_contacto', 'like', "%{$query}%");
-            })->limit(10)->get();
+            $propietarios = Propietario::select($selectFields)
+                ->where(function ($q) use ($query) {
+                    $q->where('nombre_completo', 'like', "%{$query}%")
+                        ->orWhere('numero_identificacion', 'like', "%{$query}%")
+                        ->orWhere('telefono_contacto', 'like', "%{$query}%")
+                        ->orWhere('correo_electronico', 'like', "%{$query}%")
+                        ->orWhere('direccion_contacto', 'like', "%{$query}%");
+                })
+                ->limit(10)
+                ->get();
         }
 
         return response()->json($propietarios->map(function ($propietario) {

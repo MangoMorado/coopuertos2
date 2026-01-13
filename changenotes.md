@@ -1,5 +1,12 @@
 # Coopuertos App
 
+## *v. 0.1.9*
+- Agregado a github actions test de calidad lint
+- Optimización de consultas a base de datos (Fase 1, 2 y 3):
+  - Eager Loading: Optimizado CarnetController (index, generar, exportarQRs) con eager loading de relaciones. Optimizado DashboardController eliminando N+1 queries en consulta de usuarios por rol. Mejorado eager loading en controladores API (ConductorController, VehicleController).
+  - Optimización de consultas: Creado método helper getDashboardStats() en DashboardController para centralizar estadísticas. Optimizados métodos search() en ConductorController, VehicleController y PropietarioController con SELECT específicos para reducir transferencia de datos.
+  - Índices: Agregados 12 índices estratégicos en tablas conductors (6 índices), vehicles (3 índices) y propietarios (3 índices) para acelerar búsquedas frecuentes. Migración: 2026_01_13_173917_add_search_indexes_to_tables.php
+
 ## *v. 0.1.8.2*
 - Corregida la configuración de node y compilación para pruebas en github actions
 - Corrección de error en navigation.blade.php: Envuelta toda la sección del perfil y logout en verificación de autenticación (@if(auth()->check())) para prevenir errores "Attempt to read property on null" en rutas públicas donde Auth::user() puede ser null

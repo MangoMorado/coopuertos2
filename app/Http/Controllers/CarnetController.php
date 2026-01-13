@@ -23,7 +23,7 @@ class CarnetController extends Controller
     public function index()
     {
         $template = CarnetTemplate::where('activo', true)->first();
-        $conductores = Conductor::all();
+        $conductores = Conductor::with(['asignacionActiva.vehicle'])->get();
 
         return view('carnets.index', compact('template', 'conductores'));
     }
@@ -64,10 +64,11 @@ class CarnetController extends Controller
         // Obtener conductores a procesar (todos por defecto, o los seleccionados si se envía)
         $conductorIds = $request->input('conductor_ids');
 
+        $query = Conductor::with(['asignacionActiva.vehicle']);
         if ($conductorIds && is_array($conductorIds)) {
-            $conductores = Conductor::whereIn('id', $conductorIds)->get();
+            $conductores = $query->whereIn('id', $conductorIds)->get();
         } else {
-            $conductores = Conductor::all();
+            $conductores = $query->get();
         }
 
         if ($conductores->isEmpty()) {
@@ -275,8 +276,8 @@ class CarnetController extends Controller
     public function exportarQRs()
     {
         try {
-            // Obtener todos los conductores
-            $conductores = Conductor::all();
+            // Obtener todos los conductores con eager loading
+            $conductores = Conductor::with(['asignacionActiva.vehicle'])->get();
 
             if ($conductores->isEmpty()) {
                 return redirect()->route('carnets.exportar')

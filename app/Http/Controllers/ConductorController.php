@@ -321,25 +321,34 @@ class ConductorController extends Controller
             return response()->json([]);
         }
 
+        // Seleccionar solo los campos necesarios para optimizar la consulta
+        $selectFields = ['id', 'cedula', 'nombres', 'apellidos', 'celular', 'correo', 'numero_interno'];
+
         // Si se especifican columnas, usar solo esas. Si no, buscar en todas las columnas comunes
         if (! empty($columns) && is_array($columns)) {
-            $conductores = Conductor::where(function ($q) use ($query, $columns) {
-                foreach ($columns as $column) {
-                    if (in_array($column, ['cedula', 'nombres', 'apellidos', 'celular', 'correo', 'numero_interno'])) {
-                        $q->orWhere($column, 'like', "%{$query}%");
+            $conductores = Conductor::select($selectFields)
+                ->where(function ($q) use ($query, $columns) {
+                    foreach ($columns as $column) {
+                        if (in_array($column, ['cedula', 'nombres', 'apellidos', 'celular', 'correo', 'numero_interno'])) {
+                            $q->orWhere($column, 'like', "%{$query}%");
+                        }
                     }
-                }
-            })->limit(10)->get();
+                })
+                ->limit(10)
+                ->get();
         } else {
             // Búsqueda por defecto en todas las columnas comunes
-            $conductores = Conductor::where(function ($q) use ($query) {
-                $q->where('nombres', 'like', "%{$query}%")
-                    ->orWhere('apellidos', 'like', "%{$query}%")
-                    ->orWhere('cedula', 'like', "%{$query}%")
-                    ->orWhere('celular', 'like', "%{$query}%")
-                    ->orWhere('correo', 'like', "%{$query}%")
-                    ->orWhere('numero_interno', 'like', "%{$query}%");
-            })->limit(10)->get();
+            $conductores = Conductor::select($selectFields)
+                ->where(function ($q) use ($query) {
+                    $q->where('nombres', 'like', "%{$query}%")
+                        ->orWhere('apellidos', 'like', "%{$query}%")
+                        ->orWhere('cedula', 'like', "%{$query}%")
+                        ->orWhere('celular', 'like', "%{$query}%")
+                        ->orWhere('correo', 'like', "%{$query}%")
+                        ->orWhere('numero_interno', 'like', "%{$query}%");
+                })
+                ->limit(10)
+                ->get();
         }
 
         return response()->json($conductores->map(function ($conductor) {

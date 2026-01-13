@@ -212,26 +212,35 @@ class VehicleController extends Controller
             return response()->json([]);
         }
 
+        // Seleccionar solo los campos necesarios para optimizar la consulta
+        $selectFields = ['id', 'placa', 'marca', 'modelo', 'anio_fabricacion', 'chasis_vin', 'capacidad_pasajeros', 'tipo'];
+
         // Si se especifican columnas, usar solo esas. Si no, buscar en todas las columnas comunes
         if (! empty($columns) && is_array($columns)) {
-            $vehicles = Vehicle::where(function ($q) use ($query, $columns) {
-                foreach ($columns as $column) {
-                    if (in_array($column, ['placa', 'marca', 'modelo', 'anio_fabricacion', 'chasis_vin', 'capacidad_pasajeros', 'tipo'])) {
-                        $q->orWhere($column, 'like', "%{$query}%");
+            $vehicles = Vehicle::select($selectFields)
+                ->where(function ($q) use ($query, $columns) {
+                    foreach ($columns as $column) {
+                        if (in_array($column, ['placa', 'marca', 'modelo', 'anio_fabricacion', 'chasis_vin', 'capacidad_pasajeros', 'tipo'])) {
+                            $q->orWhere($column, 'like', "%{$query}%");
+                        }
                     }
-                }
-            })->limit(10)->get();
+                })
+                ->limit(10)
+                ->get();
         } else {
             // Búsqueda por defecto en todas las columnas comunes
-            $vehicles = Vehicle::where(function ($q) use ($query) {
-                $q->where('placa', 'like', "%{$query}%")
-                    ->orWhere('marca', 'like', "%{$query}%")
-                    ->orWhere('modelo', 'like', "%{$query}%")
-                    ->orWhere('anio_fabricacion', 'like', "%{$query}%")
-                    ->orWhere('chasis_vin', 'like', "%{$query}%")
-                    ->orWhere('capacidad_pasajeros', 'like', "%{$query}%")
-                    ->orWhere('tipo', 'like', "%{$query}%");
-            })->limit(10)->get();
+            $vehicles = Vehicle::select($selectFields)
+                ->where(function ($q) use ($query) {
+                    $q->where('placa', 'like', "%{$query}%")
+                        ->orWhere('marca', 'like', "%{$query}%")
+                        ->orWhere('modelo', 'like', "%{$query}%")
+                        ->orWhere('anio_fabricacion', 'like', "%{$query}%")
+                        ->orWhere('chasis_vin', 'like', "%{$query}%")
+                        ->orWhere('capacidad_pasajeros', 'like', "%{$query}%")
+                        ->orWhere('tipo', 'like', "%{$query}%");
+                })
+                ->limit(10)
+                ->get();
         }
 
         return response()->json($vehicles->map(function ($vehicle) {
