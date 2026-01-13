@@ -2,14 +2,14 @@
 
 /**
  * Script de configuración automática de Supervisor para Laravel Queue Worker
- * 
+ *
  * Este script se ejecuta automáticamente durante composer install/post-install-cmd
  * y configura supervisor para ejecutar el worker de colas de Laravel.
  */
 
 // Detectar la ruta del proyecto
 $projectPath = getcwd();
-if (!$projectPath) {
+if (! $projectPath) {
     $projectPath = dirname(__DIR__);
 }
 
@@ -61,27 +61,27 @@ function message(string $text, string $type = 'info'): void
     ];
     $reset = "\033[0m";
     $color = $colors[$type] ?? $colors['info'];
-    
+
     echo "{$color}{$text}{$reset}\n";
 }
 
 // Detectar si estamos en un contenedor (durante build)
-$isContainer = file_exists('/.dockerenv') || 
-               !empty(getenv('CONTAINER')) || 
-               !empty(getenv('NIXPACKS')) ||
-               !empty(getenv('RAILWAY_ENVIRONMENT')) ||
-               !empty(getenv('RAILWAY_SERVICE_NAME')) ||
+$isContainer = file_exists('/.dockerenv') ||
+               ! empty(getenv('CONTAINER')) ||
+               ! empty(getenv('NIXPACKS')) ||
+               ! empty(getenv('RAILWAY_ENVIRONMENT')) ||
+               ! empty(getenv('RAILWAY_SERVICE_NAME')) ||
                file_exists('/app/.nixpacks');
 
 // Verificar si supervisor está instalado
 $supervisorInstalled = shell_exec('which supervisorctl 2>/dev/null');
 if (empty($supervisorInstalled)) {
     if ($isContainer) {
-        message("📦 Detectado entorno de contenedor. Supervisor se instalará durante el build.", 'info');
+        message('📦 Detectado entorno de contenedor. Supervisor se instalará durante el build.', 'info');
         message("   Asegúrate de agregar 'supervisor' a los paquetes del sistema en la configuración de buildpacks.", 'info');
     } else {
-        message("⚠️  Supervisor no está instalado. El archivo de configuración se creará pero no se habilitará automáticamente.", 'warning');
-        message("   Instala supervisor con: sudo apt-get install supervisor (Ubuntu/Debian)", 'info');
+        message('⚠️  Supervisor no está instalado. El archivo de configuración se creará pero no se habilitará automáticamente.', 'warning');
+        message('   Instala supervisor con: sudo apt-get install supervisor (Ubuntu/Debian)', 'info');
     }
     $canEnable = false;
 } else {
@@ -89,34 +89,34 @@ if (empty($supervisorInstalled)) {
 }
 
 // Verificar permisos para escribir en /etc/supervisor/conf.d/
-$canWrite = is_writable('/etc/supervisor/conf.d/') || 
+$canWrite = is_writable('/etc/supervisor/conf.d/') ||
             (function_exists('shell_exec') && shell_exec('test -w /etc/supervisor/conf.d/ 2>/dev/null && echo 1'));
 
-if (!$canWrite) {
+if (! $canWrite) {
     // Intentar con sudo
     $testSudo = shell_exec('sudo test -w /etc/supervisor/conf.d/ 2>/dev/null && echo 1');
-    $canWrite = !empty($testSudo);
+    $canWrite = ! empty($testSudo);
     $useSudo = $canWrite;
 } else {
     $useSudo = false;
 }
 
 // Crear el archivo de configuración
-message("📝 Configurando Supervisor para Laravel Queue Worker...", 'info');
+message('📝 Configurando Supervisor para Laravel Queue Worker...', 'info');
 message("   Proyecto: {$projectPath}", 'info');
 message("   Usuario: {$currentUser}", 'info');
 message("   PHP: {$phpBinary}", 'info');
 if ($isContainer) {
-    $buildpack = !empty(getenv('RAILWAY_ENVIRONMENT')) ? 'Railway Buildpacks' : 
-                 (!empty(getenv('NIXPACKS')) ? 'Nixpacks' : 'Buildpacks');
+    $buildpack = ! empty(getenv('RAILWAY_ENVIRONMENT')) ? 'Railway Buildpacks' :
+                 (! empty(getenv('NIXPACKS')) ? 'Nixpacks' : 'Buildpacks');
     message("   Entorno: Contenedor ({$buildpack})", 'info');
 }
 
 if ($canWrite || $useSudo) {
     // Escribir el archivo temporal primero
-    $tempFile = sys_get_temp_dir() . '/' . basename($configFile);
+    $tempFile = sys_get_temp_dir().'/'.basename($configFile);
     file_put_contents($tempFile, $configContent);
-    
+
     // Copiar al destino con o sin sudo
     if ($useSudo) {
         $result = shell_exec("sudo cp {$tempFile} {$configFile} 2>&1");
@@ -124,70 +124,70 @@ if ($canWrite || $useSudo) {
     } else {
         $result = shell_exec("cp {$tempFile} {$configFile} 2>&1");
     }
-    
+
     unlink($tempFile);
-    
+
     if (file_exists($configFile)) {
         message("✅ Archivo de configuración creado: {$configFile}", 'success');
-        
+
         // Intentar habilitar el servicio
         if ($canEnable) {
-            message("🔄 Intentando habilitar el servicio de supervisor...", 'info');
-            
+            message('🔄 Intentando habilitar el servicio de supervisor...', 'info');
+
             $commands = [
-                "sudo supervisorctl reread 2>&1",
-                "sudo supervisorctl update 2>&1",
+                'sudo supervisorctl reread 2>&1',
+                'sudo supervisorctl update 2>&1',
                 "sudo supervisorctl start {$workerName}:* 2>&1",
             ];
-            
+
             foreach ($commands as $cmd) {
                 $output = shell_exec($cmd);
-                if (!empty($output)) {
+                if (! empty($output)) {
                     echo "   {$output}";
                 }
             }
-            
+
             // Verificar estado
             $status = shell_exec("sudo supervisorctl status {$workerName}:* 2>&1");
-            if (!empty($status) && strpos($status, 'RUNNING') !== false) {
-                message("✅ Worker de colas iniciado correctamente!", 'success');
+            if (! empty($status) && strpos($status, 'RUNNING') !== false) {
+                message('✅ Worker de colas iniciado correctamente!', 'success');
             } else {
-                message("⚠️  El servicio fue configurado pero no se pudo iniciar automáticamente.", 'warning');
-                message("   Ejecuta manualmente:", 'info');
-                message("   sudo supervisorctl reread", 'info');
-                message("   sudo supervisorctl update", 'info');
+                message('⚠️  El servicio fue configurado pero no se pudo iniciar automáticamente.', 'warning');
+                message('   Ejecuta manualmente:', 'info');
+                message('   sudo supervisorctl reread', 'info');
+                message('   sudo supervisorctl update', 'info');
                 message("   sudo supervisorctl start {$workerName}:*", 'info');
             }
         } else {
-            message("⚠️  Supervisor no está instalado. Instala y luego ejecuta:", 'warning');
-            message("   sudo supervisorctl reread", 'info');
-            message("   sudo supervisorctl update", 'info');
+            message('⚠️  Supervisor no está instalado. Instala y luego ejecuta:', 'warning');
+            message('   sudo supervisorctl reread', 'info');
+            message('   sudo supervisorctl update', 'info');
             message("   sudo supervisorctl start {$workerName}:*", 'info');
         }
     } else {
-        message("❌ No se pudo crear el archivo de configuración.", 'error');
+        message('❌ No se pudo crear el archivo de configuración.', 'error');
         message("   Crea manualmente el archivo {$configFile} con el siguiente contenido:", 'info');
         echo "\n{$configContent}\n";
     }
 } else {
-    message("⚠️  No se tienen permisos para escribir en /etc/supervisor/conf.d/", 'warning');
+    message('⚠️  No se tienen permisos para escribir en /etc/supervisor/conf.d/', 'warning');
     message("   Crea manualmente el archivo {$configFile} con el siguiente contenido:", 'info');
     echo "\n{$configContent}\n";
     message("\n   Luego ejecuta:", 'info');
-    message("   sudo supervisorctl reread", 'info');
-    message("   sudo supervisorctl update", 'info');
+    message('   sudo supervisorctl reread', 'info');
+    message('   sudo supervisorctl update', 'info');
     message("   sudo supervisorctl start {$workerName}:*", 'info');
 }
 
-if (!$isContainer || $canEnable) {
+if (! $isContainer || $canEnable) {
     message("\n📋 Para verificar el estado del worker:", 'info');
     message("   sudo supervisorctl status {$workerName}:*", 'info');
     message("   sudo supervisorctl tail -f {$workerName}:*", 'info');
 }
 
-if ($isContainer && !$canEnable) {
+if ($isContainer && ! $canEnable) {
     message("\n💡 Nota para contenedores:", 'info');
-    message("   Si supervisor está instalado pero no se detecta durante el build,", 'info');
-    message("   el servicio se iniciará automáticamente cuando el contenedor arranque.", 'info');
+    message('   Si supervisor está instalado pero no se detecta durante el build,', 'info');
+    message('   el servicio se iniciará automáticamente cuando el contenedor arranque.', 'info');
     message("   Verifica que 'supervisor' esté configurado en los paquetes del sistema de buildpacks.", 'info');
 }

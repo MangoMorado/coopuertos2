@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RolePermissionSeeder extends Seeder
 {
@@ -60,9 +60,8 @@ class RolePermissionSeeder extends Seeder
 
         // Asignar rol Mango al primer usuario si existe
         $firstUser = User::first();
-        if ($firstUser && !$firstUser->hasAnyRole(['Mango', 'Admin', 'User'])) {
+        if ($firstUser && ! $firstUser->hasAnyRole(['Mango', 'Admin', 'User'])) {
             $firstUser->assignRole('Mango');
         }
     }
 }
-

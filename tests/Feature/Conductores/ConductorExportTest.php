@@ -145,11 +145,10 @@ class ConductorExportTest extends TestCase
             'Fecha de Nacimiento',
             'Otra Profesión',
             'Nivel de Estudios',
-            'Relevo',
             'Estado',
         ];
 
         $this->assertEquals($expectedColumns, $headings);
-        $this->assertCount(14, $headings);
+        $this->assertCount(13, $headings);
     }
 }

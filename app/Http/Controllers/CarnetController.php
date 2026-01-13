@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use ZipArchive;
 
 class CarnetController extends Controller
 {
@@ -201,14 +203,37 @@ class CarnetController extends Controller
     {
         $log = CarnetGenerationLog::where('session_id', $sessionId)->first();
 
-        if (! $log || $log->estado !== 'completado' || ! $log->archivo_zip) {
+        if (! $log) {
             return redirect()->route('carnets.index')
-                ->with('error', 'El archivo ZIP no está disponible');
+                ->with('error', 'Sesión no encontrada');
         }
 
-        $filePath = public_path('storage/'.$log->archivo_zip);
+        // Intentar usar la ruta del log si está disponible
+        $filePath = null;
+        if ($log->archivo_zip) {
+            $filePath = public_path('storage/'.$log->archivo_zip);
+        }
 
-        if (! File::exists($filePath)) {
+        // Si no hay ruta en el log o el archivo no existe, intentar construir la ruta esperada
+        if (! $filePath || ! File::exists($filePath)) {
+            $expectedPath = public_path('storage/carnets/carnets_'.$sessionId.'.zip');
+            if (File::exists($expectedPath)) {
+                $filePath = $expectedPath;
+                // Actualizar el log con la ruta correcta si no tenía
+                if (! $log->archivo_zip) {
+                    $log->update(['archivo_zip' => 'carnets/carnets_'.$sessionId.'.zip']);
+                }
+            }
+        }
+
+        if (! $filePath || ! File::exists($filePath)) {
+            Log::warning('ZIP no encontrado para descarga', [
+                'session_id' => $sessionId,
+                'log_archivo_zip' => $log->archivo_zip,
+                'expected_path' => public_path('storage/carnets/carnets_'.$sessionId.'.zip'),
+                'log_estado' => $log->estado,
+            ]);
+
             return redirect()->route('carnets.index')
                 ->with('error', 'El archivo ZIP no se encontró');
         }
@@ -242,6 +267,93 @@ class CarnetController extends Controller
 
         return response()->download($filePath, 'carnets_'.date('YmdHis').'.zip')
             ->deleteFileAfterSend(false);
+    }
+
+    /**
+     * Exportar todos los QRs de conductores en un ZIP
+     */
+    public function exportarQRs()
+    {
+        try {
+            // Obtener todos los conductores
+            $conductores = Conductor::all();
+
+            if ($conductores->isEmpty()) {
+                return redirect()->route('carnets.exportar')
+                    ->with('error', 'No hay conductores para exportar QRs.');
+            }
+
+            // Crear directorio temporal para QRs
+            $tempDir = storage_path('app/temp/qrs_'.time());
+            if (! File::exists($tempDir)) {
+                File::makeDirectory($tempDir, 0755, true);
+            }
+
+            $qrGenerados = 0;
+
+            // Generar QR para cada conductor
+            foreach ($conductores as $conductor) {
+                try {
+                    $qrCode = QrCode::size(300)
+                        ->generate(route('conductor.public', $conductor->uuid));
+
+                    // Guardar QR como SVG
+                    $qrFileName = 'qr_'.$conductor->cedula.'_'.$conductor->uuid.'.svg';
+                    $qrPath = $tempDir.'/'.$qrFileName;
+                    File::put($qrPath, $qrCode);
+                    $qrGenerados++;
+                } catch (\Exception $e) {
+                    Log::warning('Error generando QR para conductor: '.$e->getMessage(), [
+                        'conductor_id' => $conductor->id,
+                        'cedula' => $conductor->cedula,
+                    ]);
+                    // Continuar con el siguiente conductor
+                }
+            }
+
+            if ($qrGenerados === 0) {
+                // Limpiar directorio temporal
+                File::deleteDirectory($tempDir);
+
+                return redirect()->route('carnets.exportar')
+                    ->with('error', 'No se pudieron generar QRs.');
+            }
+
+            // Crear ZIP con todos los QRs
+            $zipFileName = 'qrs_conductores_'.date('YmdHis').'.zip';
+            $zipPath = storage_path('app/temp/'.$zipFileName);
+
+            $zip = new ZipArchive;
+            if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                File::deleteDirectory($tempDir);
+
+                return redirect()->route('carnets.exportar')
+                    ->with('error', 'No se pudo crear el archivo ZIP.');
+            }
+
+            // Agregar todos los archivos SVG al ZIP
+            $files = File::files($tempDir);
+            foreach ($files as $file) {
+                $zip->addFile($file->getPathname(), $file->getFilename());
+            }
+
+            $zip->close();
+
+            // Limpiar directorio temporal de QRs
+            File::deleteDirectory($tempDir);
+
+            // Descargar el ZIP y eliminarlo después
+            return response()->download($zipPath, $zipFileName)
+                ->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            Log::error('Error exportando QRs: '.$e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return redirect()->route('carnets.exportar')
+                ->with('error', 'Error al exportar QRs: '.$e->getMessage());
+        }
     }
 
     /**

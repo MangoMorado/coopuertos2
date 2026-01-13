@@ -32,7 +32,6 @@ class ConductoresExport implements FromCollection, WithHeadings, WithMapping
             'Fecha de Nacimiento',
             'Otra Profesión',
             'Nivel de Estudios',
-            'Relevo',
             'Estado',
         ];
     }
@@ -44,7 +43,7 @@ class ConductoresExport implements FromCollection, WithHeadings, WithMapping
     {
         $vehiculo = $conductor->asignacionActiva && $conductor->asignacionActiva->vehicle
             ? $conductor->asignacionActiva->vehicle->placa
-            : ($conductor->vehiculo ?: 'Sin asignar');
+            : ($conductor->vehiculo ?: 'Relevo');
 
         return [
             $conductor->cedula,
@@ -59,7 +58,6 @@ class ConductoresExport implements FromCollection, WithHeadings, WithMapping
             $conductor->fecha_nacimiento ? $conductor->fecha_nacimiento->format('Y-m-d') : '',
             $conductor->otra_profesion,
             $conductor->nivel_estudios,
-            $conductor->relevo ? 'Sí' : 'No',
             $conductor->estado,
         ];
     }

@@ -30,6 +30,16 @@ chmod -R 775 /app/storage /app/bootstrap/cache 2>/dev/null || true
 chmod -R 777 /app/public/uploads 2>/dev/null || true
 chmod -R 777 /app/public/storage 2>/dev/null || true
 
+# Asegurar que app/temp existe y tiene permisos correctos
+TEMP_DIR="/app/storage/app/temp"
+if [ ! -d "$TEMP_DIR" ]; then
+    mkdir -p "$TEMP_DIR" 2>/dev/null || true
+fi
+chmod -R 775 "$TEMP_DIR" 2>/dev/null || true
+if [ "$(id -u)" = "0" ]; then
+    chown -R ${PHP_USER}:${PHP_USER} "$TEMP_DIR" 2>/dev/null || true
+fi
+
 # Asegurar que el directorio de logs tenga permisos correctos
 # Si existe un archivo laravel.log con permisos incorrectos, intentar removerlo
 if [ -f /app/storage/logs/laravel.log ] && [ ! -w /app/storage/logs/laravel.log ]; then

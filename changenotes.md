@@ -1,5 +1,13 @@
 # Coopuertos App
 
+## *v. 0.1.8*
+- Funcionalidad de exportación de QRs: Nuevo botón "Exportar QRs" en /carnets/exportar que genera todos los códigos QR de conductores en formato SVG y los descarga en un archivo ZIP
+- Cambios en exportación de conductores: Eliminada columna "Relevo", cambio de texto "Sin Asignar" a "Relevo" en columna Vehículo cuando no hay vehículo asignado
+- Mejoras en producción: Verificación y configuración de permisos del directorio app/temp en scripts/start.sh para garantizar funcionamiento correcto de exportaciones
+- Optimización de memoria: Aumento de límite de memoria a 512M y timeout a 600s en job FinalizarGeneracionCarnets para procesar lotes grandes de carnets
+- Tests: Nuevo test suite CarnetQrExportTest para validar funcionalidad de exportación de QRs
+- Correcciones de tests: Actualización de mensajes esperados en CarnetDownloadTest para coincidir con mensajes reales del controlador
+
 ## *v. 0.1.7.2*
 - Correción de permisos en producción del log
 - Correción de version de php para github

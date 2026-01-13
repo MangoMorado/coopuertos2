@@ -32,6 +32,10 @@ class FinalizarGeneracionCarnets implements ShouldQueue
      */
     public function handle(): void
     {
+        // Aumentar límites de memoria y tiempo para procesar muchos archivos
+        set_time_limit(600);
+        ini_set('memory_limit', '512M');
+
         $log = CarnetGenerationLog::where('session_id', $this->sessionId)->first();
 
         if (! $log) {

@@ -50,11 +50,12 @@ class ImportLog extends Model
      */
     public function getTiempoTranscurridoAttribute(): int
     {
-        if (!$this->started_at) {
+        if (! $this->started_at) {
             return 0;
         }
 
         $endTime = $this->completed_at ?? now();
+
         return $endTime->diffInSeconds($this->started_at);
     }
 
@@ -70,7 +71,7 @@ class ImportLog extends Model
         $tiempoTranscurrido = $this->tiempo_transcurrido;
         $tiempoPorRegistro = $tiempoTranscurrido / $this->procesados;
         $registrosRestantes = ($this->total ?? $this->procesados) - $this->procesados;
-        
+
         return (int) ($tiempoPorRegistro * $registrosRestantes);
     }
 
@@ -84,10 +85,12 @@ class ImportLog extends Model
         } elseif ($segundos < 3600) {
             $minutos = floor($segundos / 60);
             $seg = $segundos % 60;
+
             return "{$minutos}m {$seg}s";
         } else {
             $horas = floor($segundos / 3600);
             $minutos = floor(($segundos % 3600) / 60);
+
             return "{$horas}h {$minutos}m";
         }
     }

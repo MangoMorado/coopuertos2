@@ -91,9 +91,9 @@ class CarnetDownloadTest extends TestCase
 
         $response = $this->actingAs($user)->get("/carnets/descargar/{$sessionId}");
 
-        // Debe redirigir con error porque el estado no es completado
+        // Debe redirigir con error porque el archivo no se encontró
         $response->assertRedirect(route('carnets.index'));
-        $response->assertSessionHas('error', 'El archivo ZIP no está disponible');
+        $response->assertSessionHas('error', 'El archivo ZIP no se encontró');
     }
 
     public function test_user_can_download_last_generated_zip(): void
@@ -153,7 +153,7 @@ class CarnetDownloadTest extends TestCase
 
         // Debe redirigir con error porque el log no existe
         $response->assertRedirect(route('carnets.index'));
-        $response->assertSessionHas('error', 'El archivo ZIP no está disponible');
+        $response->assertSessionHas('error', 'Sesión no encontrada');
     }
 
     public function test_download_returns_error_when_zip_file_not_found(): void

@@ -20,12 +20,12 @@ return new class extends Migration
             $table->date('fecha_desasignacion')->nullable();
             $table->text('observaciones')->nullable();
             $table->timestamps();
-            
+
             // Nota: La validación de que un conductor solo tenga un vehículo activo
             // se manejará a nivel de aplicación, ya que MySQL no soporta índices únicos parciales
             // de manera directa. Se usará un índice compuesto para búsquedas rápidas.
             $table->index(['conductor_id', 'estado']);
-            
+
             // Índices para búsquedas rápidas
             $table->index('conductor_id');
             $table->index('vehicle_id');

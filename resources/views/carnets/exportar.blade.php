@@ -16,17 +16,26 @@
                     <h3 class="text-lg font-semibold {{ $textTitle }} mb-2">Generar Carnets</h3>
                     <p class="text-sm {{ $textBody }}">Haz clic en el botón para iniciar la generación masiva de carnets para todos los conductores.</p>
                 </div>
-                <form action="{{ route('carnets.generar') }}" method="POST" id="form-generar" class="flex-shrink-0">
-                    @csrf
-                    <button type="submit" 
-                            id="btn-generar"
-                            class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg shadow-md transition flex items-center space-x-2">
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    <form action="{{ route('carnets.generar') }}" method="POST" id="form-generar">
+                        @csrf
+                        <button type="submit" 
+                                id="btn-generar"
+                                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg shadow-md transition flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                            </svg>
+                            <span>Generar Carnets</span>
+                        </button>
+                    </form>
+                    <a href="{{ route('carnets.exportar-qrs') }}" 
+                       class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition flex items-center space-x-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                         </svg>
-                        <span>Generar Carnets</span>
-                    </button>
-                </form>
+                        <span>Exportar QRs</span>
+                    </a>
+                </div>
             </div>
         </div>
 

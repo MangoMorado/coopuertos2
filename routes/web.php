@@ -77,6 +77,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/carnets', [CarnetController::class, 'index'])->name('carnets.index');
     Route::get('/carnets/exportar', [CarnetController::class, 'exportar'])->name('carnets.exportar');
     Route::post('/carnets/generar', [CarnetController::class, 'generar'])->name('carnets.generar');
+    Route::get('/carnets/exportar-qrs', [CarnetController::class, 'exportarQRs'])->name('carnets.exportar-qrs');
     Route::get('/carnets/personalizar', [CarnetController::class, 'personalizar'])->name('carnets.personalizar');
     Route::post('/carnets/guardar-plantilla', [CarnetController::class, 'guardarPlantilla'])->name('carnets.guardar-plantilla');
     Route::get('/carnets/progreso/{sessionId}', [CarnetController::class, 'obtenerProgreso'])->name('carnets.progreso');
