@@ -337,7 +337,8 @@ class CarnetController extends Controller
      * Exporta todos los QRs de conductores en un archivo ZIP
      *
      * Genera códigos QR para todos los conductores (URL pública de cada conductor),
-     * los guarda como archivos SVG en un directorio temporal, crea un ZIP con todos
+     * los guarda como archivos SVG con el nombre del conductor en formato slug
+     * (ej: juanito-perez.svg) en un directorio temporal, crea un ZIP con todos
      * los QRs y lo descarga. El directorio temporal se limpia después de la descarga.
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\RedirectResponse Archivo ZIP o redirección con error
@@ -367,8 +368,9 @@ class CarnetController extends Controller
                     $qrCode = QrCode::size(300)
                         ->generate(route('conductor.public', $conductor->uuid));
 
-                    // Guardar QR como SVG
-                    $qrFileName = 'qr_'.$conductor->cedula.'_'.$conductor->uuid.'.svg';
+                    // Guardar QR como SVG con nombre del conductor en formato slug
+                    $nombreCompleto = trim($conductor->nombres.' '.$conductor->apellidos);
+                    $qrFileName = Str::slug($nombreCompleto).'.svg';
                     $qrPath = $tempDir.'/'.$qrFileName;
                     File::put($qrPath, $qrCode);
                     $qrGenerados++;

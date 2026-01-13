@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.2.2*
+- Exportación de QRs: Cambiado el nombre de los archivos SVG exportados para usar el nombre del conductor en formato slug en lugar de usar cédula y UUID. Actualizado método exportarQRs() en CarnetController para generar nombres más legibles usando Str::slug() con nombres y apellidos del conductor
+
 ## *v. 0.2.1*
 - Corrección de tipos de retorno en modelo Conductor: Agregados imports necesarios para relaciones de Eloquent (HasOne, HasMany, BelongsToMany) que causaban errores de tipo en PHP 8.4. Todos los tests ahora pasan correctamente
 
