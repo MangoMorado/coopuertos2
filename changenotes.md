@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.2.3.5*
+- MCP Fix
+
 ## *v. 0.2.3.4*
 - Corrección JsonSchema: Eliminados métodos `minimum()` y `maximum()` de schemas en `ObtenerLogsImportacion`, `ObtenerLogsLaravel` y `ObtenerLogsGeneracionCarnets` ya que no existen en la API de JsonSchema de Laravel. La validación de límites se mantiene en las reglas de validación del método `handle()`. Corrección autenticación Sanctum: Actualizado middleware `McpAuthenticate` para autenticar correctamente tokens Bearer usando `PersonalAccessToken::findToken()` en lugar de verificación manual
 

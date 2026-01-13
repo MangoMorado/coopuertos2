@@ -138,7 +138,6 @@ class ObtenerLogsLaravel extends Tool
                 ->enum(['debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency'])
                 ->description('Filtrar por nivel de log'),
             'search' => $schema->string()
-                ->maxLength(200)
                 ->description('Buscar texto en los logs'),
             'limit' => $schema->integer()
                 ->default(100)
