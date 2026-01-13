@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.1.7.1*
+- Comando php artisan new-mango ahora registra usuarios
+
 ## *v. 0.1.7*
 - Tests nuevos a la suite de test de PHPUnit: Dashboard (web/API), Usuarios, Configuración, API REST (health, rate limiting, validación, respuestas), Servicios (HealthCheckService, StorageHelper), Modelos (Conductor, Vehicle, User, Propietario). Consolidación y resumen del plan de tests.
 - GitHub Actions CI: workflow automatizado para ejecutar tests PHPUnit y Laravel Pint en push/PR
