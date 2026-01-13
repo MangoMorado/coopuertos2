@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.2.1*
+- Corrección de tipos de retorno en modelo Conductor: Agregados imports necesarios para relaciones de Eloquent (HasOne, HasMany, BelongsToMany) que causaban errores de tipo en PHP 8.4. Todos los tests ahora pasan correctamente
+
 ## *v. 0.2*
 - Implementación de documentación PHPDoc: Documentación PHPDoc completa en servicios de importación, servicios de carnets, jobs en cola, controladores API, controladores web, modelos y relaciones, helpers y utilidades, y sistema de generación de documentación HTML. Instalado phpDocumentor/shim, comando Artisan `docs:generate`, controlador DocumentacionController, item "Documentación" en navbar (solo rol Mango), integración en start.sh con generación automática y configuración de permisos
 
