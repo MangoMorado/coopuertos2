@@ -204,7 +204,7 @@
                 @endcan
 
                 {{-- API (Documentación) - Solo Mango --}}
-                @if(auth()->user()->hasRole('Mango'))
+                @if(auth()->check() && auth()->user()->hasRole('Mango'))
                 <x-sidebar-nav-link 
                     :href="url('/api/documentation')" 
                     :active="false"

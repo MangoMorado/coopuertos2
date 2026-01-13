@@ -79,6 +79,4 @@ Fase 8: MCP y Herramientas de IA
 ---
 
 Cambios Pendientes:
-- ✅ Corregir exportación de excel de relevos
-- ✅ Crear funcion que exporte solo QR
 - ✅ Reivsar la vista publica

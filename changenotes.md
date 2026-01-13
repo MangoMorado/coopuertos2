@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.1.8.1*
+- Corrección de error en navigation.blade.php: Agregada verificación de autenticación antes de llamar a hasRole() para prevenir errores en rutas públicas donde auth()->user() puede ser null
+
 ## *v. 0.1.8*
 - Funcionalidad de exportación de QRs: Nuevo botón "Exportar QRs" en /carnets/exportar que genera todos los códigos QR de conductores en formato SVG y los descarga en un archivo ZIP
 - Cambios en exportación de conductores: Eliminada columna "Relevo", cambio de texto "Sin Asignar" a "Relevo" en columna Vehículo cuando no hay vehículo asignado
