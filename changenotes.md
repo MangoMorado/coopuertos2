@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.2.3.1*
+- Corrección middleware MCP: Actualizado `McpAuthenticate` para permitir peticiones de descubrimiento inicial sin autenticación (`initialize`, `tools/list`, `prompts/list`, `resources/list`). Esto permite que clientes MCP como n8n puedan conectarse y descubrir las capacidades del servidor antes de autenticarse.
+
 ## *v. 0.2.3*
 - Implementación completa MCP: Servidor MCP configurado con autenticación Sanctum, 28 herramientas (búsqueda, CRUD, carnets, monitoreo, super poderes), 5 prompts interactivos, 5 recursos de documentación. Total: 37 capacidades MCP.
 - Suite de pruebas MCP: Suite completa de tests: 55 tests (92 assertions) cubriendo todas las funcionalidades 

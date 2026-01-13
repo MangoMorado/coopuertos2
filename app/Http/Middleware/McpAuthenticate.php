@@ -10,7 +10,8 @@ use Symfony\Component\HttpFoundation\Response;
 /**
  * Middleware personalizado para autenticación MCP
  *
- * Permite la herramienta `iniciar_sesion` sin autenticación.
+ * Permite métodos de descubrimiento inicial (initialize, tools/list, prompts/list, resources/list)
+ * y la herramienta `iniciar_sesion` sin autenticación.
  * Para todas las demás herramientas, requiere autenticación con Sanctum.
  */
 class McpAuthenticate
@@ -27,6 +28,20 @@ class McpAuthenticate
             // Intentar decodificar el body JSON-RPC
             $body = $request->getContent();
             $data = json_decode($body, true);
+
+            // Métodos MCP permitidos sin autenticación (descubrimiento inicial)
+            $allowedMethods = [
+                'initialize',
+                'tools/list',
+                'prompts/list',
+                'resources/list',
+            ];
+
+            // Verificar si es un método de descubrimiento permitido
+            if (isset($data['method']) && in_array($data['method'], $allowedMethods, true)) {
+                // Permitir acceso sin autenticación para métodos de descubrimiento
+                return $next($request);
+            }
 
             // Verificar si es una invocación de herramienta para `iniciar_sesion`
             if (
