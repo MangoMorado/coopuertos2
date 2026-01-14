@@ -3,65 +3,70 @@
 Roadmap de mejoras y nuevas funcionalidades para el sistema Coopuertos.
 
 ---
+## v.0.2.x - Alpha tecnica
 
-Fase 1: CRUDS Basicos
-  - ✅ Conductores
-  - ✅ Propietarios
-  - ✅ Vehiculos
-  - ✅ Módulo CRUD de usuarios con gestión de roles (Admin: solo User, Mango: User/Admin/Mango), integrado en navbar y configuración
-  - ✅ Sistema de roles y permisos (Mango/Admin/User) con permisos granulares por módulo, vista de configuración para Mango y navbar dinámico según permisos
-  - ✅ Importación masiva de conductores desde Excel/CSV con procesamiento en segundo plano, validación de datos, manejo de errores/duplicados, descarga de fotos desde Google Drive y seguimiento de progreso en tiempo real
+Se implementaron los módulos CRUD para conductores, propietarios y vehículos, junto con el módulo CRUD de usuarios con gestión de roles donde Admin puede crear solo usuarios tipo User, mientras que Mango puede crear User, Admin y Mango, integrado en navbar y configuración. Se implementó un sistema de roles y permisos con tres niveles (Mango, Admin, User) con permisos granulares por módulo, incluyendo vista de configuración para Mango y navbar dinámico según permisos del usuario.
 
-Fase 2: Carnets
-  - ✅ Generador de QR
-  - ✅ Generador de Carnet Masivos
-  - ✅ Diseñador web de Carnets
-  - ✅ Si placa es No Asignado mostrar Relevo
-  - ✅ Implementar Jobs en cola para generación de carnets masivos
-  - ✅ Laravel Boost configurado e integrado con Cursor
-  - ✅ Supervisor para gestión automatica de workers en producción
-  - ✅ Configuración de instalaccion de Imagick en producción
+Se agregó importación masiva de conductores desde Excel/CSV con procesamiento en segundo plano, validación de datos, manejo de errores y duplicados, descarga de fotos desde Google Drive y seguimiento de progreso en tiempo real.
 
-Fase 3: UI/UX
-  - ✅ UI: Problemas con la barra lateral
-  - ✅ UI: Mejorar el tema oscuro - Refactorizado para usar dark: de Tailwind, cambio sin recargar, toggle en sidebar
-  - ✅ UI: Logo del navbar se recarga mucho, "usar alguina tecnica para optimizar"
-  - ✅ Mejoras de UI/UX
+Se implementó generador de códigos QR, generador de carnets masivos, diseñador web de carnets con capacidad de personalización visual, y funcionalidad para mostrar Relevo cuando la placa es No Asignado. Se implementaron Jobs en cola para generación de carnets masivos, se configuró Laravel Boost e integró con Cursor, Supervisor para gestión automática de workers en producción y configuración para instalación de Imagick en producción.
 
-Fase 4: Dashboard
-  - ✅ Nuevos Widgets / Estadisticas de los CRUDs (numero de vehiculos, conductores) - Parcialmente implementado (solo conductores)
-  - ✅ Acciones rapidas (Descargar Carnets)
-  - ✅ Exportación de datos
+Se resolvieron problemas con la barra lateral, se mejoró el tema oscuro refactorizando para usar dark: de Tailwind con cambio sin recargar y toggle en sidebar, se optimizó el logo del navbar para evitar recargas excesivas y se realizaron mejoras generales de UI/UX. Se agregaron nuevos widgets y estadísticas de los CRUDs mostrando número de vehículos y conductores, parcialmente implementado con solo conductores, acciones rápidas como descargar carnets y funcionalidad de exportación de datos.
 
-Fase 5: API
-  - API REST completa
-    - ✅ Documentación con Swagger/OpenAPI
-    - ✅ Autenticación por tokens (Sanctum)
-    - ✅ Endpoints CRUD para todos los recursos
-    - ✅ Rate limiting y throttling
-    - ✅ Versionado de API
-    - ✅ Colección de postman
+Se desarrolló API REST completa con documentación usando Swagger/OpenAPI, autenticación por tokens mediante Sanctum, endpoints CRUD para todos los recursos, rate limiting y throttling, versionado de API en v1, y colección de Postman para pruebas.
 
-Fase 6: SuperAdmin / Mango
-  - ✅ Paneles de confgiuración global de permisos
-  - ✅ Paneles de salud de la App
-  - ✅ Resultados de los test
+Se implementaron paneles de configuración global de permisos, paneles de salud de la aplicación y visualización de resultados de los tests. Se optimizaron consultas a base de datos para mejorar rendimiento, se desarrolló suite completa de tests, se refactorizaron archivos muy grandes con más de mil líneas, se documentó el código agregando PHPDoc a métodos complejos y se creó documentación técnica del sistema.
 
-Fase 7: Tests y Performance
-  - ✅ Optimizar consultas a base de datos
-  - ✅ Suite de tests
-  - ✅ Refactorizar archivos muy grandes (mas de mil lineas)
-  - ✅ Documentación de código
-    - ✅ Agregar PHPDoc a métodos complejos
-    - ✅ Crear documentación técnica del sistema
+Se configuró servidor MCP (CoopuertosServer) en ruta /mcp/coopuertos con autenticación Sanctum, se implementaron 28 herramientas incluyendo búsqueda, CRUD completo para conductores, vehículos y propietarios, gestión de carnets individual y masivo, utilidades, monitoreo y funciones avanzadas, se crearon 5 prompts con guías interactivas para reportes, importación, permisos, troubleshooting y tutorial de la aplicación, y se configuraron 5 recursos incluyendo documentación del proyecto, roadmap, documentación MCP, guía de integración y ejemplos de uso, totalizando 37 capacidades MCP implementadas.
 
-Fase 8: MCP y Herramientas de IA
-  - ✅ **Servidor MCP**: Configurado (CoopuertosServer) en `/mcp/coopuertos` con autenticación Sanctum
-  - ✅ **Herramientas (28)**: Búsqueda, CRUD completo (conductores, vehículos, propietarios), gestión de carnets (individual/masivo), utilidades, monitoreo y super poderes
-  - ✅ **Prompts (5)**: Guías interactivas para reportes, importación, permisos, troubleshooting y tutorial de la app
-  - ✅ **Recursos (5)**: Documentación del proyecto, roadmap, documentación MCP, guía de integración y ejemplos de uso
-  - ✅ **Total**: 37 capacidades MCP implementadas (28 herramientas + 5 prompts + 5 recursos - 1 duplicado)
+## v.0.3.x - Beta
+
+Correcciones según informe de testing organizadas en fases:
+
+### Fase 1: Errores críticos y seguridad (Prioridad Alta)
+
+**Carnets - Error crítico de permisos**
+- Corregir error de escritura en directorio `/app/public/uploads/carnets` al subir fondos de carnet. Verificar permisos de escritura y configuración de rutas.
+
+**Autenticación - Correo de restablecimiento**
+- Corregir envío de correos de recuperación de contraseña que no llegan al usuario. Revisar configuración de mail y cola de trabajos.
+
+**Seguridad - Control de acceso a documentación API**
+- Restringir acceso a `/api/documentation` exclusivamente para usuarios con rol Superadmin (Mango). Actualmente permite acceso a Admin y User.
+
+**Seguridad - Validación de descarga pública de carnet**
+- Revisar y validar si la opción de descargar carnet en vista pública sin autenticación es intencional o requiere restricción por seguridad.
+
+### Fase 2: Validaciones y mejoras funcionales
+
+**Autenticación - Traducciones**
+- Traducir al español mensajes de autenticación: "These credentials do not match our records" y "Please wait before retrying" en restablecimiento de contraseña.
+
+**Autenticación - Expiración de sesión**
+- Implementar correcta expiración automática de sesiones. Validar que las sesiones del día anterior se cierren automáticamente.
+
+**Conductores - Cambio de estado**
+- Permitir cambiar estado de conductor (Activo/Inactivo) sin requerir correo electrónico obligatorio cuando el conductor no tiene correo.
+
+**Vehículos - Validaciones**
+- Implementar límite máximo de capacidad de pasajeros (sugerencia: 80 pasajeros).
+- Validar que fecha de revisión técnica no permita fechas futuras.
+- Mejorar validación de año de fabricación con rango configurable o límites dinámicos mínimo/máximo.
+- Corregir reflejo de cambio de estado de vehículos en el dashboard.
+
+**Propietarios - Validaciones**
+- Restringir campo teléfono para aceptar solo números.
+- Restringir campo identificación para aceptar solo números.
+
+### Fase 3: Mejoras de UI/UX
+
+**Interfaz - Vista de usuario**
+- Retirar la opción de "usuario" del menú para usuarios con rol User.
+
+**Conductores - Visualización**
+- Mostrar estado del conductor (Activo/Inactivo) directamente en la tabla/listado de conductores, no solo al ingresar al registro.
+
+**Carnets - Ajuste de diseño**
+- Ajustar tamaño del carnet en vista pública para que sea proporcional al tamaño de la página.
 
 ---
-
-Cambios Pendientes:

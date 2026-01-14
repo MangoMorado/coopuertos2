@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.2.3.6*
+- Prompt del sistema MCP y API: Creado archivo `System_prompt.md` y `System_prompt_API.md` con prompt completo del sistema para el agente MCP y API de Coopuertos. Incluye personalidad amable en español, lista completa de 28 herramientas organizadas por categorías (autenticación, búsqueda, CRUD, carnets, monitoreo, super poderes), 5 prompts y 5 recursos disponibles, flujos de trabajo comunes y buenas prácticas
+- Ultimo commit de la fase Alpha tecnica, se documento en [roadmap.md](roadmap.md) la fase y el inicio de la siguiente, la fase Beta, se resumio el documento y se cambio la estructura
+
 ## *v. 0.2.3.5*
 - MCP Fix
 
