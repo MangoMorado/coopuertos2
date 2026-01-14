@@ -35,38 +35,30 @@ Correcciones según informe de testing organizadas en fases:
 - ✅ Restringir acceso a `/api/documentation` exclusivamente para usuarios con rol Superadmin (Mango). Actualmente permite acceso a Admin y User.
 
 **Plantilla  Carnet - Actualizar la plantilla de carnets**
-- Revisar espaciado, actualizar el seeder, agregar tipo de sangre al carnet.
+- ✅ Revisar espaciado, actualizar el seeder, agregar tipo de sangre al carnet.
 
 ### Fase 2: Validaciones y mejoras funcionales
 
 **Autenticación - Traducciones**
-- Traducir al español mensajes de autenticación: "These credentials do not match our records" y "Please wait before retrying" en restablecimiento de contraseña.
-
-**Autenticación - Expiración de sesión**
-- Implementar correcta expiración automática de sesiones. Validar que las sesiones del día anterior se cierren automáticamente.
+- ✅ Traducir al español mensajes de autenticación: "These credentials do not match our records" y "Please wait before retrying" en restablecimiento de contraseña.
 
 **Conductores - Cambio de estado**
-- Permitir cambiar estado de conductor (Activo/Inactivo) sin requerir correo electrónico obligatorio cuando el conductor no tiene correo.
+- ✅ Permitir cambiar estado de conductor (Activo/Inactivo) sin requerir correo electrónico obligatorio cuando el conductor no tiene correo.
 
 **Vehículos - Validaciones**
-- Implementar límite máximo de capacidad de pasajeros (sugerencia: 80 pasajeros).
-- Validar que fecha de revisión técnica no permita fechas futuras.
-- Mejorar validación de año de fabricación con rango configurable o límites dinámicos mínimo/máximo.
-- Corregir reflejo de cambio de estado de vehículos en el dashboard.
+- ✅ Implementar límite máximo de capacidad de pasajeros (sugerencia: 80 pasajeros).
+- ✅ Validar que fecha de revisión técnica no permita fechas futuras.
+- ✅ Mejorar validación de año de fabricación con rango configurable o límites dinámicos mínimo/máximo.
+- ✅ Corregir reflejo de cambio de estado de vehículos en el dashboard.
 
 **Propietarios - Validaciones**
-- Restringir campo teléfono para aceptar solo números.
-- Restringir campo identificación para aceptar solo números.
+- ✅ Restringir campo teléfono para aceptar solo números.
+- ✅ Restringir campo identificación para aceptar solo números.
 
 ### Fase 3: Mejoras de UI/UX
 
-**Interfaz - Vista de usuario**
-- Retirar la opción de "usuario" del menú para usuarios con rol User.
-
-**Conductores - Visualización**
-- Mostrar estado del conductor (Activo/Inactivo) directamente en la tabla/listado de conductores, no solo al ingresar al registro.
-
 **Carnets - Ajuste de diseño**
-- Ajustar tamaño del carnet en vista pública para que sea proporcional al tamaño de la página.
+- ✅ Ajustar tamaño del carnet en vista pública para que sea proporcional al tamaño de la página.
+- ✅ En caso de no estar loggueado el usuario debe no aparecer el navbar
 
 ---

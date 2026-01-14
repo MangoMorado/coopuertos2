@@ -32,7 +32,15 @@ class UpdateConductorRequest extends FormRequest
             'rh' => ['required', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
             'numero_interno' => ['nullable', 'string', 'max:50'],
             'celular' => ['nullable', 'string', 'max:20'],
-            'correo' => ['nullable', 'email', 'max:255'],
+            'correo' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if (! empty($value) && $value !== 'No tiene' && ! filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        $fail('El campo :attribute debe ser una dirección de correo válida.');
+                    }
+                },
+                'max:255',
+            ],
             'fecha_nacimiento' => ['nullable', 'date'],
             'otra_profesion' => ['nullable', 'string', 'max:255'],
             'nivel_estudios' => ['nullable', 'string', 'max:255'],

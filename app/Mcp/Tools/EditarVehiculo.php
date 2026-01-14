@@ -40,21 +40,44 @@ class EditarVehiculo extends Tool
             );
         }
 
+        $currentYear = now()->year;
+        $minYear = 1990; // Año mínimo configurable
+
         $validated = $request->validate([
             'tipo' => ['sometimes', 'required', 'in:Bus,Camioneta,Taxi'],
             'marca' => ['sometimes', 'required', 'string', 'max:255'],
             'modelo' => ['sometimes', 'required', 'string', 'max:255'],
-            'anio_fabricacion' => ['sometimes', 'required', 'integer', 'min:1900', 'max:'.now()->year],
+            'anio_fabricacion' => [
+                'sometimes',
+                'required',
+                'integer',
+                'min:'.$minYear,
+                'max:'.$currentYear,
+            ],
             'placa' => ['sometimes', 'required', 'string', 'max:20', 'unique:vehicles,placa,'.$vehiculo->id.',id'],
             'chasis_vin' => ['nullable', 'string', 'max:255'],
-            'capacidad_pasajeros' => ['nullable', 'integer', 'min:0'],
+            'capacidad_pasajeros' => [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:80',
+            ],
             'capacidad_carga_kg' => ['nullable', 'integer', 'min:0'],
             'combustible' => ['sometimes', 'required', 'in:gasolina,diesel,hibrido,electrico'],
-            'ultima_revision_tecnica' => ['nullable', 'date'],
+            'ultima_revision_tecnica' => [
+                'nullable',
+                'date',
+                'before_or_equal:today',
+            ],
             'estado' => ['sometimes', 'required', 'in:Activo,En Mantenimiento,Fuera de Servicio'],
             'propietario_nombre' => ['sometimes', 'required', 'string', 'max:255'],
             'conductor_id' => ['nullable', 'exists:conductors,id'],
             'foto_base64' => ['nullable', 'string'],
+        ], [
+            'anio_fabricacion.min' => 'El año de fabricación no puede ser menor a '.$minYear.'.',
+            'anio_fabricacion.max' => 'El año de fabricación no puede ser mayor al año actual ('.$currentYear.').',
+            'capacidad_pasajeros.max' => 'La capacidad de pasajeros no puede ser mayor a 80.',
+            'ultima_revision_tecnica.before_or_equal' => 'La fecha de revisión técnica no puede ser una fecha futura.',
         ]);
 
         if (isset($validated['placa'])) {

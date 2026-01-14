@@ -207,10 +207,54 @@ class ConductorImportDataTransformer
     }
 
     /**
+     * Filtra y descarta columnas no deseadas de los headers
+     *
+     * Elimina columnas como "Marca temporal" y "Columna 1" que no deben procesarse.
+     *
+     * @param  array<int, string>  $headers  Headers originales del archivo
+     * @return array{headers: array<int, string>, original_indices: array<int, int>} Headers filtrados y sus índices originales
+     */
+    public function filterUnwantedColumns(array $headers): array
+    {
+        $unwantedColumns = [
+            'MARCA TEMPORAL',
+            'MARCA TEMPORAL ',
+            'COLUMNA 1',
+            'COLUMNA 1 ',
+        ];
+
+        $filteredHeaders = [];
+        $originalIndices = [];
+
+        foreach ($headers as $index => $header) {
+            $headerUpper = strtoupper(trim($header));
+            $shouldDiscard = false;
+
+            foreach ($unwantedColumns as $unwanted) {
+                if ($headerUpper === strtoupper(trim($unwanted))) {
+                    $shouldDiscard = true;
+                    break;
+                }
+            }
+
+            if (! $shouldDiscard) {
+                $filteredHeaders[] = $header;
+                $originalIndices[] = $index;
+            }
+        }
+
+        return [
+            'headers' => $filteredHeaders,
+            'original_indices' => $originalIndices,
+        ];
+    }
+
+    /**
      * Crea un mapeo de campos a índices de columnas basado en los headers del archivo
      *
      * Compara los headers del archivo con el mapeo de columnas estándar y crea un índice
      * que relaciona cada campo con su posición en el array de datos de la fila.
+     * Filtra automáticamente columnas no deseadas como "Marca temporal" y "Columna 1".
      *
      * @param  array<int, string>  $headers  Headers del archivo (array indexado)
      * @param  array<string, string>  $columnMapping  Mapeo de columnas estándar (retornado por getColumnMapping)
@@ -218,13 +262,19 @@ class ConductorImportDataTransformer
      */
     public function createIndexMap(array $headers, array $columnMapping): array
     {
+        // Filtrar columnas no deseadas
+        $filtered = $this->filterUnwantedColumns($headers);
+        $filteredHeaders = $filtered['headers'];
+        $originalIndices = $filtered['original_indices'];
+
         $indexMap = [];
-        $headersUpper = array_map('strtoupper', $headers);
+        $headersUpper = array_map('strtoupper', $filteredHeaders);
 
         foreach ($columnMapping as $header => $field) {
             $index = array_search(strtoupper($header), $headersUpper);
             if ($index !== false) {
-                $indexMap[$field] = $index;
+                // Usar el índice original del header filtrado
+                $indexMap[$field] = $originalIndices[$index];
             }
         }
 

@@ -61,7 +61,14 @@ class ConductorController extends Controller
             'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
             'numero_interno' => 'nullable|string|max:50',
             'celular' => 'nullable|string|max:20',
-            'correo' => 'nullable|email',
+            'correo' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if (! empty($value) && $value !== 'No tiene' && ! filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        $fail('El campo :attribute debe ser una dirección de correo válida.');
+                    }
+                },
+            ],
             'fecha_nacimiento' => 'nullable|date',
             'otra_profesion' => 'nullable|string|max:255',
             'nivel_estudios' => 'nullable|string|max:255',
@@ -263,7 +270,11 @@ class ConductorController extends Controller
             'rh' => 'required|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
             'numero_interno' => 'nullable|string|max:50',
             'celular' => 'nullable|string|max:20',
-            'correo' => 'nullable|email',
+            'correo' => ['nullable', function ($attribute, $value, $fail) {
+                if (! empty($value) && $value !== 'No tiene' && ! filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    $fail('El campo :attribute debe ser una dirección de correo válida.');
+                }
+            }],
             'fecha_nacimiento' => 'nullable|date',
             'otra_profesion' => 'nullable|string|max:255',
             'nivel_estudios' => 'nullable|string|max:255',
@@ -274,8 +285,8 @@ class ConductorController extends Controller
             'estado' => 'required|in:activo,inactivo',
         ]);
 
-        // Si correo está vacío, poner "No tiene"
-        if (empty($validated['correo'])) {
+        // Si correo está vacío o es null, poner "No tiene"
+        if (empty($validated['correo']) || $validated['correo'] === null) {
             $validated['correo'] = 'No tiene';
         }
 

@@ -245,6 +245,68 @@ class ConductorEditTest extends TestCase
         $this->assertEquals('1234567890', $conductor->cedula);
     }
 
+    public function test_user_can_change_conductor_status_without_email_when_conductor_has_no_email(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('Admin');
+
+        $conductor = Conductor::factory()->create([
+            'correo' => 'No tiene',
+            'estado' => 'activo',
+        ]);
+
+        // Cambiar solo el estado sin proporcionar correo
+        $data = [
+            'nombres' => $conductor->nombres,
+            'apellidos' => $conductor->apellidos,
+            'cedula' => $conductor->cedula,
+            'conductor_tipo' => $conductor->conductor_tipo,
+            'rh' => $conductor->rh,
+            'estado' => 'inactivo', // Cambiar estado
+            // No incluir correo
+        ];
+
+        $response = $this->actingAs($user)->patch("/conductores/{$conductor->id}", $data);
+
+        $response->assertRedirect(route('conductores.index'));
+        $response->assertSessionHasNoErrors();
+
+        $conductor->refresh();
+        $this->assertEquals('inactivo', $conductor->estado);
+        $this->assertEquals('No tiene', $conductor->correo);
+    }
+
+    public function test_user_can_change_conductor_status_without_email_when_conductor_email_is_null(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('Admin');
+
+        $conductor = Conductor::factory()->create([
+            'correo' => null,
+            'estado' => 'activo',
+        ]);
+
+        // Cambiar solo el estado sin proporcionar correo
+        $data = [
+            'nombres' => $conductor->nombres,
+            'apellidos' => $conductor->apellidos,
+            'cedula' => $conductor->cedula,
+            'conductor_tipo' => $conductor->conductor_tipo,
+            'rh' => $conductor->rh,
+            'estado' => 'inactivo', // Cambiar estado
+            // No incluir correo
+        ];
+
+        $response = $this->actingAs($user)->patch("/conductores/{$conductor->id}", $data);
+
+        $response->assertRedirect(route('conductores.index'));
+        $response->assertSessionHasNoErrors();
+
+        $conductor->refresh();
+        $this->assertEquals('inactivo', $conductor->estado);
+        $this->assertEquals('No tiene', $conductor->correo);
+    }
+
     public function test_update_conductor_with_empty_email_sets_default_value(): void
     {
         $user = User::factory()->create();

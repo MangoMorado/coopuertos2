@@ -39,13 +39,16 @@ class EditarPropietario extends Tool
 
         $validated = $request->validate([
             'tipo_identificacion' => ['sometimes', 'required', 'in:Cédula de Ciudadanía,RUC/NIT,Pasaporte'],
-            'numero_identificacion' => ['sometimes', 'required', 'string', 'unique:propietarios,numero_identificacion,'.$propietario->id.',id', 'max:50'],
+            'numero_identificacion' => ['sometimes', 'required', 'string', 'unique:propietarios,numero_identificacion,'.$propietario->id.',id', 'max:50', 'regex:/^[0-9]+$/'],
             'nombre_completo' => ['sometimes', 'required', 'string', 'max:255'],
             'tipo_propietario' => ['sometimes', 'required', 'in:Persona Natural,Persona Jurídica'],
             'direccion_contacto' => ['nullable', 'string', 'max:500'],
-            'telefono_contacto' => ['nullable', 'string', 'max:20'],
+            'telefono_contacto' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'correo_electronico' => ['nullable', 'email', 'max:255'],
             'estado' => ['sometimes', 'required', 'in:Activo,Inactivo'],
+        ], [
+            'numero_identificacion.regex' => 'El número de identificación solo puede contener números.',
+            'telefono_contacto.regex' => 'El teléfono de contacto solo puede contener números.',
         ]);
 
         $propietario->update($validated);

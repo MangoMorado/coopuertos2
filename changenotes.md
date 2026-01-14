@@ -1,11 +1,20 @@
 # Coopuertos App
 
+## *v. 0.3.1*
+- Importación: Soporte para estructura extendida con columnas "Marca temporal" y "Columna 1" (descartadas automáticamente).
+- Template de carnet: Actualizado y optimizado para producción con nuevas posiciones y activación de campo RH.
+- Autenticación: Traducciones al español de mensajes de autenticación y restablecimiento de contraseña.
+- Conductores: Permite cambiar estado sin requerir correo cuando el conductor no tiene correo. Validación acepta "No tiene" como valor válido.
+- Vehículos - Validaciones: Límite máximo de capacidad de pasajeros (80). Validación de fecha de revisión técnica (no permite futuras). Año de fabricación con rango configurable (1990 - año actual). Verificado reflejo de cambios de estado en dashboard.
+- Propietarios - Validaciones: Restricción de `numero_identificacion` y `telefono_contacto` para aceptar solo números. Implementado en controladores, Form Requests y herramientas MCP.
+- Permisos - Traducciones: Traducciones al español de mensajes de Spatie Permission. Configurado handler de excepciones para traducir errores 403.
+- Carnets - Mejoras de UI: Tamaño proporcional del carnet en vista pública (max-height: 80vh). Layout condicional que oculta navbar cuando el usuario no está autenticado. Refactorizado a partial para evitar errores de sintaxis.
+
 ## *v. 0.3*
 - Iniciamos Beta 🎉
 - Corrección permisos carnets: Mejorado método `storeImage()` en `CarnetTemplateService` para crear automáticamente directorio padre `public/uploads`, verificar permisos de escritura (0775) y manejar errores con excepciones descriptivas. Actualizados scripts `setup-storage.php` y comando `SetupStorageDirectories` para crear directorio padre. Agregado manejo de errores en `CarnetController::guardarPlantilla()` con logging y mensajes claros al usuario. Nuevo test para verificar creación automática de directorios padre.
 - Seguridad - Restricción de acceso a documentación API: Configurado middleware en `config/l5-swagger.php` para restringir acceso a `/api/documentation` exclusivamente para usuarios con rol Mango (SuperAdmin). Agregados middleware `auth` y `role:Mango` a la ruta de documentación API. Creado test suite `ApiDocumentationAccessTest` con 4 tests que verifican que usuarios no autenticados, Admin y User no pueden acceder, mientras que usuarios con rol Mango sí pueden acceder.
-- CI/CD - Corrección configuración de base de datos en GitHub Actions: Actualizado workflow `.github/workflows/ci.yml` para configurar explícitamente SQLite en lugar de MySQL durante CI. Agregadas variables de entorno `DB_CONNECTION=sqlite` y `DB_DATABASE=:memory:` en el paso de configuración de .env y en el paso de instalación de Composer para prevenir errores de conexión a MySQL cuando se ejecutan scripts que requieren base de datos. Esto previene errores como "Connection refused" cuando scripts de post-install o migraciones intentan conectarse a MySQL sin tenerlo configurado.
-- 
+- CI/CD - Corrección configuración de base de datos en GitHub Actions: Actualizado workflow `.github/workflows/ci.yml` para configurar explícitamente SQLite en lugar de MySQL durante CI. Agregadas variables de entorno `DB_CONNECTION=sqlite` y `DB_DATABASE=:memory:` en el paso de configuración de .env y en el paso de instalación de Composer para prevenir errores de conexión a MySQL cuando se ejecutan scripts que requieren base de datos. Esto previene errores como "Connection refused" cuando scripts de post-install o migraciones intentan conectarse a MySQL sin tenerlo configurado. 
 
 ## *v. 0.2.3.6*
 - Prompt del sistema MCP y API: Creado archivo `System_prompt.md` y `System_prompt_API.md` con prompt completo del sistema para el agente MCP y API de Coopuertos. Incluye personalidad amable en español, lista completa de 28 herramientas organizadas por categorías (autenticación, búsqueda, CRUD, carnets, monitoreo, super poderes), 5 prompts y 5 recursos disponibles, flujos de trabajo comunes y buenas prácticas

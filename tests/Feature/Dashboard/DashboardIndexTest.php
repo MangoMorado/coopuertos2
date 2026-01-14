@@ -373,4 +373,39 @@ class DashboardIndexTest extends TestCase
         $nombres = $proximosCumpleanos->pluck('nombres')->toArray();
         $this->assertEquals(['Dos', 'Cinco', 'Siete'], $nombres);
     }
+
+    public function test_dashboard_reflects_vehicle_status_changes(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('Admin');
+
+        // Crear vehículos con diferentes estados iniciales
+        $vehiculo1 = Vehicle::factory()->create(['estado' => 'Activo']);
+        $vehiculo2 = Vehicle::factory()->create(['estado' => 'En Mantenimiento']);
+        $vehiculo3 = Vehicle::factory()->create(['estado' => 'Fuera de Servicio']);
+
+        // Verificar estado inicial en el dashboard
+        $response1 = $this->actingAs($user)->get('/dashboard');
+        $response1->assertStatus(200);
+        $vehiculosPorEstado1 = $response1->viewData('vehiculosEstadosConPorcentaje');
+        $this->assertEquals(1, $vehiculosPorEstado1['Activo']['total']);
+        $this->assertEquals(1, $vehiculosPorEstado1['En Mantenimiento']['total']);
+        $this->assertEquals(1, $vehiculosPorEstado1['Fuera de Servicio']['total']);
+
+        // Cambiar estado de un vehículo
+        $vehiculo1->update(['estado' => 'Fuera de Servicio']);
+
+        // Verificar que el dashboard refleja el cambio
+        $response2 = $this->actingAs($user)->get('/dashboard');
+        $response2->assertStatus(200);
+        $vehiculosPorEstado2 = $response2->viewData('vehiculosEstadosConPorcentaje');
+        
+        // Verificar que el estado "Activo" ya no tiene vehículos (o no existe en el array)
+        $activosTotal = $vehiculosPorEstado2['Activo']['total'] ?? 0;
+        $this->assertEquals(0, $activosTotal);
+        
+        // Verificar que los otros estados se mantienen correctamente
+        $this->assertEquals(1, $vehiculosPorEstado2['En Mantenimiento']['total']);
+        $this->assertEquals(2, $vehiculosPorEstado2['Fuera de Servicio']['total']);
+    }
 }

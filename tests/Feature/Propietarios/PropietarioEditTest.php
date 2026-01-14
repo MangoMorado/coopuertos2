@@ -179,4 +179,60 @@ class PropietarioEditTest extends TestCase
         $this->assertEquals('Juan Carlos Pérez', $propietario->nombre_completo);
         $this->assertEquals('1234567890', $propietario->numero_identificacion);
     }
+
+    public function test_user_cannot_update_propietario_with_non_numeric_identificacion(): void
+    {
+        $user = User::factory()->create();
+
+        $propietario = Propietario::create([
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => '1234567890',
+            'nombre_completo' => 'Juan Pérez',
+            'tipo_propietario' => 'Persona Natural',
+            'estado' => 'Activo',
+        ]);
+
+        $updateData = [
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => 'ABC123456', // Contiene letras
+            'nombre_completo' => 'Juan Pérez',
+            'tipo_propietario' => 'Persona Natural',
+            'estado' => 'Activo',
+        ];
+
+        $response = $this->actingAs($user)->put("/propietarios/{$propietario->id}", $updateData);
+
+        $response->assertSessionHasErrors(['numero_identificacion']);
+        $propietario->refresh();
+        $this->assertEquals('1234567890', $propietario->numero_identificacion);
+    }
+
+    public function test_user_cannot_update_propietario_with_non_numeric_telefono(): void
+    {
+        $user = User::factory()->create();
+
+        $propietario = Propietario::create([
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => '1234567890',
+            'nombre_completo' => 'Juan Pérez',
+            'tipo_propietario' => 'Persona Natural',
+            'telefono_contacto' => '3001234567',
+            'estado' => 'Activo',
+        ]);
+
+        $updateData = [
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => '1234567890',
+            'nombre_completo' => 'Juan Pérez',
+            'tipo_propietario' => 'Persona Natural',
+            'telefono_contacto' => '+57 300 123 4567', // Contiene espacios y símbolos
+            'estado' => 'Activo',
+        ];
+
+        $response = $this->actingAs($user)->put("/propietarios/{$propietario->id}", $updateData);
+
+        $response->assertSessionHasErrors(['telefono_contacto']);
+        $propietario->refresh();
+        $this->assertEquals('3001234567', $propietario->telefono_contacto);
+    }
 }

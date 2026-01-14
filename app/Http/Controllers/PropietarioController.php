@@ -45,13 +45,16 @@ class PropietarioController extends Controller
     {
         $validated = $request->validate([
             'tipo_identificacion' => 'required|in:Cédula de Ciudadanía,RUC/NIT,Pasaporte',
-            'numero_identificacion' => 'required|string|unique:propietarios,numero_identificacion|max:50',
+            'numero_identificacion' => ['required', 'string', 'unique:propietarios,numero_identificacion', 'max:50', 'regex:/^[0-9]+$/'],
             'nombre_completo' => 'required|string|max:255',
             'tipo_propietario' => 'required|in:Persona Natural,Persona Jurídica',
             'direccion_contacto' => 'nullable|string|max:500',
-            'telefono_contacto' => 'nullable|string|max:20',
+            'telefono_contacto' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'correo_electronico' => 'nullable|email|max:255',
             'estado' => 'required|in:Activo,Inactivo',
+        ], [
+            'numero_identificacion.regex' => 'El número de identificación solo puede contener números.',
+            'telefono_contacto.regex' => 'El teléfono de contacto solo puede contener números.',
         ]);
 
         Propietario::create($validated);
@@ -74,13 +77,16 @@ class PropietarioController extends Controller
     {
         $validated = $request->validate([
             'tipo_identificacion' => 'required|in:Cédula de Ciudadanía,RUC/NIT,Pasaporte',
-            'numero_identificacion' => 'required|string|unique:propietarios,numero_identificacion,'.$propietario->id.',id|max:50',
+            'numero_identificacion' => ['required', 'string', 'unique:propietarios,numero_identificacion,'.$propietario->id.',id', 'max:50', 'regex:/^[0-9]+$/'],
             'nombre_completo' => 'required|string|max:255',
             'tipo_propietario' => 'required|in:Persona Natural,Persona Jurídica',
             'direccion_contacto' => 'nullable|string|max:500',
-            'telefono_contacto' => 'nullable|string|max:20',
+            'telefono_contacto' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
             'correo_electronico' => 'nullable|email|max:255',
             'estado' => 'required|in:Activo,Inactivo',
+        ], [
+            'numero_identificacion.regex' => 'El número de identificación solo puede contener números.',
+            'telefono_contacto.regex' => 'El teléfono de contacto solo puede contener números.',
         ]);
 
         $propietario->update($validated);

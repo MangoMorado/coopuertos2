@@ -196,4 +196,119 @@ class VehicleCreateTest extends TestCase
         $response->assertRedirect(route('vehiculos.index'));
         $response->assertSessionHas('success', 'Vehículo creado correctamente.');
     }
+
+    public function test_user_cannot_create_vehiculo_with_capacity_exceeding_maximum(): void
+    {
+        $user = User::factory()->create();
+
+        $vehiculoData = [
+            'tipo' => 'Bus',
+            'marca' => 'Toyota',
+            'modelo' => 'Corolla',
+            'anio_fabricacion' => 2020,
+            'placa' => 'ABC123',
+            'combustible' => 'diesel',
+            'estado' => 'Activo',
+            'propietario_nombre' => 'Juan Pérez',
+            'capacidad_pasajeros' => 81, // Excede el máximo de 80
+        ];
+
+        $response = $this->actingAs($user)->post('/vehiculos', $vehiculoData);
+
+        $response->assertSessionHasErrors(['capacidad_pasajeros']);
+        $this->assertDatabaseMissing('vehicles', ['placa' => 'ABC123']);
+    }
+
+    public function test_user_cannot_create_vehiculo_with_future_revision_date(): void
+    {
+        $user = User::factory()->create();
+
+        $fechaFutura = now()->addDays(30)->format('Y-m-d');
+
+        $vehiculoData = [
+            'tipo' => 'Bus',
+            'marca' => 'Toyota',
+            'modelo' => 'Corolla',
+            'anio_fabricacion' => 2020,
+            'placa' => 'ABC123',
+            'combustible' => 'diesel',
+            'estado' => 'Activo',
+            'propietario_nombre' => 'Juan Pérez',
+            'ultima_revision_tecnica' => $fechaFutura,
+        ];
+
+        $response = $this->actingAs($user)->post('/vehiculos', $vehiculoData);
+
+        $response->assertSessionHasErrors(['ultima_revision_tecnica']);
+        $this->assertDatabaseMissing('vehicles', ['placa' => 'ABC123']);
+    }
+
+    public function test_user_can_create_vehiculo_with_today_revision_date(): void
+    {
+        $user = User::factory()->create();
+
+        $fechaHoy = now()->format('Y-m-d');
+
+        $vehiculoData = [
+            'tipo' => 'Bus',
+            'marca' => 'Toyota',
+            'modelo' => 'Corolla',
+            'anio_fabricacion' => 2020,
+            'placa' => 'ABC123',
+            'combustible' => 'diesel',
+            'estado' => 'Activo',
+            'propietario_nombre' => 'Juan Pérez',
+            'ultima_revision_tecnica' => $fechaHoy,
+        ];
+
+        $response = $this->actingAs($user)->post('/vehiculos', $vehiculoData);
+
+        $response->assertRedirect(route('vehiculos.index'));
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('vehicles', ['placa' => 'ABC123']);
+    }
+
+    public function test_user_cannot_create_vehiculo_with_year_greater_than_current(): void
+    {
+        $user = User::factory()->create();
+
+        $anioFuturo = now()->year + 1;
+
+        $vehiculoData = [
+            'tipo' => 'Bus',
+            'marca' => 'Toyota',
+            'modelo' => 'Corolla',
+            'anio_fabricacion' => $anioFuturo,
+            'placa' => 'ABC123',
+            'combustible' => 'diesel',
+            'estado' => 'Activo',
+            'propietario_nombre' => 'Juan Pérez',
+        ];
+
+        $response = $this->actingAs($user)->post('/vehiculos', $vehiculoData);
+
+        $response->assertSessionHasErrors(['anio_fabricacion']);
+        $this->assertDatabaseMissing('vehicles', ['placa' => 'ABC123']);
+    }
+
+    public function test_user_cannot_create_vehiculo_with_year_less_than_minimum(): void
+    {
+        $user = User::factory()->create();
+
+        $vehiculoData = [
+            'tipo' => 'Bus',
+            'marca' => 'Toyota',
+            'modelo' => 'Corolla',
+            'anio_fabricacion' => 1989, // Menor al mínimo de 1990
+            'placa' => 'ABC123',
+            'combustible' => 'diesel',
+            'estado' => 'Activo',
+            'propietario_nombre' => 'Juan Pérez',
+        ];
+
+        $response = $this->actingAs($user)->post('/vehiculos', $vehiculoData);
+
+        $response->assertSessionHasErrors(['anio_fabricacion']);
+        $this->assertDatabaseMissing('vehicles', ['placa' => 'ABC123']);
+    }
 }

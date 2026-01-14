@@ -18,11 +18,13 @@ class CarnetTemplateSeeder extends Seeder
         $variablesConfig = [
             'rh' => [
                 'color' => '#000000',
-                'activo' => false,
+                'activo' => true,
                 'centrado' => false,
-                'fontSize' => 14,
+                'fontSize' => '40',
                 'fontStyle' => 'normal',
-                'fontFamily' => 'Arial',
+                'fontFamily' => 'Century Gothic',
+                'x' => 758.09375,
+                'y' => 357,
             ],
             'foto' => [
                 'x' => 2.65625,
@@ -31,8 +33,8 @@ class CarnetTemplateSeeder extends Seeder
                 'activo' => true,
             ],
             'cedula' => [
-                'x' => 455.28125,
-                'y' => 701.25,
+                'x' => 447.84375,
+                'y' => 685.3125,
                 'color' => '#000000',
                 'activo' => true,
                 'centrado' => false,
@@ -65,8 +67,8 @@ class CarnetTemplateSeeder extends Seeder
                 'fontFamily' => 'Arial',
             ],
             'nombres' => [
-                'x' => 453.15625,
-                'y' => 490.875,
+                'x' => 444.65625,
+                'y' => 478.125,
                 'color' => '#000000',
                 'activo' => true,
                 'centrado' => false,
@@ -91,8 +93,8 @@ class CarnetTemplateSeeder extends Seeder
                 'fontFamily' => 'Century Gothic',
             ],
             'apellidos' => [
-                'x' => 454.21875,
-                'y' => 549.3125,
+                'x' => 443.59375,
+                'y' => 538.6875,
                 'color' => '#000000',
                 'activo' => true,
                 'centrado' => false,
@@ -117,8 +119,8 @@ class CarnetTemplateSeeder extends Seeder
                 'fontFamily' => 'Arial',
             ],
             'numero_interno' => [
-                'x' => 414.90625,
-                'y' => 344.25,
+                'x' => 412.78125,
+                'y' => 324.0625,
                 'color' => '#000000',
                 'activo' => true,
                 'centrado' => true,

@@ -439,4 +439,51 @@ class ConductorImportTest extends TestCase
         // Limpiar archivo temporal
         File::delete(storage_path('app/temp_test.csv'));
     }
+
+    public function test_import_discards_unwanted_columns(): void
+    {
+        Queue::fake();
+
+        $user = User::factory()->create();
+        $user->assignRole('Admin');
+
+        // Crear CSV con columnas no deseadas: "Marca temporal" y "Columna 1"
+        $csvData = [
+            [
+                'Marca temporal' => '2024-01-01 10:00:00',
+                'nombres' => 'Juan',
+                'apellidos' => 'Pérez',
+                'CEDULA' => '1234567890',
+                'CONDUCTOR TIPO' => 'A',
+                'RH' => 'O+',
+                'VEHICULO PLACA' => 'ABC123',
+                'NUMERO INTERNO' => '101',
+                'CELULAR' => '3001234567',
+                'CORREO' => 'juan@example.com',
+                'FECHA DE NACIMIENTO' => '1990-01-01',
+                '¿SABE OTRA PROFESIÓN A PARTE DE SER CONDUCTOR?' => 'No',
+                'CARGUE SU FOTO PARA CARNET' => '',
+                'NIVEL DE ESTUDIOS' => 'Bachiller',
+                'Columna 1' => 'valor descartado',
+            ],
+        ];
+
+        $file = $this->createCsvFile($csvData);
+
+        $response = $this->actingAs($user)->post('/conductores/importar', [
+            'archivo' => $file,
+        ]);
+
+        // Verificar que se creó el registro de importación
+        $this->assertDatabaseHas('import_logs', [
+            'user_id' => $user->id,
+            'extension' => 'csv',
+        ]);
+
+        // Verificar que se encoló el job (esto significa que el archivo fue aceptado)
+        Queue::assertPushed(\App\Jobs\ProcesarImportacionConductores::class);
+
+        // Limpiar archivo temporal
+        File::delete(storage_path('app/temp_test.csv'));
+    }
 }

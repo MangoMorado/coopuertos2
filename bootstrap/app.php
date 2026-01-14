@@ -24,5 +24,6 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Las traducciones de Spatie Permission se manejan automáticamente
+        // a través del archivo lang/es/permission.php
     })->create();

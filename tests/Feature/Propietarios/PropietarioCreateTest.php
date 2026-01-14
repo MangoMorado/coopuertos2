@@ -124,7 +124,7 @@ class PropietarioCreateTest extends TestCase
 
         $propietarioData = [
             'tipo_identificacion' => 'RUC/NIT',
-            'numero_identificacion' => '900123456-1',
+            'numero_identificacion' => '9001234561',
             'nombre_completo' => 'Empresa S.A.S',
             'tipo_propietario' => 'Persona Jurídica',
             'direccion_contacto' => 'Calle Principal 123',
@@ -138,7 +138,7 @@ class PropietarioCreateTest extends TestCase
         $response->assertRedirect(route('propietarios.index'));
 
         $this->assertDatabaseHas('propietarios', [
-            'numero_identificacion' => '900123456-1',
+            'numero_identificacion' => '9001234561',
             'nombre_completo' => 'Empresa S.A.S',
             'tipo_identificacion' => 'RUC/NIT',
             'tipo_propietario' => 'Persona Jurídica',
@@ -187,11 +187,11 @@ class PropietarioCreateTest extends TestCase
 
         $propietarioData = [
             'tipo_identificacion' => 'Pasaporte',
-            'numero_identificacion' => 'AB123456',
+            'numero_identificacion' => '123456789',
             'nombre_completo' => 'María González',
             'tipo_propietario' => 'Persona Natural',
             'direccion_contacto' => 'Calle 123 #45-67, Barrio Centro',
-            'telefono_contacto' => '+57 300 123 4567',
+            'telefono_contacto' => '573001234567',
             'correo_electronico' => 'maria.gonzalez@example.com',
             'estado' => 'Inactivo',
         ];
@@ -200,13 +200,73 @@ class PropietarioCreateTest extends TestCase
 
         $response->assertRedirect(route('propietarios.index'));
 
-        $propietario = Propietario::where('numero_identificacion', 'AB123456')->first();
+        $propietario = Propietario::where('numero_identificacion', '123456789')->first();
         $this->assertNotNull($propietario);
         $this->assertEquals('Pasaporte', $propietario->tipo_identificacion);
         $this->assertEquals('María González', $propietario->nombre_completo);
         $this->assertEquals('Calle 123 #45-67, Barrio Centro', $propietario->direccion_contacto);
-        $this->assertEquals('+57 300 123 4567', $propietario->telefono_contacto);
+        $this->assertEquals('573001234567', $propietario->telefono_contacto);
         $this->assertEquals('maria.gonzalez@example.com', $propietario->correo_electronico);
         $this->assertEquals('Inactivo', $propietario->estado);
+    }
+
+    public function test_user_cannot_create_propietario_with_non_numeric_identificacion(): void
+    {
+        $user = User::factory()->create();
+
+        $propietarioData = [
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => 'ABC123456', // Contiene letras
+            'nombre_completo' => 'Juan Pérez',
+            'tipo_propietario' => 'Persona Natural',
+            'estado' => 'Activo',
+        ];
+
+        $response = $this->actingAs($user)->post('/propietarios', $propietarioData);
+
+        $response->assertSessionHasErrors(['numero_identificacion']);
+        $this->assertDatabaseMissing('propietarios', ['numero_identificacion' => 'ABC123456']);
+    }
+
+    public function test_user_cannot_create_propietario_with_non_numeric_telefono(): void
+    {
+        $user = User::factory()->create();
+
+        $propietarioData = [
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => '1234567890',
+            'nombre_completo' => 'Juan Pérez',
+            'tipo_propietario' => 'Persona Natural',
+            'telefono_contacto' => '+57 300 123 4567', // Contiene espacios y símbolos
+            'estado' => 'Activo',
+        ];
+
+        $response = $this->actingAs($user)->post('/propietarios', $propietarioData);
+
+        $response->assertSessionHasErrors(['telefono_contacto']);
+        $this->assertDatabaseMissing('propietarios', ['numero_identificacion' => '1234567890']);
+    }
+
+    public function test_user_can_create_propietario_with_numeric_only_fields(): void
+    {
+        $user = User::factory()->create();
+
+        $propietarioData = [
+            'tipo_identificacion' => 'Cédula de Ciudadanía',
+            'numero_identificacion' => '1234567890',
+            'nombre_completo' => 'Juan Pérez',
+            'tipo_propietario' => 'Persona Natural',
+            'telefono_contacto' => '3001234567',
+            'estado' => 'Activo',
+        ];
+
+        $response = $this->actingAs($user)->post('/propietarios', $propietarioData);
+
+        $response->assertRedirect(route('propietarios.index'));
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('propietarios', [
+            'numero_identificacion' => '1234567890',
+            'telefono_contacto' => '3001234567',
+        ]);
     }
 }
