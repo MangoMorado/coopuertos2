@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.3.2*
+- Carnets - Vista pública: Eliminado botón "Descargar PDF" de la vista pública del conductor (`/conductor/{uuid}`). El botón solo está disponible para usuarios autenticados.
+- Conductores - Tabla índice: Agregada columna "Estado" en la tabla de listado de conductores (`/conductores`) que muestra visualmente si el conductor está activo o inactivo mediante badges con colores (verde para activo, rojo para inactivo). Soporte para modo oscuro incluido.
+
 ## *v. 0.3.1*
 - Importación: Soporte para estructura extendida con columnas "Marca temporal" y "Columna 1" (descartadas automáticamente).
 - Template de carnet: Actualizado y optimizado para producción con nuevas posiciones y activación de campo RH.

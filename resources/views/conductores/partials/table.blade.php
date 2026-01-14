@@ -4,6 +4,7 @@
             <th class="text-left px-4 py-3">Cédula</th>
             <th class="text-left px-4 py-3">Nombre Completo</th>
             <th class="text-left px-4 py-3">Vehiculo</th>
+            <th class="text-center px-4 py-3">Estado</th>
             <th class="text-center px-4 py-3">Acciones</th>
         </tr>
     </thead>
@@ -18,6 +19,14 @@
                     @else
                         <span class="text-gray-500 dark:text-gray-400">Sin asignar</span>
                     @endif
+                </td>
+                <td class="text-center py-3">
+                    <span class="inline-block px-3 py-1 text-xs rounded-full
+                        {{ $c->estado === 'activo' 
+                            ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' 
+                            : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200' }}">
+                        {{ ucfirst($c->estado) }}
+                    </span>
                 </td>
                 <td class="text-center py-3">
                     <div class="flex justify-center space-x-2">
@@ -44,7 +53,7 @@
             </tr>
         @empty
             <tr>
-                <td colspan="4" class="text-center py-6 text-gray-500 dark:text-gray-400">No se encontraron conductores.</td>
+                <td colspan="5" class="text-center py-6 text-gray-500 dark:text-gray-400">No se encontraron conductores.</td>
             </tr>
         @endforelse
     </tbody>

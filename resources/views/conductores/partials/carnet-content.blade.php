@@ -18,8 +18,8 @@
                 </div>
                 
                 <!-- Botones de acción -->
-                <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4">
-                    @if(auth()->check())
+                @if(auth()->check())
+                    <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4">
                         <a href="{{ route('conductores.index') }}" 
                            class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg shadow-md transition flex items-center justify-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
@@ -27,16 +27,16 @@
                             </svg>
                             <span>Regresar</span>
                         </a>
-                    @endif
-                    <a href="{{ route('conductores.carnet.descargar', $conductor->uuid) }}" 
-                       class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition flex items-center justify-center space-x-2"
-                       id="btn-descargar-carnet">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                        </svg>
-                        <span>Descargar PDF</span>
-                    </a>
-                </div>
+                        <a href="{{ route('conductores.carnet.descargar', $conductor->uuid) }}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg shadow-md transition flex items-center justify-center space-x-2"
+                           id="btn-descargar-carnet">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                            </svg>
+                            <span>Descargar PDF</span>
+                        </a>
+                    </div>
+                @endif
             </div>
         @else
             <!-- Vista por defecto si no hay plantilla -->
