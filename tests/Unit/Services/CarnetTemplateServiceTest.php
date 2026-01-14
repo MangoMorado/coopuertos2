@@ -266,4 +266,34 @@ class CarnetTemplateServiceTest extends TestCase
         $this->assertEquals(50, $variablesConfig['foto']['y']);
         $this->assertEquals(150, $variablesConfig['foto']['size']);
     }
+
+    public function test_service_store_image_creates_parent_directory(): void
+    {
+        // Eliminar directorio padre para verificar que se crea automáticamente
+        $uploadsDir = public_path('uploads');
+        $carnetsDir = public_path('uploads/carnets');
+
+        if (File::exists($carnetsDir)) {
+            File::deleteDirectory($carnetsDir);
+        }
+        if (File::exists($uploadsDir)) {
+            File::deleteDirectory($uploadsDir);
+        }
+
+        $image = UploadedFile::fake()->image('template.jpg', 100, 100);
+
+        // El método debe crear tanto uploads como uploads/carnets
+        $ruta = $this->service->storeImage($image);
+
+        $this->assertIsString($ruta);
+        $this->assertStringStartsWith('uploads/carnets/', $ruta);
+
+        // Verificar que ambos directorios fueron creados
+        $this->assertDirectoryExists($uploadsDir);
+        $this->assertDirectoryExists($carnetsDir);
+
+        // Verificar que el archivo existe
+        $rutaCompleta = public_path($ruta);
+        $this->assertFileExists($rutaCompleta);
+    }
 }

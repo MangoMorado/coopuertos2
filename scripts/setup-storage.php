@@ -55,6 +55,7 @@ echo "📁 Configurando directorios de almacenamiento...\n";
 
 // Directorios en public/uploads y public/storage
 $directoriosPublic = [
+    $projectPath.'/public/uploads',
     $projectPath.'/public/uploads/carnets',
     $projectPath.'/public/storage/carnets',
     $projectPath.'/public/storage/carnet_previews',

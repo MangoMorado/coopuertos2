@@ -123,6 +123,15 @@ composer run dev
 - **Roles y Permisos**: Spatie Laravel Permission
 - **Base de datos**: MySQL/PostgreSQL/SQLite
 
+## Patrón Arquitectónico
+El proyecto sigue una **arquitectura orientada a servicios (SOA)** con separación clara de responsabilidades:
+
+## Principios Aplicados
+- **SOLID**: Servicios especializados por responsabilidad
+- **DRY**: Reutilización de código mediante servicios
+- **Separation of Concerns**: Controladores delgados, lógica en servicios
+- **Queue-based Processing**: Jobs para operaciones pesadas
+
 ## 📁 Estructura del Proyecto
 
 ```

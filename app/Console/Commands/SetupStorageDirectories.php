@@ -35,6 +35,7 @@ class SetupStorageDirectories extends Command
             storage_path('framework/sessions'),
             storage_path('framework/views'),
             // Public storage para carnets
+            public_path('uploads'),
             public_path('uploads/carnets'),
             public_path('storage/carnets'),
             public_path('storage/carnet_previews'),

@@ -67,7 +67,7 @@ return [
              * Middleware allows to prevent unexpected access to API documentation
              */
             'middleware' => [
-                'api' => [],
+                'api' => ['auth', 'role:Mango'],
                 'asset' => [],
                 'docs' => [],
                 'oauth2_callback' => [],

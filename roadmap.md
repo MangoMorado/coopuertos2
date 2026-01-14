@@ -26,16 +26,16 @@ Correcciones según informe de testing organizadas en fases:
 ### Fase 1: Errores críticos y seguridad (Prioridad Alta)
 
 **Carnets - Error crítico de permisos**
-- Corregir error de escritura en directorio `/app/public/uploads/carnets` al subir fondos de carnet. Verificar permisos de escritura y configuración de rutas.
+- ✅ Corregir error de escritura en directorio `/app/public/uploads/carnets` al subir fondos de carnet. Verificar permisos de escritura y configuración de rutas.
 
 **Autenticación - Correo de restablecimiento**
 - Corregir envío de correos de recuperación de contraseña que no llegan al usuario. Revisar configuración de mail y cola de trabajos.
 
 **Seguridad - Control de acceso a documentación API**
-- Restringir acceso a `/api/documentation` exclusivamente para usuarios con rol Superadmin (Mango). Actualmente permite acceso a Admin y User.
+- ✅ Restringir acceso a `/api/documentation` exclusivamente para usuarios con rol Superadmin (Mango). Actualmente permite acceso a Admin y User.
 
-**Seguridad - Validación de descarga pública de carnet**
-- Revisar y validar si la opción de descargar carnet en vista pública sin autenticación es intencional o requiere restricción por seguridad.
+**Plantilla  Carnet - Actualizar la plantilla de carnets**
+- Revisar espaciado, actualizar el seeder, agregar tipo de sangre al carnet.
 
 ### Fase 2: Validaciones y mejoras funcionales
 

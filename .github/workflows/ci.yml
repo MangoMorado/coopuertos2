@@ -31,9 +31,17 @@ jobs:
           fi
           echo "APP_KEY=" >> .env
           echo "APP_ENV=testing" >> .env
+          echo "DB_CONNECTION=sqlite" >> .env
+          echo "DB_DATABASE=:memory:" >> .env
+          # Crear archivo SQLite temporal si es necesario para migraciones fuera de tests
+          touch database/database.sqlite || true
 
       - name: Instalar dependencias Composer
         run: composer install --prefer-dist --no-interaction --no-progress
+        env:
+          # Asegurar que Composer no intente ejecutar migraciones que requieran MySQL
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
 
       - name: Generar key de aplicación
         run: php artisan key:generate

@@ -195,7 +195,18 @@ class CarnetController extends Controller
         // Manejo de la imagen si se sube
         $imagenPath = null;
         if ($request->hasFile('imagen_plantilla')) {
-            $imagenPath = $this->templateService->storeImage($request->file('imagen_plantilla'));
+            try {
+                $imagenPath = $this->templateService->storeImage($request->file('imagen_plantilla'));
+            } catch (\RuntimeException $e) {
+                Log::error('Error al guardar imagen de plantilla de carnet: '.$e->getMessage(), [
+                    'error' => $e->getMessage(),
+                    'upload_path' => public_path('uploads/carnets'),
+                ]);
+
+                return redirect()->route('carnets.personalizar')
+                    ->with('error', 'Error al subir la imagen de plantilla: '.$e->getMessage())
+                    ->withInput();
+            }
         } else {
             // Si no se sube nueva imagen, mantener la anterior si existe
             $templateAnterior = CarnetTemplate::latest()->first();

@@ -97,21 +97,79 @@ class CarnetTemplateService
      *
      * Guarda un archivo de imagen de plantilla en el directorio público de uploads/carnets.
      * Genera un nombre único usando UUID para evitar colisiones. Crea el directorio
-     * si no existe.
+     * si no existe y verifica permisos de escritura.
      *
      * @param  \Illuminate\Http\UploadedFile  $file  Archivo de imagen subido
      * @return string Ruta relativa de la imagen almacenada (ej: 'uploads/carnets/uuid.jpg')
+     *
+     * @throws \RuntimeException Si no se puede crear el directorio o no tiene permisos de escritura
      */
     public function storeImage($file): string
     {
         $uploadPath = public_path('uploads/carnets');
+        $uploadsDir = public_path('uploads');
 
-        if (! File::exists($uploadPath)) {
-            File::makeDirectory($uploadPath, 0755, true);
+        // Asegurar que el directorio padre 'uploads' existe
+        if (! File::exists($uploadsDir)) {
+            try {
+                File::makeDirectory($uploadsDir, 0775, true);
+            } catch (\Exception $e) {
+                throw new \RuntimeException(
+                    "No se pudo crear el directorio padre 'uploads': {$e->getMessage()}"
+                );
+            }
         }
 
+        // Crear el directorio 'uploads/carnets' si no existe
+        if (! File::exists($uploadPath)) {
+            try {
+                File::makeDirectory($uploadPath, 0775, true);
+            } catch (\Exception $e) {
+                throw new \RuntimeException(
+                    "No se pudo crear el directorio 'uploads/carnets': {$e->getMessage()}"
+                );
+            }
+        }
+
+        // Verificar permisos de escritura
+        if (! is_writable($uploadPath)) {
+            // Intentar establecer permisos de escritura (solo en sistemas Unix)
+            if (PHP_OS_FAMILY !== 'Windows') {
+                try {
+                    @chmod($uploadPath, 0775);
+                } catch (\Exception $e) {
+                    // Ignorar si no se pueden cambiar permisos
+                }
+            }
+
+            // Verificar nuevamente después de intentar cambiar permisos
+            if (! is_writable($uploadPath)) {
+                throw new \RuntimeException(
+                    "El directorio 'uploads/carnets' no tiene permisos de escritura. ".
+                    "Por favor, verifica los permisos del directorio: {$uploadPath}"
+                );
+            }
+        }
+
+        // Generar nombre único para el archivo
         $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
-        $file->move($uploadPath, $filename);
+        $filePath = $uploadPath.'/'.$filename;
+
+        // Intentar mover el archivo
+        try {
+            $file->move($uploadPath, $filename);
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                "No se pudo guardar la imagen en 'uploads/carnets': {$e->getMessage()}"
+            );
+        }
+
+        // Verificar que el archivo se guardó correctamente
+        if (! File::exists($filePath)) {
+            throw new \RuntimeException(
+                "El archivo no se guardó correctamente en 'uploads/carnets'"
+            );
+        }
 
         return 'uploads/carnets/'.$filename;
     }
