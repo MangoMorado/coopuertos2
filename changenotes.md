@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.3.2.2*
+- Configuración temporal de correos
+
 ## *v. 0.3.2.1*
 - Configuración temporal de correos
 
