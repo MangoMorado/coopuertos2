@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.3.3*
+- Configuración de correos y traducción de "Olvide mi contraseña"
+
 ## *v. 0.3.2.2*
 - Configuración temporal de correos
 
