@@ -399,11 +399,11 @@ class DashboardIndexTest extends TestCase
         $response2 = $this->actingAs($user)->get('/dashboard');
         $response2->assertStatus(200);
         $vehiculosPorEstado2 = $response2->viewData('vehiculosEstadosConPorcentaje');
-        
+
         // Verificar que el estado "Activo" ya no tiene vehículos (o no existe en el array)
         $activosTotal = $vehiculosPorEstado2['Activo']['total'] ?? 0;
         $this->assertEquals(0, $activosTotal);
-        
+
         // Verificar que los otros estados se mantienen correctamente
         $this->assertEquals(1, $vehiculosPorEstado2['En Mantenimiento']['total']);
         $this->assertEquals(2, $vehiculosPorEstado2['Fuera de Servicio']['total']);

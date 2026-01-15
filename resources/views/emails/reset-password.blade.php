@@ -29,17 +29,23 @@
             margin-bottom: 20px;
         }
         .button {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #1e40af;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: #1f2937;
             color: #ffffff;
             text-decoration: none;
-            border-radius: 6px;
+            border: 1px solid transparent;
+            border-radius: 0.375rem;
             font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             margin: 20px 0;
+            transition: background-color 0.15s ease-in-out;
         }
         .button:hover {
-            background-color: #1e3a8a;
+            background-color: #374151;
         }
         .footer {
             text-align: center;
@@ -59,8 +65,8 @@
 </head>
 <body>
     <div class="header">
-        @if(isset($logoUrl))
-            <img src="{{ $logoUrl }}" alt="Coopuertos" style="max-width: 200px; height: auto; margin-bottom: 20px;">
+        @if(isset($logoUrl) && !empty($logoUrl))
+            <img src="{{ $logoUrl }}" alt="Coopuertos" width="200" height="auto" style="max-width: 200px; height: auto; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto; border: 0;">
         @endif
         <h1>Coopuertos</h1>
     </div>
