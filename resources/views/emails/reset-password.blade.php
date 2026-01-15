@@ -77,7 +77,7 @@
         <p>Estás recibiendo este correo porque recibimos una solicitud de restablecimiento de contraseña para tu cuenta.</p>
 
         <div style="text-align: center;">
-            <a href="{{ $url }}" class="button">Restablecer Contraseña</a>
+            <a href="{{ $url }}" class="button" style="display: inline-flex; align-items: center; padding: 0.5rem 1rem; background-color: #1f2937; color: #ffffff !important; text-decoration: none; border: 1px solid transparent; border-radius: 0.375rem; font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 20px 0;">Restablecer Contraseña</a>
         </div>
 
         <p>Este enlace de restablecimiento de contraseña expirará en <strong>60 minutos</strong>.</p>

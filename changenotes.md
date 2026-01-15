@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.3.3.3*
+- Correos - Restablecimiento de contraseña: Mejorado contraste del botón (bg-gray-800 con texto blanco) y corregida URL del logo para mejor compatibilidad con clientes de correo.
+
 ## *v. 0.3.3.2*
 - Correos - Restablecimiento de contraseña: Mejorado contraste del botón (bg-gray-800 con texto blanco) y corregida URL del logo para mejor compatibilidad con clientes de correo.
 

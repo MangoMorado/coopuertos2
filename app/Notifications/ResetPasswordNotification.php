@@ -20,7 +20,7 @@ class ResetPasswordNotification extends BaseResetPasswordNotification
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
-        $logoUrl = rtrim(config('app.url'), '/').'/images/logo.svg';
+        $logoUrl = 'https://app.coopuertos.com/images/logo.svg';
 
         return (new MailMessage)
             ->subject('Restablecer Contraseña - Coopuertos')
