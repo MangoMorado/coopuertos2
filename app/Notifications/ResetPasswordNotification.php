@@ -20,13 +20,10 @@ class ResetPasswordNotification extends BaseResetPasswordNotification
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
-        $logoUrl = 'https://app.coopuertos.com/images/logo.svg';
-
         return (new MailMessage)
             ->subject('Restablecer Contraseña - Coopuertos')
             ->view('emails.reset-password', [
                 'url' => $url,
-                'logoUrl' => $logoUrl,
             ]);
     }
 }

@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.3.3.4*
+- Correos - Restablecimiento de contraseña: Eliminado el logo y actualizacion en los test de correos.
+
 ## *v. 0.3.3.3*
 - Correos - Restablecimiento de contraseña: Mejorado contraste del botón (bg-gray-800 con texto blanco) y corregida URL del logo para mejor compatibilidad con clientes de correo.
 

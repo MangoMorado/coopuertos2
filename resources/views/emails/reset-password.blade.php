@@ -18,9 +18,9 @@
             margin-bottom: 30px;
         }
         .header h1 {
-            color: #1e40af;
+            color: #1f2937;
             margin: 0;
-            font-size: 28px;
+            font-size: 33px;
         }
         .content {
             background-color: #f9fafb;
@@ -65,9 +65,6 @@
 </head>
 <body>
     <div class="header">
-        @if(isset($logoUrl) && !empty($logoUrl))
-            <img src="{{ $logoUrl }}" alt="Coopuertos" width="200" height="auto" style="max-width: 200px; height: auto; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto; border: 0;">
-        @endif
         <h1>Coopuertos</h1>
     </div>
 
