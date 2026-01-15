@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.3.3.4.1*
+- Actualizado el Roadmap y Documentación de la fase beta
+
 ## *v. 0.3.3.4*
 - Correos - Restablecimiento de contraseña: Eliminado el logo y actualizacion en los test de correos.
 
