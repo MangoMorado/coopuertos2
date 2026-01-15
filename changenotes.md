@@ -1,5 +1,8 @@
 # Coopuertos App
 
+## *v. 0.3.2.1*
+- Configuración temporal de correos
+
 ## *v. 0.3.2*
 - Carnets - Vista pública: Eliminado botón "Descargar PDF" de la vista pública del conductor (`/conductor/{uuid}`). El botón solo está disponible para usuarios autenticados.
 - Conductores - Tabla índice: Agregada columna "Estado" en la tabla de listado de conductores (`/conductores`) que muestra visualmente si el conductor está activo o inactivo mediante badges con colores (verde para activo, rojo para inactivo). Soporte para modo oscuro incluido.
