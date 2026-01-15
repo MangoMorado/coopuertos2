@@ -59,6 +59,9 @@
 </head>
 <body>
     <div class="header">
+        @if(isset($logoUrl))
+            <img src="{{ $logoUrl }}" alt="Coopuertos" style="max-width: 200px; height: auto; margin-bottom: 20px;">
+        @endif
         <h1>Coopuertos</h1>
     </div>
 

@@ -21,44 +21,6 @@ Se configuró servidor MCP (CoopuertosServer) en ruta /mcp/coopuertos con autent
 
 ## v.0.3.x - Beta
 
-Correcciones según informe de testing organizadas en fases:
-
-### Fase 1: Errores críticos y seguridad (Prioridad Alta)
-
-**Carnets - Error crítico de permisos**
-- ✅ Corregir error de escritura en directorio `/app/public/uploads/carnets` al subir fondos de carnet. Verificar permisos de escritura y configuración de rutas.
-
-**Autenticación - Correo de restablecimiento**
-- Corregir envío de correos de recuperación de contraseña que no llegan al usuario. Revisar configuración de mail y cola de trabajos.
-
-**Seguridad - Control de acceso a documentación API**
-- ✅ Restringir acceso a `/api/documentation` exclusivamente para usuarios con rol Superadmin (Mango). Actualmente permite acceso a Admin y User.
-
-**Plantilla  Carnet - Actualizar la plantilla de carnets**
-- ✅ Revisar espaciado, actualizar el seeder, agregar tipo de sangre al carnet.
-
-### Fase 2: Validaciones y mejoras funcionales
-
-**Autenticación - Traducciones**
-- ✅ Traducir al español mensajes de autenticación: "These credentials do not match our records" y "Please wait before retrying" en restablecimiento de contraseña.
-
-**Conductores - Cambio de estado**
-- ✅ Permitir cambiar estado de conductor (Activo/Inactivo) sin requerir correo electrónico obligatorio cuando el conductor no tiene correo.
-
-**Vehículos - Validaciones**
-- ✅ Implementar límite máximo de capacidad de pasajeros (sugerencia: 80 pasajeros).
-- ✅ Validar que fecha de revisión técnica no permita fechas futuras.
-- ✅ Mejorar validación de año de fabricación con rango configurable o límites dinámicos mínimo/máximo.
-- ✅ Corregir reflejo de cambio de estado de vehículos en el dashboard.
-
-**Propietarios - Validaciones**
-- ✅ Restringir campo teléfono para aceptar solo números.
-- ✅ Restringir campo identificación para aceptar solo números.
-
-### Fase 3: Mejoras de UI/UX
-
-**Carnets - Ajuste de diseño**
-- ✅ Ajustar tamaño del carnet en vista pública para que sea proporcional al tamaño de la página.
-- ✅ En caso de no estar loggueado el usuario debe no aparecer el navbar
+Se corrigieron errores críticos de permisos en carnets mejorando la creación automática de directorios y manejo de errores. Se configuró sistema de correos con Poste.io mediante SMTP, creando notificación personalizada `ResetPasswordNotification` con mensajes en español y logo. Se restringió acceso a documentación API solo para rol Mango con tests de verificación. Se implementaron traducciones completas al español para autenticación y permisos. Se actualizó plantilla de carnets con campo RH activado. Se corrigió configuración de CI para usar SQLite. Se mejoraron validaciones: conductores permiten cambio de estado sin correo obligatorio; vehículos con límite de capacidad (80), validación de fechas y año configurable (1990-actual); propietarios con campos numéricos restringidos. Se realizaron mejoras de UI/UX: carnet proporcional en vista pública, navbar condicional, botón PDF solo para autenticados, columna "Estado" con badges de colores y soporte para estructura extendida en importación.
 
 ---

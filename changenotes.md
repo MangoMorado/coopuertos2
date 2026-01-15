@@ -1,5 +1,9 @@
 # Coopuertos App
 
+## *v. 0.3.3.1*
+- Correción del logo en restablecer contraseña
+- Roadmap actualizado
+
 ## *v. 0.3.3*
 - Configuración de correos y traducción de "Olvide mi contraseña"
 

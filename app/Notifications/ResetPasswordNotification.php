@@ -24,12 +24,9 @@ class ResetPasswordNotification extends BaseResetPasswordNotification
 
         return (new MailMessage)
             ->subject('Restablecer Contraseña - Coopuertos')
-            ->logo($logoUrl)
-            ->greeting('¡Hola!')
-            ->line('Estás recibiendo este correo porque recibimos una solicitud de restablecimiento de contraseña para tu cuenta.')
-            ->action('Restablecer Contraseña', $url)
-            ->line('Este enlace de restablecimiento de contraseña expirará en 60 minutos.')
-            ->line('Si no solicitaste un restablecimiento de contraseña, no se requiere ninguna acción adicional.')
-            ->salutation('Saludos, Coopuertos');
+            ->view('emails.reset-password', [
+                'url' => $url,
+                'logoUrl' => $logoUrl,
+            ]);
     }
 }
